@@ -1,0 +1,19 @@
+# Per-machine play progress (the game recreates this directory as needed)
+/data/saves/*.json
+/data/saves/*.tmp
+
+# Temporary renders and local build/test output
+/tmp/
+/node_modules/
+/dist/
+/coverage/
+*.log
+*.tmp
+
+# Local environment and OS metadata
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+Desktop.ini

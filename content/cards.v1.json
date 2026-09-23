@@ -1,0 +1,231 @@
+{
+  "version": "1.1.0",
+  "source": "黄金驿道桌游.pdf; digital effects normalized by docs/RULEBOOK_V1.md",
+  "rules": {
+    "marketTacticCopiesEach": 1,
+    "blackMarketTacticCopiesEach": 2,
+    "marketEquipmentCopiesEach": 1,
+    "eventCopiesEach": 1,
+    "marketDisplayCount": 3,
+    "blackMarketBlindPrice": 3
+  },
+  "cards": [
+    {
+      "id": "T_STEAL_CARD", "name": "窃钩偷卡", "kind": "tactic", "pdfPage": 3,
+      "marketPrice": 3, "timing": "ownAction", "target": "characterWithin1", "duration": "instant",
+      "effectId": "stealRandomHandCardAndBanHub2Turns",
+      "text": "随机取得同格或相邻角色的1张功能牌；随后两次自己的回合不得进入二十二驿站。"
+    },
+    {
+      "id": "T_NIGHT_ESCAPE", "name": "暗夜遁形", "kind": "tactic", "pdfPage": 4,
+      "marketPrice": 3, "timing": "ownAction", "target": "self", "duration": "turn",
+      "effectId": "freeMove1AndUntargetable",
+      "text": "免费移动最多1格；至本回合结束不能成为功能牌、稽查或搜寻的目标。"
+    },
+    {
+      "id": "T_MARCH_RATION", "name": "急行军粮", "kind": "tactic", "pdfPage": 5,
+      "marketPrice": 3, "timing": "ownAction", "target": "self", "duration": "turn",
+      "effectId": "gain3Ap2Food",
+      "text": "本回合行动点加3（总量仍受7点上限），粮草加2（不超过携带上限）。"
+    },
+    {
+      "id": "T_DRUG_WINE", "name": "蒙汗药酒", "kind": "tactic", "pdfPage": 6,
+      "marketPrice": 3, "timing": "ownAction", "target": "characterWithin1", "duration": "nextOwnTurn",
+      "effectId": "nextTurnMinus1ApNoTactics",
+      "text": "目标下一次回合行动点减1，且不能打功能牌。"
+    },
+    {
+      "id": "T_PRIVATE_SEARCH", "name": "私刑查抄", "kind": "tactic", "pdfPage": 7,
+      "marketPrice": 4, "timing": "ownAction", "target": "characterWithin1", "duration": "instant",
+      "effectId": "forcedTwoBoxSearch",
+      "text": "对同格或相邻角色发动一次双箱收缴，无视阵营；不计入官兵稽查连续次数。"
+    },
+    {
+      "id": "T_INTERROGATION", "name": "刑讯逼供", "kind": "tactic", "pdfPage": 8,
+      "marketPrice": 3, "timing": "ownActionOrOwnSearchQuestion", "target": "characterWithin1OrSearchTarget", "duration": "instant",
+      "effectId": "viewHandAndAskTwoQuestions",
+      "text": "查看目标全部功能牌；若在自己的收缴询问窗口打出，可问两个不同的系统是非问题。"
+    },
+    {
+      "id": "T_ROAD_ROBBERY", "name": "劫道夺财", "kind": "tactic", "pdfPage": 9,
+      "marketPrice": 4, "timing": "ownAction", "target": "characterWithin1", "duration": "instant",
+      "effectId": "stealUnprotectedGoldAndSilver",
+      "text": "取得同格或相邻角色全部未保护的碎金与官银；可被暴力拒查阻止。"
+    },
+    {
+      "id": "T_CONFUSE", "name": "混淆视听", "kind": "tactic", "pdfPage": 10,
+      "marketPrice": 3, "timing": "ownAction", "target": "otherCharacter", "duration": "nextOwnTurn",
+      "effectId": "nextTurnPlus2ApControlFirst2MovementAp",
+      "text": "目标下一回合行动点加2；你替其决定至多前2点行动力的移动方向，不能控制其他操作。"
+    },
+    {
+      "id": "T_RESIST_SEARCH", "name": "暴力拒查", "kind": "tactic", "pdfPage": 11,
+      "marketPrice": 3, "timing": "responseToSearchOrRobbery", "target": "sourceCharacter", "duration": "nextOwnTurn",
+      "effectId": "cancelSearchOrRobberyAndMinus2NextAp",
+      "text": "阻止一次稽查、金矿搜寻或劫道夺财；发动者下一回合行动点减2。"
+    },
+    {
+      "id": "T_LAUNDER", "name": "黑市洗钱", "kind": "tactic", "pdfPage": 12,
+      "marketPrice": 2, "timing": "ownActionOnRoad", "target": "self", "duration": "untilNextSafeNode",
+      "effectId": "pay1SilverSealUpTo2Gold",
+      "text": "支付1官银，密封至多2碎金；密封金免受一次成功发动的收缴或抢劫，随后或进入安全地点时自动拆封。死亡仍掉落。",
+      "editorialNote": "新效果；原PDF文本误重复窃钩偷卡。"
+    },
+    {
+      "id": "T_HIDDEN_ARROW", "name": "暗箭伤人", "kind": "tactic", "pdfPage": 13,
+      "marketPrice": 3, "timing": "ownAction", "target": "anyCharacter", "duration": "nextOwnTurn",
+      "effectId": "halveFoodAndMinus2NextAp",
+      "text": "目标粮草减至原值的一半（向上取整），下一回合行动点减2。"
+    },
+
+    {
+      "id": "E_TIGER_WINE", "name": "虎骨药酒", "kind": "equipment", "slot": "charm", "pdfPage": 14,
+      "marketPrice": 5, "timing": "passiveOwnTurnStart", "duration": "whileEquipped", "effectId": "plus1ApEachTurn",
+      "text": "每次自己的回合开始时行动点加1。"
+    },
+    {
+      "id": "E_PICKAXE", "name": "精铁矿镐", "kind": "equipment", "slot": "tool", "pdfPage": 15,
+      "marketPrice": 4, "timing": "passiveOnMine", "duration": "whileEquipped", "effectId": "mineYieldTimes1Point5Ceil",
+      "text": "每次采矿产量乘1.5并向上取整，仍受本轮公共产量上限。"
+    },
+    {
+      "id": "E_MINE_MAP", "name": "矿洞密图", "kind": "equipment", "slot": "tool", "pdfPage": 16,
+      "marketPrice": 5, "timing": "passiveOnMine", "duration": "whileEquipped", "effectId": "ignoreGlobalMineOutputLimit",
+      "text": "采矿可无视金矿本轮公共产量上限，个人采矿次数限制仍生效。"
+    },
+    {
+      "id": "E_MINER_CONTRACT", "name": "矿工契约", "kind": "equipment", "slot": "contract", "pdfPage": 17,
+      "marketPrice": 5, "timing": "passiveRoundEnd", "duration": "whileEquipped", "effectId": "mineWorkerProduces1PerRoundMax6",
+      "text": "矿工每轮轮末在金矿积累1碎金，至多6；同队角色到金矿可取走，矿洞塌方清空存量。"
+    },
+    {
+      "id": "E_LAST_WILL", "name": "临终遗嘱", "kind": "equipment", "slot": "document", "pdfPage": 18,
+      "marketPrice": 3, "timing": "passiveOnDeath", "duration": "whileEquipped", "effectId": "transferDeathItemsToAlly",
+      "text": "饿死时将遗产转移给一名活队友；本牌随之弃置。"
+    },
+    {
+      "id": "E_HORSE_FEED", "name": "马料锦囊", "kind": "equipment", "slot": "horseAccessory", "pdfPage": 19,
+      "marketPrice": 3, "timing": "passiveOnRent", "duration": "whileEquipped", "effectId": "extendHorseRentalOneOwnTurn",
+      "text": "租借马匹时租期增加一次自己的回合。"
+    },
+    {
+      "id": "E_LOCKBOX", "name": "密匣藏金", "kind": "equipment", "slot": "container", "pdfPage": 20,
+      "marketPrice": 5, "timing": "ownActionAndPassive", "duration": "whileEquipped", "effectId": "store3ProtectedGoldOrSilver",
+      "text": "消耗1行动点存入或取出，匣内最多3个碎金或官银，不受收缴和抢劫影响。"
+    },
+    {
+      "id": "E_TIME_GONG", "name": "时辰铜锣", "kind": "equipment", "slot": "document", "pdfPage": 21,
+      "marketPrice": 4, "timing": "preEvent", "duration": "instant", "effectId": "reverseTurnOrderThisRoundOnce",
+      "text": "轮前使用一次，反转本轮角色行动顺序，本牌随后弃置。"
+    },
+    {
+      "id": "E_DOUBLE_AGENT", "name": "双面谍证", "kind": "equipment", "slot": "document", "pdfPage": 22,
+      "marketPrice": 5, "timing": "passive", "duration": "whileEquipped", "effectId": "copyOpposingFactionSkill",
+      "text": "保留自身阵营技能，额外获得另一阵营技能。"
+    },
+    {
+      "id": "E_ROAD_BLOCK", "name": "铁索拒马", "kind": "equipment", "slot": "trap", "pdfPage": 23,
+      "marketPrice": 3, "timing": "ownAction", "duration": "untilRemoved", "effectId": "placeRoadEdgeBlock",
+      "text": "花1行动点放在当前驿道节点的一条相邻边上，跨轮保留；任意角色可从任一端花2行动点移除，否则不得穿越。"
+    },
+    {
+      "id": "E_BACKPACK", "name": "行军背囊", "kind": "equipment", "slot": "bag", "pdfPage": 24,
+      "marketPrice": 4, "timing": "passive", "duration": "whileEquipped", "effectId": "plus3FoodCapacity",
+      "text": "粮草携带上限加3。"
+    },
+    {
+      "id": "E_BOUNTY", "name": "悬赏榜文", "kind": "equipment", "slot": "document", "pdfPage": 25,
+      "marketPrice": 4, "timing": "passiveOnOfficerSuccess", "duration": "whileEquipped", "effectId": "gain2SilverOnOfficerSearchSuccess",
+      "text": "官兵成功收缴至少1碎金时，额外从银行获得2官银。"
+    },
+
+    {
+      "id": "M_RED_HARE", "name": "赤兔", "kind": "mount", "pdfPage": 26,
+      "rentalPrice": 6, "rentalOwnTurns": 2, "effectId": "allMovementUpTo2PerAp",
+      "text": "每次移动花1行动点可最多走2格。"
+    },
+    {
+      "id": "M_DILU", "name": "的卢", "kind": "mount", "pdfPage": 27,
+      "rentalPrice": 4, "rentalOwnTurns": 2, "effectId": "firstMoveDiceHalfCeil",
+      "text": "本回合第一次移动可花1行动点掷骰，走点数一半并向上取整的格数。"
+    },
+    {
+      "id": "M_WHITE_STEED", "name": "白驹", "kind": "mount", "pdfPage": 28,
+      "rentalPrice": 5, "rentalOwnTurns": 2, "effectId": "preEventFreeMove1Plus1Ap",
+      "text": "事件揭示前免费走1格，该轮自己的回合额外获得1行动点。"
+    },
+
+    {
+      "id": "V_CLEAR_ROAD", "name": "驿路晴和", "kind": "event", "pdfPage": 29,
+      "timing": "reveal", "duration": "round", "effectId": "roadCharactersFirstMovePlus2",
+      "text": "揭示时位于驿道的角色，本轮其回合第一次移动可多走最多2格。"
+    },
+    {
+      "id": "V_LIGHT_SNOW", "name": "薄雪覆道", "kind": "event", "pdfPage": 30,
+      "timing": "reveal", "duration": "round", "effectId": "roadCharactersMinus1Ap",
+      "text": "揭示时位于驿道的角色，本轮行动点减1。"
+    },
+    {
+      "id": "V_MERCHANT_SALE", "name": "商贾促销", "kind": "event", "pdfPage": 31,
+      "timing": "reveal", "duration": "round", "effectId": "cardPricesTimes0Point6Ceil",
+      "text": "本轮市场卡与黑市盲抽价乘0.6，向上取整。马匹租金不受影响。"
+    },
+    {
+      "id": "V_HORSE_STUMBLE", "name": "马失前蹄", "kind": "event", "pdfPage": 32,
+      "timing": "reveal", "duration": "round", "effectId": "horseRiderMax2EnteredNodes",
+      "text": "本轮租马角色通过移动进入的节点总数不超过2。"
+    },
+    {
+      "id": "V_RUSSIAN_PARTY", "name": "沙俄马队", "kind": "event", "pdfPage": 33,
+      "timing": "reveal", "duration": "round", "effectId": "smugglersOneFreeMoveUpTo3",
+      "text": "每名走私者本轮行动阶段可额外免费移动最多3格一次。"
+    },
+    {
+      "id": "V_FOREST_FOG", "name": "林海迷雾", "kind": "event", "pdfPage": 34,
+      "timing": "reveal", "duration": "round", "effectId": "disableDistanceInspectionAbove0",
+      "text": "本轮稽查站只能对本格目标稽查，不能远程稽查。"
+    },
+    {
+      "id": "V_MINE_COLLAPSE", "name": "矿洞塌方", "kind": "event", "pdfPage": 35,
+      "timing": "reveal", "duration": "round", "effectId": "disableMiningClearWorkers",
+      "text": "本轮不能采矿；矿工契约已积累的碎金清空。"
+    },
+    {
+      "id": "V_BANDIT_RAID", "name": "金匪袭扰", "kind": "event", "pdfPage": 36,
+      "timing": "reveal", "duration": "instant", "effectId": "halveCarriedGoldFloor",
+      "text": "揭示时每名角色未保护的随身碎金减半，向下取整；已保护碎金不受影响。"
+    },
+    {
+      "id": "V_POLAR_DAY", "name": "极昼长明", "kind": "event", "pdfPage": 37,
+      "timing": "reveal", "duration": "round", "effectId": "allPlus1FoodCostDoubleBaseAp",
+      "text": "揭示时所有角色额外消耗1粮草；本轮基础行动点翻倍，其他修正随后计算并受7点上限约束。"
+    },
+    {
+      "id": "V_OFFICER_PATROL", "name": "官兵巡哨", "kind": "event", "pdfPage": 38,
+      "timing": "reveal", "duration": "round", "effectId": "inspectionCostMinus1Min0",
+      "text": "本轮官兵在稽查站发动稽查的行动点消耗减2，最低为0。"
+    },
+    {
+      "id": "V_FROZEN_ROAD", "name": "冰封驿道", "kind": "event", "pdfPage": 39,
+      "timing": "reveal", "duration": "round", "effectId": "roadCharactersMinus2Ap",
+      "text": "揭示时位于驿道的角色，本轮行动点减2。"
+    },
+
+    {
+      "id": "R_SMUGGLER", "name": "走私者", "kind": "role", "pdfPage": 40,
+      "effectId": "redrawBlackMarketOncePerPurchase",
+      "text": "购买黑市盲抽牌并查看后，可弃置该牌并免费重抽一次，必须保留第二张。"
+    },
+    {
+      "id": "R_OFFICER", "name": "官兵", "kind": "role", "pdfPage": 41,
+      "effectId": "refreshMarketOncePerOwnTurnAtHub",
+      "text": "在二十二驿站中，每自己的回合可0行动点强制刷新市场全部未售牌一次。"
+    }
+  ],
+  "excludedPdfPages": [
+    { "page": 1, "reason": "Resource tokens, not cards" },
+    { "page": 2, "reason": "Food tokens, not cards" },
+    { "page": 42, "reason": "Malformed duplicate officer page" },
+    { "page": 43, "reason": "Blank page" }
+  ]
+}

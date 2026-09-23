@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 930" preserveAspectRatio="xMidYMid slice">
+ <defs>
+  <radialGradient id="paper" cx="50%" cy="43%" r="78%"><stop stop-color="#f1e4c4"/><stop offset=".66" stop-color="#dfcfaa"/><stop offset="1" stop-color="#b9a27b"/></radialGradient>
+  <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a4b8ae" stop-opacity=".05"/><stop offset=".5" stop-color="#7e9b99" stop-opacity=".23"/><stop offset="1" stop-color="#819b95" stop-opacity=".08"/></linearGradient>
+  <pattern id="fiber" width="94" height="76" patternUnits="userSpaceOnUse"><path d="M5 12h17M52 29h9M34 64h23M74 6h8M12 51h6" stroke="#745d3e" stroke-opacity=".11" stroke-width="1"/><circle cx="66" cy="52" r="1" fill="#765c39" fill-opacity=".16"/><circle cx="29" cy="36" r=".8" fill="#fff8df" fill-opacity=".45"/></pattern>
+  <g id="pine" fill="#405246" fill-opacity=".52" stroke="#e3d6b5" stroke-opacity=".45" stroke-width="2"><path d="M0-52 18-21H9L25 2H14L31 27H8V48H-8V27H-31L-14 2H-25L-9-21H-18Z"/><path d="M0-52v100" fill="none" stroke="#51452f" stroke-opacity=".3"/></g>
+  <g id="peak" fill="#87917e" fill-opacity=".48" stroke="#536051" stroke-opacity=".22" stroke-width="2"><path d="m-190 132 110-117 43 46L12-34l42 58 53-81 119 189-99-56-54 40-72-48-66 42-65-30Z"/><path d="m-80 15 43 46 61-37 32 58-52-28-40 31-47-28-56 34 59-76Z" fill="#eee5cf" fill-opacity=".72" stroke="none"/><path d="m-175 110 96-29 45 40 57-49 62 61 53-24 76 58M-132 137l75-17 53 30 70-39 56 30 57-9" fill="none"/></g>
+  <g id="contour" fill="none" stroke="#806f4e" stroke-opacity=".17" stroke-width="2"><path d="M0 82Q95 4 197 75t201-5q115-87 228 6t219-15q105-88 213 5t210-8"/><path d="M0 105Q95 28 197 98t201-4q115-86 228 7t219-15q105-87 213 5t210-8"/><path d="M0 129Q95 51 197 122t201-5q115-87 228 6t219-14q105-88 213 5t210-8"/></g>
+ </defs>
+ <rect width="1440" height="930" fill="url(#paper)"/><rect width="1440" height="930" fill="url(#fiber)"/>
+ <g opacity=".8"><path d="M0 185q118-39 243 7t246-16q98-37 202 13v120Q550 266 414 312T139 297Q57 308 0 339Z" fill="url(#ice)"/><path d="M1440 554q-118-28-217 13t-189 24q-93-8-165 52t-146 42q-86-11-139 47t-114 51q-103 1-182 68v-89q86-66 178-70t145-58q53-53 135-42t141-50q70-61 154-62t181-35q118-44 218-17Z" fill="url(#ice)"/></g>
+ <g transform="translate(145 118) scale(1.16)"><use href="#peak"/></g><g transform="translate(1315 145) scale(.93)"><use href="#peak"/></g><g transform="translate(120 800) scale(.7)"><use href="#peak"/></g><g transform="translate(1338 796) scale(.76)"><use href="#peak"/></g>
+ <g transform="translate(0 0)"><use href="#contour"/></g><g transform="translate(0 780) rotate(180 720 75)"><use href="#contour"/></g>
+ <g opacity=".72">
+  <use href="#pine" transform="translate(75 390) scale(.55)"/><use href="#pine" transform="translate(122 441) scale(.38)"/><use href="#pine" transform="translate(87 496) scale(.47)"/><use href="#pine" transform="translate(1347 343) scale(.42)"/><use href="#pine" transform="translate(1390 400) scale(.6)"/><use href="#pine" transform="translate(1360 468) scale(.34)"/>
+  <use href="#pine" transform="translate(356 862) scale(.5)"/><use href="#pine" transform="translate(415 889) scale(.33)"/><use href="#pine" transform="translate(1065 871) scale(.4)"/><use href="#pine" transform="translate(1121 887) scale(.55)"/>
+ </g>
+ <g fill="#a68347" fill-opacity=".38"><circle cx="250" cy="530" r="3"/><circle cx="295" cy="567" r="2"/><circle cx="1156" cy="292" r="2.5"/><circle cx="1104" cy="337" r="1.8"/><circle cx="688" cy="854" r="2"/><circle cx="788" cy="121" r="2"/></g>
+ <rect x="20" y="20" width="1400" height="890" rx="8" fill="none" stroke="#79613b" stroke-opacity=".34" stroke-width="3"/><rect x="31" y="31" width="1378" height="868" rx="5" fill="none" stroke="#fff4d9" stroke-opacity=".5" stroke-width="2"/>
+</svg>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>二十二驿 · 黄金邮道</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+<main>
+<header class="app-header">
+  <div><p class="eyebrow">北境驿路 · 策略对抗桌游</p><h1>二十二驿 · 黄金邮道</h1></div>
+  <nav aria-label="主导航"><button id="nav-home">主菜单</button><button id="nav-help">规则指引</button><button id="nav-library">卡牌图鉴</button></nav>
+</header>
+<div id="notice" role="status" aria-live="polite" hidden></div>
+<section id="screen-home" class="screen">
+ <div class="hero"><p class="eyebrow">一程风雪，一局黄金。</p><h2>北境的驿路<br>等你落下第一步。</h2><p>在走私者与官兵之间选择阵营。采矿、押运、设卡、出牌，<br>让每一次出发都成为下一次胜利的伏笔。</p></div>
+ <div class="mode-grid">
+  <button class="mode-card" id="mode-solo"><span class="mode-icon">对</span><strong>本地人机</strong><span>你指挥两名角色，与人机阵营对抗。无需联网。</span><small>适合独自熟悉规则 →</small></button>
+  <button class="mode-card" id="mode-hotseat"><span class="mode-icon">弈</span><strong>同屏对局</strong><span>轮流操作四名角色。和朋友共用一台电脑。</span><small>适合面对面游玩 →</small></button>
+  <button class="mode-card" id="home-help"><span class="mode-icon">册</span><strong>新手入门</strong><span>先读获胜目标和回合流程，再查看卡牌图鉴。</span><small>三分钟认识驿道 →</small></button>
+ </div>
+ <div class="home-resume"><button id="resume">继续当前对局</button><button id="home-load">读取本地存档</button><p id="home-status" class="muted"></p></div>
+</section>
+<section id="screen-setup" class="screen panel" hidden>
+ <p class="eyebrow">出发之前</p><h2 id="setup-title">创建对局</h2>
+ <form id="setup-form">
+ <fieldset><legend>胜负方式</legend><label class="choice"><input type="radio" name="mode" value="race" checked><strong>竞速局</strong><span>率先获得五十声望的阵营获胜。</span></label><label class="choice"><input type="radio" name="mode" value="fixedRounds"><strong>火并局</strong><span>三十轮后比较声望；相同时平局。</span></label></fieldset>
+ <fieldset id="faction-choice"><legend>你的阵营</legend><label class="choice"><input type="radio" name="faction" value="smuggler" checked><strong>走私者</strong><span>向边境黑市运金，拥有黑市重抽技能。</span></label><label class="choice"><input type="radio" name="faction" value="officer"><strong>官兵</strong><span>向墨尔根交金，可稽查与刷新市场。</span></label></fieldset>
+ <p class="muted">人机为启发式入门对手，使用相同规则，不读取隐藏手牌、分箱或牌库顺序。</p>
+ <div class="dialog-actions"><button type="button" id="setup-back">返回</button><button class="primary" type="submit">开始征程</button></div>
+ </form>
+</section>
+<section id="screen-play" class="screen" hidden>
+ <div class="game-toolbar"><p id="summary"></p><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
+ <div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div>
+ <p id="last-action" class="last-action" role="status" aria-live="polite"></p>
+ <section id="event-banner" class="event-banner"></section>
+ <section id="result-panel" class="result-panel" hidden></section>
+ <div class="layout">
+  <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><h2>北境舆图</h2><p>朱衣走私 · 蓝甲官兵<br><small class="map-legend">粮 / 林 / 商 / 遗 / 烽：停驻掷骰遭遇</small></p></div><span class="board-seal">北境<br>驿路</span></div><div id="board-status" class="board-status"></div><svg id="board" viewBox="-7 -7.2 13.5 8.7" aria-label="黄金邮道地图"></svg><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
+  <aside class="control-panel">
+   <section><h2 id="turn-title">当前角色</h2><div id="active-character"></div><p id="turn-hint" class="muted"></p></section>
+   <section id="decision-section"><h2>当前决策</h2><div id="decision"></div></section>
+   <nav class="tabs" aria-label="操作分类"><button data-tab="location">驿站与行动</button><button data-tab="equipment">随身装备</button></nav>
+   <section id="actions"></section><section id="cards"></section><div id="end-turn"></div>
+  </aside>
+ </div>
+ <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-tray"></div></section>
+ <section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section>
+ <div class="bottom-grid"><section><h2>双方阵容</h2><div id="characters" class="character-list"></div></section><section><h2>驿道战报</h2><ol id="log" class="log"></ol></section></div>
+</section>
+<section id="screen-help" class="screen" hidden>
+ <div class="section-heading"><div><p class="eyebrow">行前必读</p><h2>新手驿路指南</h2></div><button class="return-game">返回上一页</button></div>
+ <div class="guide-grid">
+  <article class="panel"><h3>一 · 怎样获胜</h3><p>从漠河金矿采得碎金，再押运回阵营交金点。走私者在边境黑市交金，官兵在墨尔根交金。每兑换一枚碎金，获得一官银和一点阵营声望。</p></article>
+  <article class="panel"><h3>二 · 轮到你时</h3><p>每轮先揭示事件并扣粮，再按顺序行动。通常每名角色有三点行动力。点击亮起的节点移动，或在“地点行动”中采矿、补给、交易。最后结束回合。</p></article>
+  <article class="panel"><h3>三 · 别忘了粮草</h3><p>轮初在驿道上消耗一粮。粮草不够就会饿死、掉落携带物，并在下一轮驿站复活。驿站可耗尽剩余行动补满粮草；黑市补给另收一官银。</p></article>
+  <article class="panel"><h3>四 · 出牌与收缴</h3><p>自己的回合通常最多打两张功能牌，响应牌在专门窗口打出。收缴时目标先分甲乙两箱，发动者问系统问题，再选一箱。回答永远真实，另一箱仍归目标。</p></article>
+ </div>
+ <div class="panel"><h3>现在可以做什么？</h3><p>操作区只列出后端确认合法的动作。卡牌置灰时查看旁边说明；事件影响、角色资源和剩余行动都会显示在对局里。人机行动时会逐步播放战报，遇到你的响应就停下来等待。</p></div>
+ <details class="panel"><summary>展开完整规则书与补充裁定</summary><pre id="full-rules">正在载入规则书…</pre></details>
+</section>
+<section id="screen-library" class="screen" hidden>
+ <div class="section-heading"><div><p class="eyebrow">知己知彼</p><h2>卡牌图鉴</h2></div><button class="return-game">返回上一页</button></div>
+ <div class="library-tools"><label>搜索卡牌<input id="card-search" type="search" placeholder="输入名称或效果关键词"></label><label>卡牌类别<select id="card-kind"><option value="all">全部卡牌</option><option value="tactic">功能牌</option><option value="equipment">装备牌</option><option value="mount">马匹</option><option value="event">事件牌</option><option value="role">阵营技能</option></select></label></div>
+ <p id="library-count" class="muted"></p><div id="library-grid" class="library-grid"></div>
+</section>
+</main>
+<dialog id="interaction" aria-labelledby="dialog-title"><form id="interaction-form"><h2 id="dialog-title"></h2><p id="dialog-description" class="muted"></p><div id="dialog-fields"></div><p id="dialog-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="dialog-cancel">取消</button><button type="submit" id="dialog-confirm" class="primary">确认</button></div></form></dialog>
+<script type="module" src="/app.js"></script>
+</body></html>
