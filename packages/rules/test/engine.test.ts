@@ -76,6 +76,29 @@ test('movement validates adjacency and pays the correct AP', () => {
   assert.throws(() => applyCommand(game, { type: 'MOVE', actorId: 'SMUGGLER_1', path: ['MINE'] }), RuleError);
 });
 
+test('the west shortcut moves directly from W2 to W4 and only resolves the landed site', () => {
+  const game = started(73);
+  const actor = game.characters.find((item) => item.id === 'SMUGGLER_1')!;
+  actor.nodeId = 'W2';
+  actor.actionPoints = 3;
+  const moved = applyCommand(game, { type: 'MOVE', actorId: actor.id, path: ['W4'] });
+  assert.equal(moved.characters.find((item) => item.id === actor.id)!.nodeId, 'W4');
+  assert.equal(moved.characters.find((item) => item.id === actor.id)!.actionPoints, 2);
+  assert.match(moved.log.find((entry) => entry.type === 'siteEncounter')!.message, /旧驿亭/);
+  assert.equal(moved.log.some((entry) => entry.type === 'siteEncounter' && entry.message.includes('冰河浅滩')), false);
+});
+
+test('the Morgeng depot link reaches MRG from W4 in one step', () => {
+  const game = started(74);
+  const actor = game.characters.find((item) => item.id === 'SMUGGLER_1')!;
+  actor.nodeId = 'W4';
+  actor.actionPoints = 3;
+  const moved = applyCommand(game, { type: 'MOVE', actorId: actor.id, path: ['MRG'] });
+  assert.equal(moved.characters.find((item) => item.id === actor.id)!.nodeId, 'MRG');
+  assert.equal(moved.characters.find((item) => item.id === actor.id)!.actionPoints, 2);
+  assert.equal(moved.log.some((entry) => entry.type === 'siteEncounter'), false);
+});
+
 test('mine is server-random but replayable with fixed seed', () => {
   const base = started(41);
   const smuggler = base.characters.find((item) => item.id === 'SMUGGLER_1')!;

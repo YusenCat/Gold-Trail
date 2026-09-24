@@ -201,7 +201,7 @@ function renderBoard(){
  board.append(landscape);
  for(const route of state.map.routes)for(let i=1;i<route.nodes.length;i++){
  const a=nodes[route.nodes[i-1]],b=nodes[route.nodes[i]],blocked=state.game.blockedEdges.includes([a.id,b.id].sort().join('::'));
- board.append(svg('line',{x1:a.x,y1:-a.y,x2:b.x,y2:-b.y,class:'route'+(blocked?' blocked-route':'')}));
+ board.append(svg('line',{x1:a.x,y1:-a.y,x2:b.x,y2:-b.y,class:'route'+(route.shortcut?' shortcut-route':'')+(blocked?' blocked-route':'')}));
  }
  const moveTypes=['MOVE','FREE_MOVE','PRE_EVENT_MOVE','CONTROLLED_MOVE'];
  const boardActions=state.selectedCard?state.actions.filter((a)=>a.command.cardId===state.selectedCard&&a.command.path?.length):state.actions.filter((a)=>moveTypes.includes(a.command.type)&&a.command.path?.length);

@@ -2,24 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialGame, edgeKey, getNeighbors, initialTurnOrder, isCheckpoint, isSafeNode, RandomStream, shortestPath, staticDistance } from '../src/index.ts';
 
-test('map has the four canonical distances', () => {
-  assert.equal(staticDistance('HUB', 'MRG'), 6);
+test('map has the canonical depot distances', () => {
+  assert.equal(staticDistance('HUB', 'MRG'), 4);
   assert.equal(staticDistance('HUB', 'MINE'), 5);
   assert.equal(staticDistance('HUB', 'BAZAAR'), 5);
   assert.equal(staticDistance('MINE', 'BAZAAR'), 10);
+  assert.equal(staticDistance('MINE', 'MRG'), 9);
   assert.equal(staticDistance('MINE', 'CP_E'), 3);
   assert.equal(staticDistance('MINE', 'CP_F'), 7);
   assert.equal(isSafeNode('HUB'), true);
   assert.equal(isSafeNode('CP_C'), false);
   assert.equal(isCheckpoint('CP_G'), true);
-  assert.deepEqual(getNeighbors('MRG'), ['NW1', 'W5']);
+  assert.deepEqual(getNeighbors('MRG'), ['NW1', 'W4', 'W5']);
   assert.deepEqual(getNeighbors('F1'), ['E2', 'E4']);
 });
 
 test('a road block changes legal route but not static distance', () => {
   const blocked = new Set([edgeKey('HUB', 'N1')]);
   assert.equal(staticDistance('HUB', 'BAZAAR'), 5);
-  assert.equal(shortestPath('HUB', 'BAZAAR', blocked)?.length, 15);
+  assert.equal(shortestPath('HUB', 'BAZAAR', blocked)?.length, 13);
 });
 
 test('same seed yields identical shuffled setup', () => {

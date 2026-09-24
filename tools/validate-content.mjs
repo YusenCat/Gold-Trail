@@ -12,6 +12,16 @@ for (const route of map.routes) {
   assert.equal(route.nodes.length - 1, route.steps, `${route.id} step count`);
   for (const nodeId of route.nodes) assert(nodeIds.has(nodeId), `unknown node ${nodeId}`);
 }
+assert(map.routes.some((route) => route.id === 'WEST_SHORTCUT'
+  && route.shortcut === true
+  && route.nodes.length === 2
+  && new Set(route.nodes).has('W2')
+  && new Set(route.nodes).has('W4')), 'west shortcut should directly connect W2 and W4');
+assert(map.routes.some((route) => route.id === 'WEST_DEPOT_LINK'
+  && route.shortcut === true
+  && route.nodes.length === 2
+  && new Set(route.nodes).has('W4')
+  && new Set(route.nodes).has('MRG')), 'west depot link should directly connect W4 and MRG');
 const roadNodes = map.nodes.filter((node) => node.type === 'road');
 assert(roadNodes.length > map.nodes.length / 2, 'most map spaces should be interactive road encounters');
 for (const node of roadNodes) {
@@ -46,10 +56,11 @@ function distance(start, end) {
 }
 
 for (const [a, b, expected] of [
-  ['HUB', 'MRG', 6],
+  ['HUB', 'MRG', 4],
   ['HUB', 'MINE', 5],
   ['HUB', 'BAZAAR', 5],
   ['MINE', 'BAZAAR', 10],
+  ['MINE', 'MRG', 9],
   ['HUB', 'CP_C', 4],
   ['HUB', 'CP_D', 3],
   ['MINE', 'CP_E', 3],
@@ -94,5 +105,5 @@ console.log(JSON.stringify({
   cardCounts: counts,
   marketCards,
   blackMarketCards,
-  distancesVerified: 8,
+  distancesVerified: 9,
 }, null, 2));

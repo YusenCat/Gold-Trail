@@ -401,3 +401,4 @@ body.hints-hidden #guide-strip,body.hints-hidden #board-prompt,body.hints-hidden
 .board-heading .map-legend { display:inline-block; margin-top:3px; color:#765722; font-size:.72rem; letter-spacing:.08em; }
 @media(max-width:460px) { #cards { gap:7px; }.market-card { padding:5px; }.market-caption strong { font-size:.82rem; }.card-face-rules { font-size:4.35cqw; }.playing-card { flex-basis:190px; } }
 @media(prefers-reduced-motion:reduce) { .playing-card { animation:none!important; } }
+#board .route.shortcut-route { stroke:#9a6b24; stroke-dasharray:.12 .07; stroke-width:.085; }

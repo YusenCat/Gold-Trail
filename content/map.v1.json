@@ -1,13 +1,13 @@
 {
-  "version": "1.3.0-trail-encounters",
+  "version": "1.5.0-officer-depot-link",
   "distanceRule": "Each edge costs exactly one grid step; locations are nodes.",
   "nodes": [
     { "id": "HUB", "type": "hub", "label": "二十二驿站", "x": 0, "y": 0 },
     { "id": "W1", "type": "road", "site": "forage", "siteName": "樵夫小径", "x": -1, "y": 0 },
     { "id": "W2", "type": "road", "site": "forest", "siteName": "雪松林", "x": -2, "y": 0 },
-    { "id": "W3", "type": "road", "site": "forage", "siteName": "冰河浅滩", "x": -3, "y": 0 },
+    { "id": "W3", "type": "road", "site": "forage", "siteName": "冰河浅滩", "x": -3, "y": 0.65 },
     { "id": "W4", "type": "road", "site": "caravan", "siteName": "旧驿亭", "x": -4, "y": 0 },
-    { "id": "W5", "type": "road", "site": "signal", "siteName": "烽火台", "x": -5, "y": 0 },
+    { "id": "W5", "type": "road", "site": "signal", "siteName": "烽火台", "x": -5, "y": -1.1 },
     { "id": "MRG", "type": "morgeng", "label": "墨尔根", "x": -6, "y": 0 },
     { "id": "E1", "type": "road", "site": "forage", "siteName": "松烟林道", "x": 1, "y": 0 },
     { "id": "E2", "type": "road", "site": "forest", "siteName": "林海岔口", "x": 2, "y": 0 },
@@ -38,6 +38,8 @@
   ],
   "routes": [
     { "id": "WEST", "label": "墨尔根支线", "nodes": ["HUB", "W1", "W2", "W3", "W4", "W5", "MRG"], "steps": 6 },
+    { "id": "WEST_SHORTCUT", "label": "雪松林捷径", "nodes": ["W2", "W4"], "steps": 1, "shortcut": true },
+    { "id": "WEST_DEPOT_LINK", "label": "墨尔根捷径", "nodes": ["W4", "MRG"], "steps": 1, "shortcut": true },
     { "id": "EAST", "label": "金矿主道", "nodes": ["HUB", "E1", "E2", "CP_D", "E4", "MINE"], "steps": 5 },
     { "id": "NORTH", "label": "黑市主道", "nodes": ["HUB", "N1", "N2", "N3", "CP_C", "BAZAAR"], "steps": 5 },
     { "id": "FOREST", "label": "林间栈道与商道捷径", "nodes": ["E2", "F1", "E4", "R1"], "steps": 3 },
