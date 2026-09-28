@@ -36,12 +36,12 @@ export function selectFromObservation(view: GameState, id: string, candidates: L
   const interceptNode = valuableSmuggler
     ? shortestPath(valuableSmuggler.nodeId, 'BAZAAR', blocked)?.find(isCheckpoint) ?? valuableSmuggler.nodeId
     : undefined;
-  const victoryLoad = view.mode === 'race' && gold >= 50 - view.reputation[actor.faction];
-  const finalDelivery = gold > 0 && view.mode === 'fixedRounds' && 30 - view.round <= Math.ceil(distance(actor.nodeId, depot) / 3) + 1;
+  const victoryLoad = view.mode === 'race' && gold >= balance.raceReputationTarget - view.reputation[actor.faction];
+  const finalDelivery = gold > 0 && view.mode === 'fixedRounds' && balance.fixedRoundLimit - view.round <= Math.ceil(distance(actor.nodeId, depot) / 3) + 1;
   let destination = gold >= 4 || (gold > 0 && (victoryLoad || finalDelivery)) ? depot : 'MINE';
   if (actor.faction === 'officer' && gold === 0 && interceptNode) destination = interceptNode;
   const exhaustedMine = view.activeEventId === 'V_MINE_COLLAPSE' || (view.mineOutputRemaining === 0 && !Object.values(actor.equipped).includes('E_MINE_MAP'));
-  if (actor.nodeId === 'MINE' && (actor.mineActionsThisTurn >= 3 || exhaustedMine)) destination = gold > 0 ? depot : 'HUB';
+  if (actor.nodeId === 'MINE' && (actor.mineActionsThisTurn >= balance.mineActionsPerCharacterTurn || exhaustedMine)) destination = gold > 0 ? depot : 'HUB';
   // Plan for the next safe stop using public distances; never peek at future events.
   const refill = ['HUB', ...(actor.silver > 0 ? ['BAZAAR'] : [])].sort((a,b)=>distance(actor.nodeId,a)-distance(actor.nodeId,b))[0];
   const travelBudget = Math.max(1, actor.actionPoints) * (actor.mountId === 'M_RED_HARE' ? 2 : 1);

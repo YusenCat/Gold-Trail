@@ -117,6 +117,8 @@ export interface GameState {
   cardVersion: string;
   balanceVersion: string;
   mode: Mode;
+  /** Simulation setup only; normal games default to the published smuggler-first order. */
+  startingFaction?: Faction;
   session: { kind: 'hotseat' | 'solo'; humanFaction: Faction };
   revision: number;
   round: number;
@@ -151,15 +153,19 @@ function copies(kind: string, count: number): string[] {
   return cardsData.cards.filter((card) => card.kind === kind).flatMap((card) => Array(count).fill(card.id));
 }
 
-export function initialTurnOrder(round: number): string[] {
+export function initialTurnOrder(round: number, startingFaction: Faction = 'smuggler'): string[] {
   if (!Number.isInteger(round) || round < 1) throw new Error('round must be a positive integer');
-  return round % 2 === 1
+  const openingOrder = startingFaction === 'smuggler'
     ? ['SMUGGLER_1', 'OFFICER_1', 'SMUGGLER_2', 'OFFICER_2']
     : ['OFFICER_1', 'SMUGGLER_1', 'OFFICER_2', 'SMUGGLER_2'];
+  return round % 2 === 1
+    ? openingOrder
+    : [openingOrder[1], openingOrder[0], openingOrder[3], openingOrder[2]];
 }
 
-export function createInitialGame(seed: number, mode: Mode = 'race'): GameState {
+export function createInitialGame(seed: number, mode: Mode = 'race', startingFaction: Faction = 'smuggler'): GameState {
   if (mode !== 'race' && mode !== 'fixedRounds') throw new Error(`unsupported mode: ${mode}`);
+  if (startingFaction !== 'smuggler' && startingFaction !== 'officer') throw new Error(`unsupported starting faction: ${startingFaction}`);
   const rng = new RandomStream(seed);
   const marketDeck = rng.shuffle([
     ...copies('tactic', cardsData.rules.marketTacticCopiesEach),
@@ -169,7 +175,7 @@ export function createInitialGame(seed: number, mode: Mode = 'race'): GameState 
   const blackMarketDeck = rng.shuffle(copies('tactic', cardsData.rules.blackMarketTacticCopiesEach));
   const eventDeck = rng.shuffle(copies('event', cardsData.rules.eventCopiesEach));
 
-  const characters: CharacterState[] = initialTurnOrder(1).map((id, seat) => ({
+  const characters: CharacterState[] = initialTurnOrder(1, startingFaction).map((id, seat) => ({
     id,
     faction: id.startsWith('SMUGGLER') ? 'smuggler' : 'officer',
     seat,
@@ -225,12 +231,13 @@ export function createInitialGame(seed: number, mode: Mode = 'race'): GameState 
     cardVersion: cardsData.version,
     balanceVersion: balanceData.version,
     mode,
+    startingFaction,
     session: { kind: 'hotseat', humanFaction: 'smuggler' },
     revision: 0,
     round: 1,
     phase: 'preEvent',
     activeCharacterId: null,
-    turnOrder: initialTurnOrder(1),
+    turnOrder: initialTurnOrder(1, startingFaction),
     turnIndex: 0,
     preEventQueue: [],
     pendingDecision: null,

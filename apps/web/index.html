@@ -27,12 +27,14 @@
  </form>
 </section>
 <section id="screen-play" class="screen" hidden>
- <div class="game-toolbar"><p id="summary"></p><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
- <div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div>
- <p id="last-action" class="last-action" role="status" aria-live="polite"></p>
- <section id="event-banner" class="event-banner"></section>
+ <div class="game-toolbar"><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
  <section id="result-panel" class="result-panel" hidden></section>
  <div class="layout">
+  <aside class="intel-sidebar" aria-label="对局情报">
+   <section class="intel-section situation-panel"><h2>当前局势</h2><p id="summary"></p><div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div><p id="last-action" class="last-action" role="status" aria-live="polite"></p><div id="event-banner" class="event-banner"></div><section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section></section>
+   <section class="intel-section roster-panel"><h2>双方阵容</h2><div id="characters" class="character-list"></div></section>
+   <section class="intel-section report-panel"><div class="report-heading"><h2>驿道战报</h2><button id="report-toggle" type="button" aria-expanded="true">收起</button></div><div class="report-tools"><button id="report-project" type="button">投影战报 · 暂停对局</button></div><ol id="log" class="log"></ol></section>
+  </aside>
   <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><h2>北境舆图</h2><p>朱衣走私 · 蓝甲官兵<br><small class="map-legend">粮 / 林 / 商 / 遗 / 烽：停驻掷骰遭遇</small></p></div><span class="board-seal">北境<br>驿路</span></div><div id="board-status" class="board-status"></div><svg id="board" viewBox="-7 -7.2 13.5 8.7" aria-label="黄金邮道地图"></svg><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
   <aside class="control-panel">
    <section><h2 id="turn-title">当前角色</h2><div id="active-character"></div><p id="turn-hint" class="muted"></p></section>
@@ -42,8 +44,6 @@
   </aside>
  </div>
  <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-tray"></div></section>
- <section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section>
- <div class="bottom-grid"><section><h2>双方阵容</h2><div id="characters" class="character-list"></div></section><section><h2>驿道战报</h2><ol id="log" class="log"></ol></section></div>
 </section>
 <section id="screen-help" class="screen" hidden>
  <div class="section-heading"><div><p class="eyebrow">行前必读</p><h2>新手驿路指南</h2></div><button class="return-game">返回上一页</button></div>
@@ -62,6 +62,8 @@
  <p id="library-count" class="muted"></p><div id="library-grid" class="library-grid"></div>
 </section>
 </main>
+<dialog id="card-preview" aria-labelledby="preview-title"><div class="preview-heading"><div><small id="preview-kind" class="eyebrow"></small><h2 id="preview-title"></h2></div><button id="preview-close" type="button">关闭</button></div><div id="preview-card"></div></dialog>
+<dialog id="report-projection" aria-label="驿道战报投影"><div class="projection-content"><p class="eyebrow">黄金邮道 · 实时战况</p><h2>驿道战报</h2><p id="projection-summary"></p><ol id="projection-log"></ol><p class="projection-dismiss">单击任意位置返回棋盘</p></div></dialog>
 <dialog id="interaction" aria-labelledby="dialog-title"><form id="interaction-form"><h2 id="dialog-title"></h2><p id="dialog-description" class="muted"></p><div id="dialog-fields"></div><p id="dialog-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="dialog-cancel">取消</button><button type="submit" id="dialog-confirm" class="primary">确认</button></div></form></dialog>
 <script type="module" src="/app.js"></script>
 </body></html>

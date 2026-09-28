@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialGame, edgeKey, getNeighbors, initialTurnOrder, isCheckpoint, isSafeNode, RandomStream, shortestPath, staticDistance } from '../src/index.ts';
+import { applyCommand, createInitialGame, edgeKey, getNeighbors, initialTurnOrder, isCheckpoint, isSafeNode, RandomStream, shortestPath, startGame, staticDistance } from '../src/index.ts';
 
 test('map has the canonical depot distances', () => {
   assert.equal(staticDistance('HUB', 'MRG'), 4);
@@ -40,6 +40,18 @@ test('starting characters and decks match rules', () => {
   assert.equal(game.blackMarketDeck.length, 22);
   assert.equal(game.eventDeck.length, 11);
   assert.deepEqual(initialTurnOrder(2), ['OFFICER_1', 'SMUGGLER_1', 'OFFICER_2', 'SMUGGLER_2']);
+});
+
+test('opening faction is configurable for simulation and then alternates each round', () => {
+  const defaultGame = startGame(createInitialGame(91));
+  const officerFirstGame = startGame(createInitialGame(91, 'race', 'officer'));
+  assert.equal(defaultGame.activeCharacterId, 'SMUGGLER_1');
+  assert.equal(officerFirstGame.activeCharacterId, 'OFFICER_1');
+
+  let game = officerFirstGame;
+  for (let i = 0; i < 4; i += 1) game = applyCommand(game, { type: 'END_TURN', actorId: game.activeCharacterId! });
+  assert.equal(game.round, 2);
+  assert.equal(game.activeCharacterId, 'SMUGGLER_1');
 });
 
 test('random die stream can be replayed', () => {

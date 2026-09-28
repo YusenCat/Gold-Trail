@@ -22,6 +22,7 @@ const mimeByExtension: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',
   '.jpg': 'image/jpeg',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
 };
@@ -139,8 +140,8 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse)
       return json(response, 200, view());
     }
     if (method === 'GET' && url.pathname === '/') return staticFile(response, 'index.html');
-    if (method === 'GET' && /^\/(app\.js|styles\.css)$/.test(url.pathname)) return staticFile(response, url.pathname.slice(1));
-    if (method === 'GET' && /^\/assets\/(?:cards\/[A-Z0-9_]+\.png|board-map\.png|board-background\.jpg|board-illustration\.svg)$/.test(url.pathname)) return staticFile(response, url.pathname.slice(1));
+    if (method === 'GET' && /^\/(?:app\.js|styles\.css|modules\/[a-z-]+\.js)$/.test(url.pathname)) return staticFile(response, url.pathname.slice(1));
+    if (method === 'GET' && /^\/assets\/(?:cards\/[A-Z0-9_]+\.png|ui\/(?:card-frame|action-seals|hero-road|world-backdrop|hand-mat|action-panel|intel-ledger|mode-(?:solo|hotseat|guide))\.webp|board-map\.png|board-background\.jpg|board-illustration\.svg)$/.test(url.pathname)) return staticFile(response, url.pathname.slice(1));
     json(response, 404, { error: 'not_found' });
   } catch (error) {
     const status = error instanceof SaveConflictError ? 409 : error instanceof SaveNotFoundError ? 404 : error instanceof RuleError ? 400 : 500;
