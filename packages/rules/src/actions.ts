@@ -68,7 +68,7 @@ export function legalActions(state: GameState): LegalAction[] {
       cardAction('T_RESIST_SEARCH');
       add('放弃响应', 'decision', { type: 'PASS_RESPONSE', actorId: id });
     } else if (p.kind === 'splitGold') {
-      for (const a of [...new Set([0, Math.floor(actor.gold / 2), Math.ceil(actor.gold / 2), actor.gold])]) add('甲箱 ' + a + ' · 乙箱 ' + (actor.gold - a), 'decision', { type: 'SPLIT_GOLD', actorId: id, boxA: a, boxB: actor.gold - a });
+      for (const a of [...new Set([0, Math.floor(actor.gold / 2) - 1, Math.floor(actor.gold / 2), Math.ceil(actor.gold / 2), Math.ceil(actor.gold / 2) + 1, actor.gold])].filter((value) => value >= 0 && value <= actor.gold)) add('甲箱 ' + a + ' · 乙箱 ' + (actor.gold - a), 'decision', { type: 'SPLIT_GOLD', actorId: id, boxA: a, boxB: actor.gold - a });
     } else {
       if (p.kind === 'askSearchQuestion') cardAction('T_INTERROGATION');
       for (const [question, label] of Object.entries({ aMoreThanB: '甲箱比乙箱多吗？', aEmpty: '甲箱为空吗？', bAtLeast2: '乙箱至少有两枚碎金吗？', equal: '两箱一样多吗？' })) add(label, 'decision', { type: 'ASK_SEARCH_QUESTION', actorId: id, question: question as 'equal' });

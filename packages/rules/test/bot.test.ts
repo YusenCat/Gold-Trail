@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { createInitialGame, startGame, applyCommand, publicView } from '../src/index.ts';
 import { chooseBotCommand } from '../src/bot.ts';
 import { legalActions, decisionActor } from '../src/actions.ts';
+import { chooseSplit, inspectionValue, questionValue } from '../src/bot/search-policy.ts';
+import { createBotPlan } from '../src/bot/planning.ts';
 
 function strategyPosition() {
   const game = startGame(createInitialGame(7));
@@ -25,6 +27,14 @@ test('bot resupplies before leaving the hub with insufficient food',()=>{
 test('bot avoids spending silver to replace an identical piece of equipment',()=>{
   const {game,actor}=strategyPosition();actor.silver=12;actor.equipped.tool='E_PICKAXE';game.marketSlots=['E_PICKAXE',null,null];
   assert.notEqual(chooseBotCommand(game)?.type,'BUY_MARKET');
+});
+
+test('officer uses the free market refresh when no affordable useful item is available',()=>{
+  const {game}=strategyPosition();game.activeCharacterId='OFFICER_1';
+  const officer=game.characters.find((character)=>character.id==='OFFICER_1')!;
+  officer.nodeId='HUB';officer.actionPoints=0;officer.silver=0;
+  game.marketSlots=['T_CONFUSE','T_STEAL_CARD','E_LOCKBOX'];
+  assert.equal(chooseBotCommand(game)?.type,'REFRESH_MARKET');
 });
 
 test('smuggler carrying cargo avoids an occupied checkpoint instead of marching through it',()=>{
@@ -110,6 +120,42 @@ test('bot combines both truthful answers rather than forgetting the first one',(
   const {game}=strategyPosition();game.characters.find((c)=>c.id==='OFFICER_1')!.gold=6;
   game.pendingDecision={kind:'chooseSearchBox',sourceId:'SMUGGLER_1',targetId:'OFFICER_1',sourceKind:'privateSearch',boxA:2,boxB:4,question:'aEmpty',answer:false,questionsRemaining:0,askedQuestions:['aMoreThanB','aEmpty'],answers:[{question:'aMoreThanB',answer:false},{question:'aEmpty',answer:false}]};
   assert.deepEqual(chooseBotCommand(game),{type:'CHOOSE_SEARCH_BOX',actorId:'SMUGGLER_1',box:'B'});
+});
+
+test('balanced box splits vary across public decision states without using hidden data',()=>{
+  const {game,actor}=strategyPosition();actor.gold=6;
+  game.pendingDecision={kind:'splitGold',sourceId:'OFFICER_1',targetId:actor.id,sourceKind:'inspection'};
+  const actions=legalActions(game);
+  const choices=new Set<number>();
+  for(let revision=1;revision<=24;revision++){
+    game.revision=revision;
+    const picked=chooseSplit(publicView(game,'smuggler'),actor.id,actions)?.command;
+    assert.equal(picked?.type,'SPLIT_GOLD');
+    if(picked?.type==='SPLIT_GOLD'){
+      assert.ok(Math.abs(picked.boxA-picked.boxB)<=2);
+      choices.add(picked.boxA);
+    }
+  }
+  assert.ok(choices.size>1);
+});
+
+test('search estimates account for question value, AP cost and inspection streak',()=>{
+  const {game,actor}=strategyPosition();
+  const target=game.characters.find((character)=>character.id==='OFFICER_1')!;
+  target.gold=5;
+  game.pendingDecision={kind:'askSearchQuestion',sourceId:actor.id,targetId:target.id,sourceKind:'privateSearch',boxA:2,boxB:3,interrogationUsed:false,askedQuestions:[]};
+  assert.ok(questionValue(publicView(game,'smuggler'),'aMoreThanB')>=2.5);
+  const fresh=inspectionValue(actor,target,1,'INSPECT');
+  actor.successiveSuccessfulInspections=2;
+  assert.ok(inspectionValue(actor,target,1,'INSPECT')<fresh);
+  assert.ok(inspectionValue(actor,target,3,'INSPECT')<inspectionValue(actor,target,1,'INSPECT'));
+});
+
+test('short plan changes from mining to delivery as cargo grows',()=>{
+  const {game,actor}=strategyPosition();actor.nodeId='MINE';actor.gold=1;
+  assert.equal(createBotPlan(publicView(game,'smuggler'),actor).goal,'mine');
+  actor.gold=5;
+  assert.equal(createBotPlan(publicView(game,'smuggler'),actor).goal,'deliver');
 });
 
 test('all enumerated moves pass through the same rule engine without changing the source', () => {

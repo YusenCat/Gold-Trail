@@ -15,7 +15,7 @@
 | `economy.ts` | 采矿、兑换、补给、市场、拾取和装备效果 |
 | `search.ts` | 官兵稽查、金矿搜寻、私刑收缴、分箱问答和响应结算 |
 
-地图定义、合法动作枚举、AI 决策和初始状态仍分别属于 `map.ts`、`actions.ts`、`bot.ts`、`state.ts`。`content/` 提供卡牌、地图与平衡数据；规则逻辑不放在 UI 或 HTTP 路由中。
+地图定义、合法动作枚举、AI 决策和初始状态仍分别属于 `map.ts`、`actions.ts`、`bot.ts`、`state.ts`。AI 的押运计划、收缴判断和卡牌时机分别位于 `bot/planning.ts`、`bot/search-policy.ts`、`bot/tactic-policy.ts`；`bot-baseline.ts` 保留旧评分策略供同种子对照。`content/` 提供卡牌、地图与平衡数据；规则逻辑不放在 UI 或 HTTP 路由中。
 
 ## 浏览器端
 
