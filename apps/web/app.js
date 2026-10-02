@@ -1,7 +1,15 @@
+import {createModeFlow} from './modules/mode-flow.js';
+import {bindSaveControls} from './modules/local-saves.js';
+import {createBotController} from './modules/bot-controller.js';
+import {bindReportView} from './modules/report-view.js';
+import {createGameHud} from './modules/game-hud.js';
+import {createHallController} from './modules/hall.js';
 import { createApiClient } from './modules/api.js';
 import { createBoardRenderer } from './modules/board.js';
 import { createGamePanels } from './modules/panels.js';
 import { createLibraryRenderer } from './modules/library.js';
+import { createLobbyController } from './modules/lobby.js';
+import { portrait, renderPlayerTableaux } from './modules/player-tableau.js';
 const state = { game: null, map: null, cards: [], actions: [], legalMoves: [], balance: {}, botPending: false, decisionActorId: null, busy: false, screen: 'home', previous: 'home', setupKind: 'solo', tab: 'location', botPaused: false, botTimer: null };
 const $ = (selector) => document.querySelector(selector);
 const phases = { preEvent:'轮前准备', eventReveal:'揭示事件', supply:'粮草结算', characterTurn:'角色行动', roundEnd:'轮末结算', finished:'对局结束' };
@@ -12,7 +20,7 @@ const factionName = (id) => id === 'smuggler' ? '走私者' : '官兵';
 const card = (id) => state.cards.find((c) => c.id === id) || { name:'未知牌', text:'' };
 function nodeName(id) {
  const n=state.map?.nodes.find((n)=>n.id===id);
- return n?.siteName || n?.label?.replace(/C$/,'丙').replace(/D$/,'丁').replace(/E$/,'戊').replace(/F$/,'己') || (id || '').replace(/^W/,'西路·').replace(/^E/,'东路·').replace(/^N/,'北路·').replace(/^R/,'绕行道·');
+ return n?.siteName || n?.label?.replace(/C$/,'丙').replace(/D$/,'丁').replace(/E$/,'戊').replace(/F$/,'己').replace(/G$/,'庚') || (id || '').replace(/^W/,'西路·').replace(/^E/,'东路·').replace(/^N/,'北路·').replace(/^R/,'绕行道·');
 }
 function textCN(value) {
  let text=String(value);
@@ -35,11 +43,7 @@ function show(screen){
  if(screen==='help' && !state.rulesLoaded)api('/api/rules').then((result)=>{$('#full-rules').textContent=result.text;state.rulesLoaded=true;}).catch(()=>{$('#full-rules').textContent='规则书暂时无法载入，请稍后重试。';});
  render();
 }
-function scheduleBot(){
- clearTimeout(state.botTimer);
- if(state.screen!=='play'||!state.botPending||state.botPaused||state.busy||$('#interaction').open||$('#report-projection').open)return;
- state.botTimer=setTimeout(async()=>{if(state.screen==='play'&&!state.botPaused)await mutate('/api/game/bot-step');},state.botDelay??1000);
-}
+function scheduleBot(){botController.schedule();}
 function modal(title,description,build,submit,label='确认'){
  if($('#interaction').open)return;
  clearTimeout(state.botTimer);$('#dialog-title').textContent=title;$('#dialog-description').textContent=description;$('#dialog-error').textContent='';$('#dialog-fields').replaceChildren();$('#dialog-confirm').disabled=false;$('#dialog-confirm').textContent=label;
@@ -48,7 +52,7 @@ function modal(title,description,build,submit,label='确认'){
  $('#interaction').showModal();
 }
 $('#dialog-cancel').onclick=()=>{if(!state.busy){$('#interaction').close();scheduleBot();}};
-$('#interaction').addEventListener('close',()=>{state.previewPath=null;if(state.screen==='play')renderBoard();scheduleBot();});
+$('#interaction').addEventListener('close',()=>{state.roomUtilityDialog=false;state.previewPath=null;if(state.screen==='play'&&state.game)renderBoard();scheduleBot();});
 $('#interaction').addEventListener('cancel',(e)=>{if(state.busy)e.preventDefault();else setTimeout(scheduleBot,0);});
 function field(label,input){const row=el('label',label,'field');row.append(input);$('#dialog-fields').append(row);return input;}
 function select(label,options){const input=el('select');for(const [id,name] of options){const option=el('option',name);option.value=id;input.append(option);}return field(label,input);}
@@ -76,32 +80,6 @@ function showCardPreview(item){
  $('#preview-card').replaceChildren(cardFace(item));if(!dialog.open)dialog.showModal();
 }
 $('#preview-close').onclick=()=>$('#card-preview').close();
-const reportDialog=$('#report-projection');
-let reportRestorePause=false;
-function setReportCollapsed(collapsed){
- $('#log').hidden=collapsed;
- $('#report-toggle').textContent=collapsed?'展开':'收起';
- $('#report-toggle').setAttribute('aria-expanded',String(!collapsed));
- $('.report-panel').classList.toggle('collapsed',collapsed);
-}
-function closeReportProjection(){
- if(!reportDialog.open)return;
- reportDialog.close();
- setReportCollapsed(true);
- state.botPaused=reportRestorePause;
- render();
-}
-$('#report-toggle').onclick=()=>setReportCollapsed(!$('#log').hidden);
-$('#report-project').onclick=()=>{
- if(!state.game)return;
- reportRestorePause=state.botPaused;
- state.botPaused=true;
- clearTimeout(state.botTimer);
- render();
- reportDialog.showModal();
-};
-reportDialog.addEventListener('click',closeReportProjection);
-reportDialog.addEventListener('cancel',(event)=>{event.preventDefault();closeReportProjection();});
 const renderLibrary = createLibraryRenderer({ state, $, el, button, kinds, cardFace, showCardPreview });
 function marketTile(item,price,action,status){
  const tile=el('article',undefined,'market-card');const look=button('',()=>showCardPreview(item));look.className='market-art-preview';look.setAttribute('aria-label','放大查看'+item.name);look.append(cardFace(item),el('small','放大查看牌面'));tile.append(look);
@@ -156,13 +134,19 @@ function inspectCharacter(actor){
 function renderHand(){
  const tray=$('#hand-tray');tray.replaceChildren();
  const actor=state.game.characters.find((c)=>c.id===state.decisionActorId);
- const visible=actor&&(state.game.session.kind!=='solo'||actor.faction===state.game.session.humanFaction)?actor:null;
- $('#hand-title').textContent=state.game.phase==='finished'?'本局已结束':visible?playerName(visible.id)+' · 手牌 '+visible.hand.length+'/5':'等待你的回合';
+ const lan=state.game.session.kind==='lan';
+ const visible=lan ? (state.game.characters.find((c)=>c.id===state.handCharacterId&&state.me?.characterIds.includes(c.id)) || state.game.characters.find((c)=>c.id===(state.canAct?state.decisionActorId:state.me?.characterIds[0]))) : actor&&(state.game.session.kind!=='solo'||actor.faction===state.game.session.humanFaction)?actor:null;
+ const choices=$('#hand-characters');choices.replaceChildren();choices.hidden=!lan;
+ if(lan)for(const c of state.game.characters.filter((c)=>c.faction===state.me?.faction))choices.append(button(playerName(c.id)+(state.me.characterIds.includes(c.id)?' · 你':' · 队友'),()=>{state.handCharacterId=c.id;state.selectedCard=null;state.previewPath=null;render();}));
+ const chosen=lan&&state.handCharacterId?state.game.characters.find((c)=>c.id===state.handCharacterId&&c.faction===state.me?.faction):visible;
+ const handActor=chosen||visible;
+ $('#hand-title').textContent=state.game.phase==='finished'?'本局已结束':handActor?playerName(handActor.id)+' · 手牌 '+handActor.hand.length+'/5':'等待你的回合';
  $('#hand-hint').textContent=state.selectedCard?'已选中「'+card(state.selectedCard).name+'」 · 点击发光棋子或目的地':'点击卡牌选取目标 · 每回合至多两张';
- if(!visible){tray.append(el('p',state.game.phase==='finished'?'可以保存战局，或回主菜单开始新的行程。':'对手正在行动。你的响应窗口出现时，手牌会自动切换。','empty-hand'));return;}
- if(!visible.hand.length){tray.append(el('p','行囊里还没有功能牌。到驿站购买明牌，或在黑市盲抽。','empty-hand'));return;}
- visible.hand.forEach((id)=>{
-  const item=card(id),available=state.actions.filter((a)=>a.command.type==='PLAY_TACTIC'&&a.command.cardId===id),row=button('',()=>selectCard(id),!available.length),slot=el('div',undefined,'hand-card-slot');
+ if(lan&&!state.canAct)$('#hand-hint').textContent='可查看你方手牌 · 等待你的行动或响应窗口';
+ if(!handActor){tray.append(el('p',state.game.phase==='finished'?'可回主菜单开始新的行程。':'对手正在行动。你的响应窗口出现时，手牌会自动切换。','empty-hand'));return;}
+ if(!handActor.hand.length){tray.append(el('p','行囊里还没有功能牌。到驿站购买明牌，或在黑市盲抽。','empty-hand'));return;}
+ handActor.hand.forEach((id)=>{
+  const item=card(id),available=lan&&!state.canAct?[]:state.actions.filter((a)=>a.command.type==='PLAY_TACTIC'&&a.command.cardId===id&&a.command.actorId===handActor.id),row=button('',()=>selectCard(id),!available.length),slot=el('div',undefined,'hand-card-slot');
   row.className='playing-card card-illustrated'+(available.length?' playable':'')+(state.selectedCard===id?' picked':'');
   row.setAttribute('aria-label',item.name+'：'+item.text);
   row.setAttribute('aria-pressed',String(state.selectedCard===id));
@@ -171,44 +155,7 @@ function renderHand(){
   slot.append(row);const look=button('放大查看',()=>showCardPreview(item));look.className='hand-preview-button';look.setAttribute('aria-label','放大查看'+item.name);slot.append(look);tray.append(slot);
  });
 }
-function setup(kind){
- state.setupKind=kind;$('#setup-title').textContent=kind==='solo'?'本地人机对战':'本地同屏对局';$('#faction-choice').hidden=kind!=='solo';show('setup');
-}
-$('#setup-form').onsubmit=async(event)=>{
- event.preventDefault();const form=new FormData(event.target);
- const start=async()=>{const ok=await mutate('/api/game/new',{kind:state.setupKind,mode:form.get('mode'),humanFaction:form.get('faction'),start:true});if(ok){state.botPaused=false;show('play');}return ok;};
- if(state.game?.log.length && state.game.phase!=='finished')confirm('替换当前对局？','新局会替换当前未保存进度，请先保存需要保留的行程。',start);else await start();
-};
-$('#mode-solo').onclick=()=>setup('solo');$('#mode-hotseat').onclick=()=>setup('hotseat');
-$('#nav-home').onclick=()=>show('home');$('#nav-help').onclick=$('#home-help').onclick=()=>show('help');$('#nav-library').onclick=()=>show('library');$('#setup-back').onclick=()=>show('home');
-for(const b of document.querySelectorAll('.return-game'))b.onclick=()=>show(state.previous);
-$('#resume').onclick=()=>show('play');
-for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>{state.tab=b.dataset.tab;render();};
-$('#bot-pause').onclick=()=>{state.botPaused=!state.botPaused;render();};
-$('#bot-speed').onclick=()=>{state.botDelay=state.botDelay===350?1000:350;render();};
-document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&!$('#interaction').open&&state.selectedCard){state.selectedCard=null;state.previewPath=null;render();}});
-$('#save').onclick=()=>{
- let overwrite=false;
- modal('保存行程','每个名称对应独立存档。输入新名称；同名存档会先询问是否覆盖。',()=>{
-  const i=el('input');i.required=true;i.maxLength=48;i.autocomplete='off';i.value='第'+state.game.round+'轮-'+Date.now().toString().slice(-6);return field('存档名称',i);
- },async(i)=>{
-  try{await api('/api/saves',{name:i.value.trim(),overwrite});notify(overwrite?'存档已覆盖并更新。':'新存档已创建。');return true;}
-  catch(e){if(e.status===409&&!overwrite){overwrite=true;$('#dialog-description').textContent='“'+(e.data.conflict?.name||i.value.trim())+'”已存在。再次点击“确认覆盖”会更新这个存档；取消则保留原存档。';$('#dialog-confirm').textContent='确认覆盖';return false;}throw e;}
- },'新建存档');
-};
-async function load(){
- clearTimeout(state.botTimer);
- try{
- const {saves}=await api('/api/saves');
- if(!saves.length){notify('还没有本地存档。');scheduleBot();return;}
- const modeName=(s)=>s.mode==='fixedRounds'?'固定轮数':'竞速';
- const sessionName=(s)=>s.kind==='solo'?'人机':'本地双人';
- const phaseName=(s)=>({preEvent:'轮前准备',eventReveal:'事件揭示',supply:'粮草结算',characterTurn:'角色行动',roundEnd:'轮末结算',finished:'已结束'}[s.phase]||'进行中');
- const optionLabel=(s)=>`${s.name}　·　第${s.round}轮　·　${modeName(s)}${s.kind?' / '+sessionName(s):''}${s.faction?' / '+(s.faction==='smuggler'?'走私者':'官兵'):''}　·　${phaseName(s)}　·　${new Date(s.savedAt).toLocaleString('zh-CN')}`;
- modal('读取行程','选择要读取的独立存档。读取后会替换当前对局；自动恢复进度不会出现在此列表。旧规则存档会保留，但不能用于当前规则。',()=>select('可读取存档',saves.map((s)=>[s.id,optionLabel(s)])),async(i)=>{const ok=await mutate('/api/saves/load',{id:i.value});if(ok){state.botPaused=false;show('play');}return ok;},'读取所选存档');
- }catch(e){notify(e.message,true);scheduleBot();}
-}
-$('#load').onclick=$('#home-load').onclick=load;
+function setup(kind){return modeFlow.setup(kind);}
 function pickup(actor){
  const drop=state.game.droppedItems[actor.nodeId];if(!drop)return;
  modal('拾取路上遗物','每回合一次。手牌上限五张；同槽装备替换现有装备。',()=>{
@@ -218,6 +165,9 @@ function pickup(actor){
  },(f)=>{const chosen=(items)=>items.filter((i)=>i.checked).map((i)=>i.value);const handIds=chosen(f.hand);if(handIds.length+actor.hand.length>5)throw new Error('手牌不能超过五张');return command({type:'PICK_UP',actorId:actor.id,gold:Number(f.gold.value),silver:Number(f.silver.value),handIds,equipmentIds:chosen(f.equipment)});},'确认拾取');
 }
 const renderBoard = createBoardRenderer({ state, $, playerName, factionName, nodeName, card, command, chooseAction, inspectCharacter });
+$('#map-expand').onclick=()=>{const dialog=$('#map-detail');$('#map-detail-viewport').append($('#board'));dialog.showModal();};
+$('#map-detail-close').onclick=()=>$('#map-detail').close();
+$('#map-detail').addEventListener('close',()=>{$('#map-home-viewport').append($('#board'));});
 
 function guideFor(g,active){
  if(g.phase==='finished')return ['行程结算','本局胜负已定。保存这份战报，或从主菜单开启新的行程。'];
@@ -252,32 +202,18 @@ function renderGuide(g,active){
 const { renderResult, renderDecision, renderOperations } = createGamePanels({ state, $, el, button, factionName, playerName, card, modal, field, number, boundedInteger, command, execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render: () => render(), renderBoard });
 
 function render(){
+ lobby.renderLobby();
+ hall.render();
+ $('#home-load').hidden=!state.localAvailable||!!state.room;
+ if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
+ else {$('#resume').textContent='继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
  const g=state.game;if(!g||!state.map)return;
- $('#resume').disabled=!g.log.length;$('#home-status').textContent=g.log.length?'自动恢复已就绪 · 第'+g.round+'轮 · '+phases[g.phase]+' · 每次落子都会保留。':'先选择一种游玩方式。';
+ if(!state.room)$('#home-status').textContent=g.log.length?'自动恢复已就绪 · 第'+g.round+'轮 · '+phases[g.phase]+' · 每次落子都会保留。':'先选择一种游玩方式。';
  if(state.screen==='library')renderLibrary();
  if(state.screen!=='play')return;
- const active=g.characters.find((c)=>c.id===g.activeCharacterId);
- $('#summary').textContent=(g.session.kind==='solo'?'人机对战 · 你是'+factionName(g.session.humanFaction):'同屏对局')+'　｜　第'+g.round+'轮 · '+phases[g.phase]+'　｜　走私者 '+g.reputation.smuggler+' / 官兵 '+g.reputation.officer+' 声望';
- $('#bot-pause').hidden=g.session.kind!=='solo';$('#bot-pause').textContent=state.botPaused?'继续人机':'暂停人机';
- $('#bot-speed').hidden=g.session.kind!=='solo';$('#bot-speed').textContent='人机速度 · '+(state.botDelay===350?'快速':'正常');
- $('#autosave-state').textContent='自动保留 · 第'+g.round+'轮';
- const track=$('#turn-track');track.replaceChildren();
- g.turnOrder.forEach((id,index)=>{const c=g.characters.find((c)=>c.id===id),piece=el('span',undefined,'turn-piece '+c.faction+(id===g.activeCharacterId?' active':''));if(id===g.activeCharacterId)piece.setAttribute('aria-current','step');piece.append(el('small',String(index+1)),el('strong',playerName(id)),el('span',g.phase==='finished'?'已结算':c.deadUntilRound?'等待复活':g.phase==='preEvent'?'轮前准备':id===g.activeCharacterId?'正在行动':index<g.turnIndex?'已行动':'待命'));track.append(piece);});
- $('#last-action').textContent=g.log.length?textCN(g.log.at(-1).message):'行程即将开始';
- const event=$('#event-banner');event.replaceChildren();
- if(g.phase==='finished')event.append(el('strong',g.winner==='draw'?'本局平分秋色':factionName(g.winner)+'获胜'),el('p','可保存战局，或回主菜单再来一局。'));
- else if(g.activeEventId)event.append(el('strong','本轮事件 · '+card(g.activeEventId).name),el('p',card(g.activeEventId).text));
- else event.append(el('strong','轮前准备'),el('p','在事件揭示前，处理白驹与铜锣。'));
- const info=$('#active-character');info.replaceChildren();
- if(active){
- info.append(el('strong',playerName(active.id)+' · '+nodeName(active.nodeId)));
- const resources=el('div',undefined,'resource-grid');for(const [label,value,kind] of [['行动 · 骰'+(active.actionRoll??'—'),active.actionPoints,null],['粮草',active.food,'food'],['碎金',active.gold,'gold'],['官银',active.silver,'silver']]){const token=el('span',undefined,'resource-token'),caption=el('small');if(kind)caption.append(resourceIcon(kind));caption.append(document.createTextNode(label));token.append(caption,el('strong',String(value)));resources.append(token);}info.append(resources);
- const statuses=[];if(active.mountId)statuses.push(card(active.mountId).name+' · 余'+active.mountTurnsRemaining+'回合');if(active.sealedGold)statuses.push('密封金 '+active.sealedGold);if(active.lockbox.gold+active.lockbox.silver)statuses.push('密匣：金'+active.lockbox.gold+' / 银'+active.lockbox.silver);if(active.tacticsBlockedThisTurn)statuses.push('本回合禁用功能牌');if(active.hubEntryBanTurns)statuses.push('暂禁进入驿站');if(active.controlledById)statuses.push('受'+playerName(active.controlledById)+'控制移动');info.append(el('p',statuses.join(' · '),'muted'));
- }
- $('#turn-hint').textContent=g.phase==='finished'?'对局结束':state.botPending?(state.botPaused?'人机已暂停':'对手正在行动，遇到你的决策会自动停下。'):'等待'+playerName(state.decisionActorId)+'操作。';
+ const active=renderHud(g);
  renderResult(g);renderBoard();renderDecision();renderOperations();renderHand();renderGuide(g,active);
- const characters=$('#characters');characters.replaceChildren();
- for(const c of g.characters){const row=el('div',undefined,'character '+c.faction+(c.id===g.activeCharacterId?' selected':'')),detail=el('p');detail.append(document.createTextNode(nodeName(c.nodeId)+'　'));for(const [label,value,kind] of [['粮',c.food,'food'],['金',c.gold,'gold'],['银',c.silver,'silver']]){const resource=el('span',undefined,'roster-resource');resource.append(resourceIcon(kind),document.createTextNode(label+' '+value));detail.append(resource);}row.append(el('strong',playerName(c.id)+(g.session.kind==='solo'?(c.faction===g.session.humanFaction?' · 你方':' · 人机'):'')),detail,el('small','手牌 '+c.hand.length+' · 装备 '+Object.values(c.equipped).map((id)=>card(id).name).join('、')));if(c.deadUntilRound)row.append(el('p','第'+c.deadUntilRound+'轮复活'));characters.append(row);}
+ renderPlayerTableaux({state,el,button,playerName,nodeName,card,inspectCharacter,resourceIcon});
  const log=$('#log');log.replaceChildren();for(const entry of g.log.slice(-35).reverse())log.append(el('li',textCN(entry.message)));
  $('#projection-summary').textContent=$('#summary').textContent;
  const projectionLog=$('#projection-log');projectionLog.replaceChildren();for(const entry of g.log.slice(-60).reverse())projectionLog.append(el('li',textCN(entry.message)));
@@ -288,5 +224,19 @@ const hintsButton=$('#toggle-hints');
 function setHintsVisible(visible){document.body.classList.toggle('hints-hidden',!visible);hintsButton.textContent=visible?'隐藏提示':'显示提示';hintsButton.setAttribute('aria-pressed',String(visible));try{localStorage.setItem('golden-post-road-hints',visible?'show':'hide');}catch{}}
 hintsButton.onclick=()=>setHintsVisible(document.body.classList.contains('hints-hidden'));
 try{setHintsVisible(localStorage.getItem('golden-post-road-hints')!=='hide');}catch{setHintsVisible(true);}
-async function init(){try{const [view,map,cards]=await Promise.all([api('/api/game'),api('/api/map'),api('/api/cards')]);state.map=map;state.cards=cards.cards;absorb(view);render();}catch(e){notify('连接失败，请启动服务后刷新页面。',true);}}
+const lobby = createLobbyController({ state, $, el, button, api, absorb, mutate, show, render, notify, confirm, modal, field, select, playerName, factionName });
+const modeFlow=createModeFlow({state,$,api,absorb,mutate,notify,show,confirm,render});
+const botController=createBotController({state,$,mutate,render});
+bindSaveControls({state,$,api,mutate,lobby,modal,el,field,select,notify,scheduleBot,show});
+bindReportView({state,$,render});
+const renderHud=createGameHud({state,$,el,phases,factionName,playerName,nodeName,textCN,resourceIcon,portrait,card});
+const hall=createHallController({state,$,render});
+async function init(){
+ try{
+  const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);
+  state.map=map;state.cards=cards.cards;hall.configure(session);
+  if(session.local)absorb(await api('/api/game'));
+  await lobby.restore();render();
+ }catch(e){notify('连接失败，正在重试；请确认主机服务已启动。',true);setTimeout(init,3000);}
+}
 init();

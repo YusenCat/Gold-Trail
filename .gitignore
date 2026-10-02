@@ -1,25 +1,46 @@
-# Per-machine play progress (the game recreates this directory as needed)
-/data/saves/*.json
-/data/saves/*.tmp
+# Publish only the minimum playable package; excluded files remain on this machine.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/package.json
+!/启动游戏.cmd
+!/apps/
+!/packages/
+!/content/
+!/docs/
+!/tools/
 
-# Temporary renders and local build/test output
-/tmp/
-/node_modules/
-/dist/
-/coverage/
+# Only the rulebook is read at runtime.
+/docs/*
+!/docs/RULEBOOK_V1.md
+
+# Only the launcher and Windows runtime finder are needed to play.
+/tools/*
+!/tools/start-game.mjs
+!/tools/start-game.ps1
+
+# Rules source is required; tests and the comparison bot are development files.
+/packages/*
+!/packages/rules/
+/packages/rules/*
+!/packages/rules/src/
+/packages/rules/src/bot-baseline.ts
+/apps/server/*.test.ts
+
+# Card PNGs are runtime art. UI PNGs are originals; runtime uses WebP.
+/apps/web/assets/ui/*.png
+/apps/web/assets/board-map.png
+/apps/web/assets/board-background.jpg
+/apps/web/assets/board-illustration.svg
+
+# Machine data, dependencies, caches, generated output and private configuration.
+**/node_modules/
+**/.env
+**/.env.*
 *.log
 *.tmp
-
-# Local environment and OS metadata
-.env
-.env.*
-!.env.example
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# Other files
-二十二驿_黄金邮道_说明书.docx 
-黄金驿道桌游.pdf 
-黄金邮道_数字版开发规划书.md
-微信图片_20260921225958_12_465.jpg
+*.tsbuildinfo
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini

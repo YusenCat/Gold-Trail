@@ -4,9 +4,11 @@ export function createGamePanels(deps) {
   function renderResult(g){
    const panel=$('#result-panel');panel.replaceChildren();panel.hidden=g.phase!=='finished';if(g.phase!=='finished')return;
    const title=g.winner==='draw'?'平分秋色':factionName(g.winner)+'赢得此局';
-   const left=el('div',undefined,'result-title');left.append(el('small',g.mode==='race'?'竞速局结算':'三十轮火并结算'),el('h2',title),el('p','第'+g.round+'轮结束 · 自动恢复已保留本局。'));
+   const left=el('div',undefined,'result-title');left.append(el('small',g.mode==='race'?'竞速局结算':'三十轮火并结算'),el('h2',title),el('p','第'+g.round+'轮结束 · 自动保留已记录本局。'));
    const score=el('div',undefined,'result-score');for(const faction of ['smuggler','officer']){const chip=el('span',undefined,'result-score-item '+faction);chip.append(el('small',factionName(faction)),el('strong',String(g.reputation[faction])));score.append(chip);}
-   const controls=el('div',undefined,'result-actions');controls.append(button('保存战报',()=>$('#save').click()),button('再开一局',()=>setup(g.session.kind)));
+   const controls=el('div',undefined,'result-actions');
+   if(g.session.kind==='lan'){controls.append(button('返回房间',()=>$('#lan-lobby').click()));if(state.me.playerId===state.room.hostId)controls.append(button('保存战报',()=>$('#save').click()),button('再开一局',()=>$('#lan-rematch').click(),state.roomConnection!=='connected'));}
+   else controls.append(button('保存战报',()=>$('#save').click()),button('再开一局',()=>setup(g.session.kind)));
    panel.append(left,score,controls);
   }
   
@@ -15,9 +17,10 @@ export function createGamePanels(deps) {
    const actions=state.actions.filter((a)=>a.group==='decision');section.hidden=!state.game.pendingDecision&&!actions.length;
    if(state.botPending){panel.append(el('p','人机正在处理决策…','muted'));return;}
    const p=state.game.pendingDecision;
+   if(state.game.session.kind==='lan'&&!state.canAct){panel.append(el('p',state.room.status==='paused'?'对局已暂停，原决策会保留。':'等待'+playerName(state.decisionActorId)+'处理，结果会自动同步。','muted'));return;}
    if(p?.kind==='splitGold'){
    const actor=state.game.characters.find((c)=>c.id===p.targetId);
-   panel.append(el('p',playerName(p.targetId)+'分箱。同屏对局请让其他玩家暂时避看。'));
+   panel.append(el('p',playerName(p.targetId)+'分箱。'+(state.game.session.kind==='lan'?'箱数不会发送给其他玩家。':'同屏对局请让其他玩家暂时避看。')));
    panel.append(button('秘密分箱 · '+actor.gold+'枚碎金',()=>modal('双箱分配','乙箱自动接收剩余碎金，回答由系统如实生成。',()=>{
    const input=el('input');Object.assign(input,{type:'number',value:'0',min:'0',max:String(actor.gold),step:'1',required:true,inputMode:'numeric',autocomplete:'off',ariaDescription:'只能输入 0 到 '+actor.gold+' 的整数'});const rest=el('p','乙箱：'+actor.gold),hint=el('small','甲箱可分配 0 至 '+actor.gold+' 枚碎金。','muted');field('甲箱碎金',input);$('#dialog-fields').append(rest,hint);
    const update=()=>{const valid=input.value!==''&&Number.isInteger(input.valueAsNumber)&&input.valueAsNumber>=0&&input.valueAsNumber<=actor.gold;input.setCustomValidity(valid?'':'请输入 0 至 '+actor.gold+' 的整数。');$('#dialog-confirm').disabled=!valid;rest.textContent=valid?'乙箱：'+(actor.gold-input.valueAsNumber):'乙箱：—';hint.textContent=valid?'两箱合计 '+actor.gold+' 枚碎金。':'请输入 0 至 '+actor.gold+' 的整数。';};input.oninput=update;update();return input;
@@ -38,6 +41,7 @@ export function createGamePanels(deps) {
    const actor=state.game.characters.find((c)=>c.id===state.decisionActorId);
    for(const b of document.querySelectorAll('[data-tab]')){b.classList.toggle('selected',b.dataset.tab===state.tab);b.setAttribute('aria-pressed',String(b.dataset.tab===state.tab));}
    if(state.botPending){panel.append(el('p',state.botPaused?'人机已暂停，可随时继续。':'人机正在思考与行动…','muted'));return;}
+   if(state.game.session.kind==='lan'&&!state.canAct){panel.append(el('p',state.roomConnection!=='connected'?'正在恢复连接，暂时不能操作。':state.room.status==='paused'?'对局暂停。等待全员在线后，由房主继续。':'等待同伴操作，行程会自动更新。','muted'));return;}
    if(!actor)return;
    const moves=state.actions.filter((a)=>a.group==='movement');
    if(state.selectedCard)$('#move-actions').append(button('取消选牌',()=>{state.selectedCard=null;render();}));

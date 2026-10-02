@@ -1,13 +1,10 @@
 {
   "name": "golden-post-road",
   "private": true,
-  "version": "0.1.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
-    "validate:content": "node tools/validate-content.mjs",
-    "test:rules": "node --test packages/rules/test/foundation.test.ts",
-    "test": "node --test packages/rules/test/*.test.ts apps/server/*.test.ts",
-    "check": "node tools/validate-content.mjs && node --test packages/rules/test/*.test.ts apps/server/*.test.ts",
+    "start": "node tools/start-game.mjs",
     "dev": "node apps/server/server.ts"
   }
 }

@@ -1,21 +1,42 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>二十二驿 · 黄金邮道</title><link rel="stylesheet" href="/styles.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>二十二驿 · 黄金邮道</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/expedition.css"></head>
 <body>
 <main>
 <header class="app-header">
   <div><p class="eyebrow">北境驿路 · 策略对抗桌游</p><h1>二十二驿 · 黄金邮道</h1></div>
-  <nav aria-label="主导航"><button id="nav-home">主菜单</button><button id="nav-help">规则指引</button><button id="nav-library">卡牌图鉴</button></nav>
+  <nav aria-label="主导航"><button id="nav-home">驿站大厅</button><button id="nav-help">规则指引</button><button id="nav-library">卡牌图鉴</button></nav>
 </header>
 <div id="notice" role="status" aria-live="polite" hidden></div>
 <section id="screen-home" class="screen">
- <div class="hero"><p class="eyebrow">一程风雪，一局黄金。</p><h2>北境的驿路<br>等你落下第一步。</h2><p>在走私者与官兵之间选择阵营。采矿、押运、设卡、出牌，<br>让每一次出发都成为下一次胜利的伏笔。</p></div>
- <div class="mode-grid">
-  <button class="mode-card" id="mode-solo"><span class="mode-icon">对</span><strong>本地人机</strong><span>你指挥两名角色，与人机阵营对抗。无需联网。</span><small>适合独自熟悉规则 →</small></button>
-  <button class="mode-card" id="mode-hotseat"><span class="mode-icon">弈</span><strong>同屏对局</strong><span>轮流操作四名角色。和朋友共用一台电脑。</span><small>适合面对面游玩 →</small></button>
-  <button class="mode-card" id="home-help"><span class="mode-icon">册</span><strong>新手入门</strong><span>先读获胜目标和回合流程，再查看卡牌图鉴。</span><small>三分钟认识驿道 →</small></button>
+ <div class="hero"><p class="eyebrow">驿站大厅 · 一程风雪，一局黄金</p><h2>一起落座，<br>开启北境征程。</h2><p>朱衣行商与蓝甲巡卫，在同一张舆图上交锋。<br>先选择对战方式，再决定你的阵营与征程。</p></div>
+ <div class="hall-heading"><div><p class="eyebrow">置席开局</p><h2>这次与谁同行？</h2><p id="hall-mode-note" class="muted">正在接通驿站…</p></div><span id="hall-service-state" class="hall-service-state" role="status">正在接通</span></div>
+ <div class="mode-grid hall-mode-grid">
+  <button class="mode-card" id="mode-solo" disabled><span class="mode-icon">对</span><strong>本地人机</strong><span>独自落座，指挥两名角色，与人机阵营较量。同样的地图、卡牌与人物台面。</span><small>选择阵营，开始练习 →</small></button>
+  <button class="mode-card" id="mode-lan" disabled><span class="mode-icon">联</span><strong>局域网对战</strong><span>邀请朋友各用自己的设备，二人对阵或四人结伴。选位准备，踏上同一条驿路。</span><small>创建房间或凭码入席 →</small></button>
  </div>
+ <div class="hall-secondary"><button id="mode-hotseat" disabled><strong>同屏对局</strong><span>共用一台设备，轮流执棋 →</span></button><button id="home-help"><strong>新手入门</strong><span>查看目标、流程与规则 →</span></button></div>
+ <section id="hall-network" class="hall-network panel" hidden><label class="field">朋友从这里入席<select id="hall-address" aria-label="联机邀请使用的主机地址"></select></label><p class="muted">创建房间后会用此地址生成邀请链接。多网卡时选择与朋友同一网络的地址。</p></section>
  <div class="home-resume"><button id="resume">继续当前对局</button><button id="home-load">读取本地存档</button><p id="home-status" class="muted"></p></div>
+</section>
+<section id="screen-lan" class="screen" hidden>
+ <div class="section-heading"><div><p class="eyebrow">同路相逢</p><h2>相约黄金邮道</h2></div><button id="lan-back" type="button">返回主菜单</button></div>
+ <p id="lan-network-hint" class="muted"></p>
+ <div class="room-entry-grid">
+  <form id="room-create-form" class="panel"><p class="eyebrow">置席待友</p><h2>创建房间</h2><label class="field">你的昵称<input name="nickname" required maxlength="24" autocomplete="nickname" placeholder="驿路来客"></label>
+   <fieldset><legend>同行人数</legend><label class="choice"><input type="radio" name="capacity" value="2" checked><strong>二人对阵</strong><span>每人指挥一个阵营的两名角色。</span></label><label class="choice"><input type="radio" name="capacity" value="4"><strong>四人结伴</strong><span>每人一名角色，两队各两人。</span></label></fieldset>
+   <fieldset><legend>胜负方式</legend><label class="choice"><input type="radio" name="mode" value="race" checked><strong>竞速局</strong><span>率先达到五十声望。</span></label><label class="choice"><input type="radio" name="mode" value="fixedRounds"><strong>火并局</strong><span>三十轮后比较声望。</span></label></fieldset>
+   <div class="dialog-actions"><button type="submit" class="primary">置办新局</button></div>
+  </form>
+  <form id="room-join-form" class="panel"><p class="eyebrow">凭帖入席</p><h2>加入朋友的房间</h2><label class="field">你的昵称<input name="nickname" required maxlength="24" autocomplete="nickname" placeholder="同行好友"></label><label class="field">六位房间码<input id="join-code" name="code" required minlength="6" maxlength="6" pattern="[A-Fa-f0-9]{6}" autocomplete="off" placeholder="例如 A3F812"></label><p class="muted room-note">朋友先创建房间，再把房间码或邀请链接发给你。请确认你们连接同一局域网。</p><div class="dialog-actions"><button type="submit" class="primary">凭码入席</button></div></form>
+ </div>
+ <p class="muted room-note">同伴操作自动同步，每步自动保留。短暂断线会暂停对局；全员回来后由房主继续征程。</p>
+</section>
+<section id="screen-lobby" class="screen" hidden>
+ <div class="section-heading lobby-banner"><div><p class="eyebrow">北境驿站 · 候友入席</p><h2>风雪同路<span class="lobby-room-label">房间 <span id="lobby-code" class="room-code"></span></span></h2><p id="lobby-description" class="muted"></p><p id="room-connection" class="room-connection" role="status" aria-live="polite"></p></div><div class="actions"><button id="room-refresh" type="button">重新同步</button><button id="room-exit" type="button">离开房间</button></div></div>
+ <section class="panel"><h2>邀友入席</h2><label id="invite-address-field" class="field invite-address-field" hidden>使用的主机地址<select id="invite-address" aria-label="切换联机邀请地址"></select></label><div class="room-invite"><input id="room-invitation" readonly aria-label="邀请链接"><button id="room-copy" type="button">复制邀请链接</button></div><p id="invite-hint" class="muted room-note"></p></section>
+ <div class="room-entry-grid"><section class="panel"><p class="eyebrow">朱衣蓝甲</p><h2>选择你的席位</h2><div id="lobby-seats" class="room-seats"></div><button id="room-release" type="button">取消选位</button><p class="muted room-note">四人局队友可查看彼此手牌，只能操作自己的角色；秘密分箱不向其他玩家公开。</p></section><section class="panel"><h2>同伴名单</h2><div id="lobby-members" class="character-list"></div><p id="lobby-phase" class="muted room-note"></p><div class="dialog-actions"><button id="room-ready" type="button">准备就绪</button><button id="room-start" class="primary" type="button">全员出发</button><button id="room-pause" type="button" hidden>暂停对局</button><button id="room-rematch" type="button" hidden>再开一局</button><button id="room-play" class="primary" type="button" hidden>返回棋盘</button></div></section></div>
+ <p class="muted room-note">同伴的选位、准备和在线状态会自动更新；满员在线且全员准备后，由房主开始。</p>
 </section>
 <section id="screen-setup" class="screen panel" hidden>
  <p class="eyebrow">出发之前</p><h2 id="setup-title">创建对局</h2>
@@ -28,14 +49,15 @@
 </section>
 <section id="screen-play" class="screen" hidden>
  <div class="game-toolbar"><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
+ <section class="expedition-scoreboard" aria-label="轮次与阵营声望"><div class="faction-score smuggler"><span class="faction-sign">朱</span><div><small>走私者 · 阵营声望</small><strong id="score-smuggler">0</strong></div></div><div class="round-dial"><span>第 <strong id="round-number">01</strong> 轮</span><small id="round-phase">角色行动</small><small id="victory-goal">五十声望竞速</small></div><div class="faction-score officer"><div><small>官兵 · 阵营声望</small><strong id="score-officer">0</strong></div><span class="faction-sign">蓝</span></div></section>
+ <div id="lan-toolbar" class="room-game-status panel" hidden><span id="lan-player-status" role="status" aria-live="polite"></span><div class="actions"><button id="lan-pause" type="button" hidden>暂停对局</button><button id="lan-rematch" type="button" hidden>再开一局</button><button id="lan-refresh" type="button">重新同步</button><button id="lan-lobby" type="button">查看房间</button></div><small id="lan-sync-hint">驿路已接通 · 自动同步与保存</small></div>
  <section id="result-panel" class="result-panel" hidden></section>
  <div class="layout">
   <aside class="intel-sidebar" aria-label="对局情报">
    <section class="intel-section situation-panel"><h2>当前局势</h2><p id="summary"></p><div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div><p id="last-action" class="last-action" role="status" aria-live="polite"></p><div id="event-banner" class="event-banner"></div><section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section></section>
-   <section class="intel-section roster-panel"><h2>双方阵容</h2><div id="characters" class="character-list"></div></section>
    <section class="intel-section report-panel"><div class="report-heading"><h2>驿道战报</h2><button id="report-toggle" type="button" aria-expanded="true">收起</button></div><div class="report-tools"><button id="report-project" type="button">投影战报 · 暂停对局</button></div><ol id="log" class="log"></ol></section>
   </aside>
-  <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><h2>北境舆图</h2><p>朱衣走私 · 蓝甲官兵<br><small class="map-legend">粮 / 林 / 商 / 遗 / 烽：停驻掷骰遭遇</small></p></div><span class="board-seal">北境<br>驿路</span></div><div id="board-status" class="board-status"></div><svg id="board" viewBox="-7 -7.2 13.5 8.7" aria-label="黄金邮道地图"></svg><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
+  <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><p class="eyebrow">北境三道 · 风雪行旅</p><h2>北境舆图</h2><p><small class="map-legend">粮 / 林 / 商 / 遗 / 烽：停驻掷骰遭遇<br>每段驿道均为一步，虚线表示捷径</small></p></div><div class="atlas-controls"><span class="board-seal">北境<br>驿路</span><button id="map-expand" type="button" aria-haspopup="dialog">放大地图</button></div></div><div id="board-status" class="board-status"></div><div id="map-home-viewport" class="atlas-viewport"><svg id="board" class="expedition-map" viewBox="0 0 1200 840" aria-label="黄金邮道地图，任意相邻节点间的一段路线均为一步"></svg></div><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
   <aside class="control-panel">
    <section><h2 id="turn-title">当前角色</h2><div id="active-character"></div><p id="turn-hint" class="muted"></p></section>
    <section id="decision-section"><h2>当前决策</h2><div id="decision"></div></section>
@@ -43,7 +65,8 @@
    <section id="actions"></section><section id="cards"></section><div id="end-turn"></div>
   </aside>
  </div>
- <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-tray"></div></section>
+ <section class="tableaux-section" aria-label="四名角色的独立台面"><div class="tableaux-caption"><div><p class="eyebrow">朱衣蓝甲 · 各行其道</p><h2>同行者台面</h2></div><p class="muted">资源与行装一目了然 · 点击肖像查看角色</p></div><div id="characters" class="tableaux-grid"></div></section>
+ <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-characters" class="actions" hidden></div><div id="hand-tray"></div></section>
 </section>
 <section id="screen-help" class="screen" hidden>
  <div class="section-heading"><div><p class="eyebrow">行前必读</p><h2>新手驿路指南</h2></div><button class="return-game">返回上一页</button></div>
@@ -65,5 +88,6 @@
 <dialog id="card-preview" aria-labelledby="preview-title"><div class="preview-heading"><div><small id="preview-kind" class="eyebrow"></small><h2 id="preview-title"></h2></div><button id="preview-close" type="button">关闭</button></div><div id="preview-card"></div></dialog>
 <dialog id="report-projection" aria-label="驿道战报投影"><div class="projection-content"><p class="eyebrow">黄金邮道 · 实时战况</p><h2>驿道战报</h2><p id="projection-summary"></p><ol id="projection-log"></ol><p class="projection-dismiss">单击任意位置返回棋盘</p></div></dialog>
 <dialog id="interaction" aria-labelledby="dialog-title"><form id="interaction-form"><h2 id="dialog-title"></h2><p id="dialog-description" class="muted"></p><div id="dialog-fields"></div><p id="dialog-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="dialog-cancel">取消</button><button type="submit" id="dialog-confirm" class="primary">确认</button></div></form></dialog>
+<dialog id="map-detail" aria-labelledby="map-detail-title"><div class="map-detail-heading"><h2 id="map-detail-title">北境舆图</h2><button id="map-detail-close" type="button">收起地图</button></div><div id="map-detail-viewport" class="atlas-viewport"></div><p class="map-detail-note">左右滑动查看全图 · 点击亮圈规划移动 · 每段驿道均为一步</p></dialog>
 <script type="module" src="/app.js"></script>
 </body></html>

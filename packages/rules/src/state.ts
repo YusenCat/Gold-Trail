@@ -119,7 +119,7 @@ export interface GameState {
   mode: Mode;
   /** Simulation setup only; normal games default to the published smuggler-first order. */
   startingFaction?: Faction;
-  session: { kind: 'hotseat' | 'solo'; humanFaction: Faction };
+  session: { kind: 'hotseat' | 'solo' | 'lan'; humanFaction: Faction };
   revision: number;
   round: number;
   phase: Phase;

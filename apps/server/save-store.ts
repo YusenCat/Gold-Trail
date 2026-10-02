@@ -85,6 +85,7 @@ export class SaveStore {
   }
 
   async save(rawName: string, game: GameState, overwrite = false): Promise<SaveSummary> {
+    if (game.session.kind === 'lan') throw new Error('联机房间不能写入本地单局存档');
     await mkdir(this.directory, { recursive: true });
     const name = safeName(rawName);
     const id = idForName(name);
@@ -140,6 +141,7 @@ export class SaveStore {
   }
 
   async saveRecovery(game: GameState): Promise<void> {
+    if (game.session.kind === 'lan') throw new Error('联机房间不能覆盖本地自动恢复');
     await mkdir(this.directory, { recursive: true });
     const payload: SaveFile = { schemaVersion: 1, summary: { id: '_recovery', name: '自动恢复', savedAt: new Date().toISOString(), round: game.round, phase: game.phase, mode: game.mode, kind: game.session.kind, faction: game.session.humanFaction }, game };
     const target = join(this.directory, '_recovery.json');

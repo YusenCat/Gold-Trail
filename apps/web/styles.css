@@ -1,4 +1,31 @@
 :root { color-scheme: dark; font-family: "Microsoft YaHei", system-ui, sans-serif; background: #111611; color: #f7ecd5; }
+.mode-grid:has(#mode-lan) { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.room-entry-grid { display:grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap:20px; align-items:start; }
+.room-entry-grid .panel { margin:18px 0; min-width:0; }
+.room-entry-grid h2, #screen-lobby h2 { font-family:"KaiTi","STKaiti",serif; font-size:1.4rem; }
+.room-entry-grid .field + .field { margin-top:18px; }
+.room-note { margin-top:14px; }
+.room-code { color:var(--gold); letter-spacing:.14em; font-family:system-ui,sans-serif; }
+.room-invite { display:flex; gap:10px; flex-wrap:wrap; }
+.room-invite input { flex:1; min-width:200px; }
+.room-seats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+.room-seat { text-align:left; grid-template-columns:auto 1fr; align-items:center; }
+.room-seat.choice > .mode-icon { grid-column:1; grid-row:1 / span 2; background:#423b23; background-image:none; color:var(--gold); font:24px "KaiTi",serif; border:1px solid #a7894d; border-radius:6px; }
+.room-seat > strong { grid-column:2; }
+.room-seat small { grid-column:2; overflow-wrap:anywhere; }
+.room-seat.selected { border-color:#cfaa5c; background:#41452c; }
+.room-ready { color:#d9b568; }
+.room-connection { margin-top:8px; font-size:.85rem; color:#d0b887; }
+.room-connection::before { content:""; display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:#b58c4c; box-shadow:0 0 8px #b58c4c66; }
+.room-connection.connected::before { background:#a6b784; box-shadow:0 0 8px #a6b78466; }
+.room-game-status:has(#lan-pause:not([hidden])) { border-color:#9c8357; }
+.room-game-status { display:flex; align-items:center; flex-wrap:wrap; gap:12px; justify-content:space-between; }
+.room-game-status small { flex-basis:100%; color:#afaa96; }
+#lobby-members strong { overflow-wrap:anywhere; }
+#hand-characters { margin-bottom:12px; }
+@media(max-width:1100px) { .mode-grid:has(#mode-lan) { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:700px) { .room-entry-grid { grid-template-columns:minmax(0,1fr); gap:0; } .room-seats { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:460px) { .mode-grid:has(#mode-lan) { grid-template-columns:minmax(0,1fr); } }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; background: radial-gradient(circle at top, #243125, #111611 58%); }
 main { max-width: 1440px; margin: auto; padding: 28px; }
@@ -72,7 +99,7 @@ input, select { font: inherit; border: 1px solid #82734f; border-radius: 6px; pa
 .field { display: grid; gap: 6px; }
 .check-row { display: flex; gap: 12px; align-items: center; padding: 8px; background: #2a392a; border-radius: 6px; }
 input[type=checkbox] { width: 20px; height: 20px; accent-color: #b5914e; }
-.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 #dialog-confirm { background: #7f5b26; }
 .decision-card input { width: 75px; }
 @media (max-width: 900px) { .event-banner { display: block; } .control-panel { max-height: none; } main { padding: 16px; } }
@@ -623,6 +650,7 @@ input:focus,select:focus { border-color:#e2c579; }
 }
 #mode-solo { --mode-art:url('/assets/ui/mode-solo.webp'); }
 #mode-hotseat { --mode-art:url('/assets/ui/mode-hotseat.webp'); }
+#mode-lan { --mode-art:url('/assets/ui/mode-hotseat.webp'); }
 #home-help { --mode-art:url('/assets/ui/mode-guide.webp'); }
 .mode-card:hover { background-color:#314139; filter:brightness(1.13); }
 .mode-card>* { position:relative; z-index:1; }
@@ -647,6 +675,7 @@ input:focus,select:focus { border-color:#e2c579; }
 .art-block { background-position:88% 97%; }
 #mode-solo .mode-icon { background-position:12% 50%; }
 #mode-hotseat .mode-icon { background-position:12% 97%; }
+#mode-lan .mode-icon { background-position:50% 97%; }
 #home-help .mode-icon { background-position:12% 3%; }
 .mode-icon { width:56px; height:56px; border:0; box-shadow:0 4px 10px #0008; transform:none; }
 #actions>button.table-action {
