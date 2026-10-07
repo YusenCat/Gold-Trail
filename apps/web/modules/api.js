@@ -36,6 +36,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
         actions: view.actions || [],
         legalMoves: view.legalMoves || [],
         balance: view.balance || {},
+        foodAdvice: view.foodAdvice || [],
         botPending: view.botPending,
         decisionActorId: view.decisionActorId,
       });

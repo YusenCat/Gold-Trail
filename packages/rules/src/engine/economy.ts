@@ -8,19 +8,18 @@ import { actorForCommand, canUseOfficerRole, canUseSmugglerRole } from './moveme
 export function mine(state: GameState, actor: CharacterState): void {
   if (actor.nodeId !== 'MINE') fail('只能在漠河金矿采矿');
   if (eventActive(state, 'V_MINE_COLLAPSE')) fail('矿洞塌方，本轮不能采矿');
-  if (state.mineOutputRemaining === 0 && !hasCard(actor, 'E_MINE_MAP')) fail('本轮矿产已耗尽');
+  if (state.mineOutputRemaining === 0) fail('本轮矿产已耗尽');
   const factionRemaining = balanceData.mineFactionOutputPerRound - state.mineOutputByFaction[actor.faction];
   if (factionRemaining <= 0) fail('本阵营本轮矿车已满');
   if (actor.mineActionsThisTurn >= balanceData.mineActionsPerCharacterTurn) fail('本回合采矿次数已达上限');
-  charge(actor, 1);
+  charge(actor, hasCard(actor, 'E_MINE_MAP') && actor.mineActionsThisTurn === 0 ? 0 : 1);
   const rng = randomFor(state);
   const roll = rng.rollDie(6);
   saveRandom(state, rng);
   let yieldGold = roll <= 2 ? 1 : roll <= 4 ? 2 : 3;
   if (hasCard(actor, 'E_PICKAXE')) yieldGold = Math.ceil(yieldGold * 1.5);
-  const ignoresLimit = hasCard(actor, 'E_MINE_MAP');
-  const gained = ignoresLimit ? Math.min(yieldGold, factionRemaining) : Math.min(yieldGold, state.mineOutputRemaining, factionRemaining);
-  if (!ignoresLimit) state.mineOutputRemaining -= gained;
+  const gained = Math.min(yieldGold, state.mineOutputRemaining, factionRemaining);
+  state.mineOutputRemaining -= gained;
   state.mineOutputByFaction[actor.faction] += gained;
   actor.gold += gained;
   actor.mineActionsThisTurn += 1;

@@ -1,5 +1,6 @@
 import {createModeFlow} from './modules/mode-flow.js';
 import {createOnboarding} from './modules/onboarding.js';
+import {createSurvivalAdvisor} from './modules/survival-advisor.js';
 import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
@@ -105,6 +106,8 @@ function execute(action){
  return command(c);
 }
 function chooseAction(title,description,actions){
+ if($('#interaction').open)return;
+ if(actions[0]?.command.path?.length){state.previewPath=actions[0].command.path;renderBoard();}
  modal(title,description,()=>{
   const container=el('div',undefined,'action-choices');let selected=0;
   actions.forEach((a,i)=>{const row=el('label',undefined,'action-choice'),input=el('input');input.type='radio';input.name='action-choice';input.checked=i===0;input.onchange=()=>{selected=i;if(a.command.path){state.previewPath=a.command.path;renderBoard();}};
@@ -201,7 +204,7 @@ function renderGuide(g,active){
  panel.append(el('span','行前指引','guide-stamp'),el('strong',title),el('p',detail));
 }
 
-const { renderResult, renderDecision, renderOperations } = createGamePanels({ state, $, el, button, factionName, playerName, card, modal, field, number, boundedInteger, command, execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render: () => render(), renderBoard });
+const { renderResult, renderDecision, renderOperations } = createGamePanels({ state, $, el, button, factionName, playerName, card, modal, field, number, boundedInteger, command, execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render: () => render(), renderBoard, nodeName });
 
 function render(){
  lobby.renderLobby();
@@ -216,6 +219,7 @@ function render(){
  if(state.screen!=='play')return;
  const active=renderHud(g);
  renderTurnPrompt();
+ renderSurvival();
  renderResult(g);renderBoard();renderDecision();renderOperations();renderHand();renderGuide(g,active);
  renderPlayerTableaux({state,el,button,playerName,nodeName,card,inspectCharacter,resourceIcon});
  const log=$('#log');log.replaceChildren();for(const entry of g.log.slice(-35).reverse())log.append(el('li',textCN(entry.message)));
@@ -237,6 +241,7 @@ const renderHud=createGameHud({state,$,el,phases,factionName,playerName,nodeName
 const renderTurnPrompt=createTurnPrompt({state,$,playerName});
 const hall=createHallController({state,$,render});
 const onboarding=createOnboarding({state,$,el,button,show,setup});
+const renderSurvival=createSurvivalAdvisor({state,$,playerName,nodeName,el});
 async function init(){
  try{
   const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);

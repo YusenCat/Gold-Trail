@@ -8,7 +8,7 @@ export function renderRulebook() {
 
 本规则书适用于当前数字版的地图、卡牌、行动、事件和联机。游戏内完整规则、Markdown、Word 和 PDF 从同一份规范生成；卡牌正文来自游戏实际使用的数据。历史原稿不再作为执行规则。
 
-地图版本 ${map.version}；卡牌版本 ${cards.version}；平衡版本 ${b.version}。规则改版后需要新建对局，旧行程文件应先备份。
+地图版本 ${map.version}；卡牌版本 ${cards.version}；平衡版本 ${b.version}。执行规则版本1.2.0。规则改版后需要新建对局，旧行程文件应先备份。
 
 ## 一 胜负与初始资源
 
@@ -52,7 +52,7 @@ ${map.nodes.map(n=>'- '+n.id+' '+checkpointName(n.siteName||n.label||n.id)+'：'
 
 ## 四 地点行动与费用
 
-- 金矿采矿：通常1行动，六面骰1–2产1金、3–4产2金、5–6产3金；装备会修改产量或费用。个人每回合最多${b.mineActionsPerCharacterTurn}次，公共矿脉每轮${b.miningGlobalOutputPerCharacterPerRound*4}金，每阵营每轮${b.mineFactionOutputPerRound}金。具体矿洞密图例外见卡牌正文，不能忽略阵营配额。塌方时禁止采矿。
+- 金矿采矿：通常1行动，六面骰1–2产1金、3–4产2金、5–6产3金；装备会修改产量或费用。个人每回合最多${b.mineActionsPerCharacterTurn}次，公共矿脉每轮${b.miningGlobalOutputPerCharacterPerRound*4}金，每阵营每轮${b.mineFactionOutputPerRound}金。矿洞密图使每回合第一次采矿免行动点，但不能忽略矿脉、个人次数与阵营配额。塌方时禁止采矿。
 - 官兵在金矿可1行动发动金矿搜寻，每回合一次；目标与保护条件由合法动作判断。
 - 交金：走私者仅黑市、官兵仅墨尔根，1行动，选择随身1枚至全部碎金，每回合一次。
 - 驿站伙房：至少1剩余行动，消耗全部剩余行动补满粮，每回合一次。
@@ -97,4 +97,3 @@ ${cards.cards.map(c=>'### '+c.name+' '+c.id+'\n\n'+c.text+(c.marketPrice?'\n\n�
 移动、目标、分箱及装备替换都先预览／确认；取消不扣资源。查看图鉴、规则和新手导览不执行动作。命名保存用于保留独立快照；新局会替换自动恢复，开始前先保存重要行程。规则语义升级时旧存档不能无声套用新数值。
 `;
 }
-

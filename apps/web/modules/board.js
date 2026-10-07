@@ -40,7 +40,7 @@ export function createBoardRenderer(deps) {
    if(node.site)group.append(svg('text',{y:7,class:'atlas-site-symbol'},({forage:'粮',forest:'林',caravan:'商',ruins:'遗',signal:'烽'})[node.site]));
    if(node.label){const label=cityLabels[node.id]??{x:0,y:-40};group.append(svg('text',{x:label.x,y:label.y,'text-anchor':label.anchor??'middle',class:'atlas-node-label'},nodeName(node.id)));if(label.subtitle)group.append(svg('text',{x:label.x,y:label.y+19,'text-anchor':'middle',class:'atlas-city-subtitle'},label.subtitle));}
    if(state.game.droppedItems[node.id])group.append(svg('text',{x:27,y:31,class:'atlas-drop-marker'},'◆'));
-   if(action){group.setAttribute('role','button');group.setAttribute('tabindex','0');group.setAttribute('aria-label','前往'+nodeName(node.id));const go=()=>{if(state.busy)return;state.previewPath=action.command.path;renderBoard();chooseAction('前往'+nodeName(node.id),'金色虚线是推荐路线。确认后移动，取消不会消耗行动。',options);};group.onclick=go;group.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};}
+   if(action){group.setAttribute('role','button');group.setAttribute('tabindex','0');group.setAttribute('aria-label','前往'+nodeName(node.id));const go=()=>{if(state.busy)return;state.previewPath=action.command.path;renderBoard();chooseAction(action.command.type==='CONTROLLED_MOVE'?'受控移动 · '+playerName(action.command.targetId)+' → '+nodeName(node.id):'前往'+nodeName(node.id),action.command.type==='CONTROLLED_MOVE'?playerName(action.command.actorId)+'指挥'+playerName(action.command.targetId)+'移动，消耗被控制角色的行动点；确认后才移动。':'金色虚线是推荐路线。确认后移动，取消不会消耗行动。',options);};group.onclick=go;group.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};}
    board.append(group);
    }
    for(const actor of state.game.characters){

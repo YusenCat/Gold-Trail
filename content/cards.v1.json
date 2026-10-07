@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source": "Canonical digital rules: packages/rules/src/rulebook.ts; original illustrations retained as art only",
   "rules": {
     "marketTacticCopiesEach": 1,
@@ -101,10 +101,10 @@
       "pdfPage": 10,
       "marketPrice": 3,
       "timing": "ownAction",
-      "target": "otherCharacter",
+      "target": "enemyCharacter",
       "duration": "nextOwnTurn",
       "effectId": "nextTurnPlus2ApControlFirst2MovementAp",
-      "text": "目标下一回合行动点加2；你替其决定至多前2点行动力的移动方向，不能控制其他操作。"
+      "text": "指定一名敌方角色：其下一回合行动点加2；你代其决定至多前2点行动力的移动，不能控制其他操作。"
     },
     {
       "id": "T_RESIST_SEARCH",
@@ -176,8 +176,8 @@
       "marketPrice": 5,
       "timing": "passiveOnMine",
       "duration": "whileEquipped",
-      "effectId": "ignoreGlobalMineOutputLimit",
-      "text": "采矿可无视金矿本轮公共产量上限，个人采矿次数限制仍生效。"
+      "effectId": "firstMineFreeEachTurn",
+      "text": "每回合第一次采矿不消耗行动点；仍受个人两次、阵营四金和公共矿脉限制。"
     },
     {
       "id": "E_MINER_CONTRACT",

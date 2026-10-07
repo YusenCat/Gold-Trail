@@ -112,7 +112,7 @@ export interface CharacterState {
 
 export interface GameState {
   schemaVersion: '1.0.0';
-  rulesVersion: '1.1.0';
+  rulesVersion: '1.2.0';
   mapVersion: string;
   cardVersion: string;
   balanceVersion: string;
@@ -226,7 +226,7 @@ export function createInitialGame(seed: number, mode: Mode = 'race', startingFac
 
   return {
     schemaVersion: '1.0.0',
-    rulesVersion: '1.1.0',
+    rulesVersion: '1.2.0',
     mapVersion,
     cardVersion: cardsData.version,
     balanceVersion: balanceData.version,

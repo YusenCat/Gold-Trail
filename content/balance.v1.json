@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0-trail-dice",
+  "version": "1.4.1-mine-map",
   "charactersPerTeam": 2,
   "baseActionPoints": 3,
   "actionPointDieSides": 3,
@@ -23,10 +23,22 @@
   "marketPurchaseActionPoints": 1,
   "blackMarketPurchaseActionPoints": 1,
   "exchangeActionPoints": 1,
-  "checkpointDistances": [0, 1, 2],
-  "checkpointActionPointCosts": [1, 2, 3],
+  "checkpointDistances": [
+    0,
+    1,
+    2
+  ],
+  "checkpointActionPointCosts": [
+    1,
+    2,
+    3
+  ],
   "maxSuccessiveInspectionPenalty": 3,
   "mountRentalOwnTurns": 2,
-  "mountPrices": { "RED_HARE": 6, "DILU": 4, "WHITE_STEED": 5 },
+  "mountPrices": {
+    "RED_HARE": 6,
+    "DILU": 4,
+    "WHITE_STEED": 5
+  },
   "fallingHungerItemPickupActionPoints": 0
 }

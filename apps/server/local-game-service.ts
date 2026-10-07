@@ -3,6 +3,7 @@ import { decisionActor, legalActions } from '../../packages/rules/src/actions.ts
 import { chooseBotCommand, isBotTurn } from '../../packages/rules/src/bot.ts';
 import balance from '../../content/balance.v1.json' with { type:'json' };
 import { SaveStore } from './save-store.ts';
+import {foodAdvice} from '../../packages/rules/src/advice.ts';
 
 // Owns the host's local match. LAN rooms have their own RoomService and storage.
 export class LocalGameService {
@@ -16,6 +17,7 @@ export class LocalGameService {
     return {game:publicView(game,game.session.kind === 'solo' ? game.session.humanFaction : undefined),
       legalMoves:!botPending && game.activeCharacterId ? legalMoveTargets(game,game.activeCharacterId) : [],
       actions:botPending ? [] : legalActions(game), decisionActorId:decisionActor(game), botPending,
+      foodAdvice:foodAdvice(game,game.characters.filter(c=>game.session.kind!=='solo'||c.faction===game.session.humanFaction)),
       balance:{mineActionsPerTurn:balance.mineActionsPerCharacterTurn,mineFactionOutputLimit:balance.mineFactionOutputPerRound,
         openingMarketDiscount:balance.openingMarketDiscount,blackMarketBlindDrawPrice:balance.blackMarketBlindDrawPrice}};
   }

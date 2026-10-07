@@ -1,4 +1,5 @@
 import balance from '../../content/balance.v1.json' with { type: 'json' };
+import {foodAdvice} from '../../packages/rules/src/advice.ts';
 import { publicView, legalMoveTargets } from '../../packages/rules/src/index.ts';
 import { decisionActor, legalActions } from '../../packages/rules/src/actions.ts';
 import { memberFaction, ownedCharacters, type Room, type RoomMember } from './room-store.ts';
@@ -26,6 +27,7 @@ export function roomView(room: Room, member: RoomMember) {
     },
     me: { playerId: member.playerId, faction, characterIds: owned },
     game, canAct, decisionActorId: actorId,
+    foodAdvice:game?foodAdvice(game,game.characters.filter(c=>c.faction===faction)):[],
     decisionPlayerId: room.members.find((m) => ownedCharacters(room, m).includes(actorId ?? ''))?.playerId ?? null,
     actions: canAct ? legalActions(room.game) : [],
     legalMoves: canAct && room.game.activeCharacterId === actorId ? legalMoveTargets(room.game, actorId!) : [],

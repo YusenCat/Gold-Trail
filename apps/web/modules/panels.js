@@ -1,6 +1,6 @@
 export function createGamePanels(deps) {
   const { state, $, el, button, factionName, playerName, card, modal, field, number, boundedInteger, command,
-    execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render, renderBoard } = deps;
+    execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render, renderBoard, nodeName } = deps;
   function renderResult(g){
    const panel=$('#result-panel');panel.replaceChildren();panel.hidden=g.phase!=='finished';if(g.phase!=='finished')return;
    const title=g.winner==='draw'?'平分秋色':factionName(g.winner)+'赢得此局';
@@ -33,7 +33,8 @@ export function createGamePanels(deps) {
     for(const answer of p.answers??[{question:p.question,answer:p.answer}]){const question={aMoreThanB:'甲箱比乙箱多吗',aEmpty:'甲箱为空吗',bAtLeast2:'乙箱至少有两枚碎金吗',equal:'两箱一样多吗'}[answer.question];panel.append(el('p',question+'？　'+(answer.answer?'是':'否'),'answer'));}
     panel.append(el('p',p.questionsRemaining?'还需问一个不同的问题，再打开一箱。':'请选择一箱打开，另一箱归还对方。','muted'));
    }
-   for(const action of actions){const b=button(action.label,()=>execute(action));if(action.command.type==='CHOOSE_SEARCH_BOX')b.className='search-box';panel.append(b);}
+   if(actions.some(a=>a.command.type==='CONTROLLED_MOVE')){const target=state.game.characters.find(c=>c.id===state.game.activeCharacterId);panel.append(el('p',playerName(state.decisionActorId)+'负责选择；移动的是'+playerName(target.id)+'，消耗其行动点。','control-movement-warning'));}
+   for(const action of actions){const c=action.command;const b=button(action.label,()=>c.type==='CONTROLLED_MOVE'?chooseAction('受控移动 · '+playerName(c.targetId),playerName(c.actorId)+'指挥'+playerName(c.targetId)+'从'+nodeName(state.game.characters.find(t=>t.id===c.targetId).nodeId)+'到'+nodeName(c.path.at(-1))+'；消耗被控制角色 '+action.actionPointCost+' 点行动。取消不移动。',[action]):execute(action));if(c.type==='CHOOSE_SEARCH_BOX')b.className='search-box';panel.append(b);}
   }
   
     function renderOperations(){

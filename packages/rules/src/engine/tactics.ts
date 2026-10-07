@@ -96,7 +96,7 @@ export function playTactic(state: GameState, actorId: string, cardId: string, ta
       log(state, 'robberyStart', `${actor.id}对 ${target.id}发动劫道夺财。`);
       return;
     case 'T_CONFUSE':
-      if (!target || target.id === actor.id) fail('混淆视听需要另一名角色');
+      if (!target || target.faction === actor.faction) fail('混淆视听只能指定敌方角色');
       discardTactic(state, actor, cardId);
       target.nextTurnApPenalty -= 2;
       target.controlledMovementAp = 2;

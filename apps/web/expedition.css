@@ -477,3 +477,8 @@ dialog::backdrop { background:#17333b99; backdrop-filter:blur(5px); }
 .coach-panel h2 { margin:8px 0; }.coach-panel .actions { flex-wrap:wrap; }
 .coach-highlight { outline:3px solid #aa7937; outline-offset:3px; }
 @media(max-width:700px){.coach-panel { padding:16px; }.coach-panel .actions button { flex:1; }.learning-lesson { padding:18px; }}
+.survival-alert { margin:12px 0; padding:16px 20px; border:1px solid #b18336; border-left:5px solid #b18336; background:#fff0d0; color:#674716; border-radius:5px; }
+.survival-alert[data-urgency=urgent] { border-color:#9a4535; background:#f9e4d6; color:#762f25; }
+.survival-alert p { margin:6px 0; font-size:.87rem; }.survival-alert strong { font-family:var(--serif); font-size:1.12rem; }
+.control-movement-warning { padding:12px; background:#f9e4d6; border-left:4px solid #9a4535; color:#762f25!important; }
+.preview-rule-copy { color:#493927; font-size:1rem; line-height:1.8; padding:14px; border:1px solid #b29a73; background:var(--paper-surface); }

@@ -121,7 +121,7 @@ export class SaveStore {
     }
     const parsed = JSON.parse(contents) as SaveFile;
     if (parsed.schemaVersion !== 1 || !parsed.game || parsed.game.schemaVersion !== '1.0.0') throw new Error('存档版本不受支持或文件已损坏');
-    if (parsed.game.rulesVersion !== '1.1.0') throw new Error('这是旧规则试玩存档，原文件仍保留。当前采用一一点零规则，请新建对局。');
+    if (parsed.game.rulesVersion !== '1.2.0') throw new Error('旧规则存档与当前 1.2.0 规则不兼容，请新建对局；原文件保留，可用旧版完成行程。');
     const game = parsed.game;
     if (!['race','fixedRounds'].includes(game.mode) || !['hotseat','solo'].includes(game.session?.kind) || !['smuggler','officer'].includes(game.session?.humanFaction) || !Array.isArray(game.characters) || game.characters.length !== 4 || !Number.isInteger(game.round) || game.round < 1 || !Array.isArray(game.log)) throw new Error('存档结构不完整');
     // 1.3.0 added a per-faction mine ledger. Older 1.x saves retain their
@@ -151,6 +151,6 @@ export class SaveStore {
 
   async loadRecovery(): Promise<GameState | null> {
     try { return await this.load('_recovery'); }
-    catch { return null; }
+    catch (error) { if(error instanceof Error && error.message.includes('旧规则')) { await rename(this.pathFor('_recovery'),join(this.directory,'previous-rules-'+Date.now()+'.json')); console.warn(error.message+' 自动恢复已另存备份。'); } return null; }
   }
 }
