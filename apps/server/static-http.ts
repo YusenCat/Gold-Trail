@@ -35,8 +35,8 @@ return async(request:IncomingMessage,response:ServerResponse,url:URL)=>{
  if(url.pathname==='/api/cards'){json(response,200,{cards:cardsData.cards});return true;}
  if(url.pathname==='/api/rules'){json(response,200,{text:renderRulebook()});return true;}
     if (method === 'GET' && url.pathname === '/') return serve(response, 'index.html');
-    if (method === 'GET' && /^\/(?:app\.js|styles\.css|expedition\.css|modules\/[a-z-]+\.js)$/.test(url.pathname)) return serve(response, url.pathname.slice(1));
-    if (method === 'GET' && /^\/assets\/(?:cards\/[A-Z0-9_]+\.png|ui\/(?:card-frame|action-seals|hero-road|world-backdrop|hand-mat|action-panel|intel-ledger|mode-(?:solo|hotseat|guide)|expedition-world-v2|expedition-portraits-v2)\.webp|board-map\.png|board-background\.jpg|board-illustration\.svg)$/.test(url.pathname)) return serve(response, url.pathname.slice(1));
+    if (method === 'GET' && /^\/(?:app\.js|styles\.css|expedition\.css|tabletop\.css|modules\/[a-z-]+\.js)$/.test(url.pathname)) return serve(response, url.pathname.slice(1));
+    if (method === 'GET' && /^\/assets\/(?:cards\/[A-Z0-9_]+\.png|ui\/(?:card-frame|action-seals|hero-road|world-backdrop|hand-mat|action-panel|intel-ledger|mode-(?:solo|hotseat|guide)|expedition-world-v2|expedition-portraits-v2|tabletop-diorama-v3)\.webp|board-map\.png|board-background\.jpg|board-illustration\.svg)$/.test(url.pathname)) return serve(response, url.pathname.slice(1));
 
 return false;
 };

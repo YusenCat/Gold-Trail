@@ -1,6 +1,7 @@
 import {createModeFlow} from './modules/mode-flow.js';
 import {createOnboarding} from './modules/onboarding.js';
 import {createSurvivalAdvisor} from './modules/survival-advisor.js';
+import {createTabletopEffects} from './modules/tabletop-effects.js';
 import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
@@ -170,7 +171,8 @@ function pickup(actor){
  return {gold,silver,hand:checks(drop.hand),equipment:checks(drop.equipment)};
  },(f)=>{const chosen=(items)=>items.filter((i)=>i.checked).map((i)=>i.value);const handIds=chosen(f.hand);if(handIds.length+actor.hand.length>5)throw new Error('手牌不能超过五张');return command({type:'PICK_UP',actorId:actor.id,gold:Number(f.gold.value),silver:Number(f.silver.value),handIds,equipmentIds:chosen(f.equipment)});},'确认拾取');
 }
-const renderBoard = createBoardRenderer({ state, $, playerName, factionName, nodeName, card, command, chooseAction, inspectCharacter });
+const drawBoard = createBoardRenderer({ state, $, playerName, factionName, nodeName, card, command, chooseAction, inspectCharacter });
+const renderBoard = ()=>{drawBoard();tabletopEffects.refresh();};
 $('#map-expand').onclick=()=>{const dialog=$('#map-detail');$('#map-detail-viewport').append($('#board'));dialog.showModal();};
 $('#map-detail-close').onclick=()=>$('#map-detail').close();
 $('#map-detail').addEventListener('close',()=>{$('#map-home-viewport').append($('#board'));});
@@ -210,6 +212,7 @@ function render(){
  lobby.renderLobby();
  hall.render();
  onboarding.render();
+  if(state.screen!=='play')tabletopEffects.render();
  $('#home-load').hidden=!state.localAvailable||!!state.room;
  if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
  else {$('#resume').textContent='继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
@@ -222,6 +225,7 @@ function render(){
  renderSurvival();
  renderResult(g);renderBoard();renderDecision();renderOperations();renderHand();renderGuide(g,active);
  renderPlayerTableaux({state,el,button,playerName,nodeName,card,inspectCharacter,resourceIcon});
+  tabletopEffects.render();
  const log=$('#log');log.replaceChildren();for(const entry of g.log.slice(-35).reverse())log.append(el('li',textCN(entry.message)));
  $('#projection-summary').textContent=$('#summary').textContent;
  const projectionLog=$('#projection-log');projectionLog.replaceChildren();for(const entry of g.log.slice(-60).reverse())projectionLog.append(el('li',textCN(entry.message)));
@@ -242,6 +246,7 @@ const renderTurnPrompt=createTurnPrompt({state,$,playerName});
 const hall=createHallController({state,$,render});
 const onboarding=createOnboarding({state,$,el,button,show,setup});
 const renderSurvival=createSurvivalAdvisor({state,$,playerName,nodeName,el});
+const tabletopEffects=createTabletopEffects({state,$,textCN,playerName});
 async function init(){
  try{
   const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);

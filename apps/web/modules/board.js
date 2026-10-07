@@ -47,7 +47,7 @@ export function createBoardRenderer(deps) {
    if(actor.deadUntilRound)continue;
    const occupants=state.game.characters.filter((c)=>c.nodeId===actor.nodeId&&!c.deadUntilRound),index=occupants.indexOf(actor),n=mapPoint(nodes[actor.nodeId]);
    const target=(state.game.session.kind!=='lan'||state.canAct)&&state.selectedCard&&state.actions.some((a)=>a.command.cardId===state.selectedCard&&a.command.targetId===actor.id);
-   const pawn=svg('g',{class:'pawn-group '+actor.faction+(actor.id===state.game.activeCharacterId?' current':'')+(target?' targetable':''),transform:`translate(${n.x+(index-(occupants.length-1)/2)*38} ${n.y+46}) scale(80)`,role:'button',tabindex:'0','aria-label':playerName(actor.id)+(target?' · 选为目标':' · 查看角色')});
+   const pawn=svg('g',{'data-character-id':actor.id,class:'pawn-group '+actor.faction+(actor.id===state.game.activeCharacterId?' current':'')+(target?' targetable':''),transform:`translate(${n.x+(index-(occupants.length-1)/2)*38} ${n.y+46}) scale(80)`,role:'button',tabindex:'0','aria-label':playerName(actor.id)+(target?' · 选为目标':' · 查看角色')});
    pawn.append(svg('ellipse',{cx:0,cy:.27,rx:.23,ry:.07,class:'pawn-shadow'}),svg('circle',{r:.235,class:'pawn-medallion'}));
    pawn.append(svg('path',{d:actor.faction==='officer'?'M-.19 .15 L-.13 -.03 H.13 L.19 .15 L0 .21 Z':'M-.2 .16 L-.14 -.05 L0 -.12 L.14 -.05 L.2 .16 Z',class:'pawn-coat'}));
    pawn.append(svg('path',{d:'M-.075 -.12 Q0 -.2 .075 -.12 L.065 -.015 Q0 .055 -.065 -.015 Z',class:'pawn-face'}));

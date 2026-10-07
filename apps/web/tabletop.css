@@ -1,0 +1,41 @@
+/* The miniature scene is decorative. Route geometry and interaction stay in board.js. */
+.hero {
+ background:linear-gradient(90deg,#10201ced 0%,#152920cb 40%,#18292218 80%),url('/assets/ui/tabletop-diorama-v3.webp') center 52%/cover;
+ border:2px solid #a88a55;box-shadow:inset 0 0 0 5px #57442b80,inset 0 -12px 25px #1b170966,0 12px 0 -6px #382b1e,0 22px 35px #171b2040;
+}
+.hero h2 {color:#fff2d0;text-shadow:0 2px 1px #081913,0 6px 18px #081913;}
+.hero .eyebrow {color:#efc47f;letter-spacing:.18em;}
+.hero>p:not(.eyebrow) {color:#f0e8d7;max-width:39em;}
+.board-panel:has(.atlas-viewport),.board-panel:has(.expedition-map) {
+ box-shadow:inset 0 2px 3px #fff2cd,inset 0 -5px 9px #6b452947,0 8px 0 -2px #5d412a,0 11px 0 -3px #32251c,0 20px 26px #1e282c38;
+}
+.atlas-location-art {filter:drop-shadow(0 5px 2px #46352155);}
+.pawn-shadow {fill:#241809;opacity:.4;}
+.pawn-group,.playing-card {animation:none;}
+.pawn-medallion {filter:drop-shadow(0 .035px .012px #46352180);}
+.pawn-group.current .pawn-medallion {filter:drop-shadow(0 .035px .012px #46352180) drop-shadow(0 0 .04px #fff0b3);}
+.player-tableau,.mode-card,.playing-card {box-shadow:inset 0 1px 0 #fff4da80,0 4px 0 -1px #786045,0 9px 15px #32251629;}
+@media(hover:hover) and (pointer:fine) {
+ body:not([data-effects="off"]) .mode-card:hover,body:not([data-effects="off"]) .playing-card:hover {transform:perspective(900px) translateY(-4px) rotateX(3deg);box-shadow:0 8px 0 -3px #786045,0 17px 24px #32251638;}
+}
+#tabletop-weather {position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:35;}
+#tabletop-weather i {position:absolute;top:-12px;left:var(--x);width:var(--size);height:var(--size);border-radius:50%;background:#fffbec;opacity:.45;animation:tabletop-snow var(--duration) var(--delay) linear infinite;}
+#tabletop-feedback {position:fixed;z-index:36;top:18px;left:50%;transform:translateX(-50%);max-width:min(640px,calc(100vw - 28px));padding:12px 24px;border:1px solid #c6a66b;border-radius:6px;background:linear-gradient(120deg,#203a32f5,#142b26f5);color:#fff0cf;box-shadow:0 5px 0 -2px #6e5336,0 12px 28px #10221e45;font-family:"KaiTi","STKaiti",serif;font-size:1.1rem;pointer-events:none;text-align:center;overflow-wrap:anywhere;}
+#tabletop-feedback.reveal,.tabletop-reveal {animation:tabletop-reveal .65s ease-out;}
+.pawn-medallion.tabletop-arrival {animation:tabletop-arrival .85s ease-out!important;}
+.tabletop-gold {animation:tabletop-gold 1s ease-out;}
+@keyframes tabletop-snow {to {transform:translate(38px,calc(100vh + 24px));}}
+@keyframes tabletop-arrival {0%,35% {fill:#fffbe8;stroke:#d28e24;stroke-width:.095;}100% {stroke-width:.025;}}
+@keyframes tabletop-reveal {0% {opacity:.35;}100% {opacity:1;}}
+@keyframes tabletop-gold {0%,40% {color:#ffe5a0;text-shadow:0 0 16px #f7bb33,0 0 5px #fff2c1;}100% {text-shadow:none;}}
+body[data-effects="off"] .playing-card,body[data-effects="off"] .pawn-group,body[data-effects="off"] .pawn-medallion,body[data-effects="off"] .node.reachable circle,body[data-effects="off"] .board-panel::after,body[data-effects="off"] [class*="tabletop-"] {animation:none!important;}
+body[data-effects="light"] .board-panel::after,body[data-effects="light"] .pawn-group.current .pawn-medallion:not(.tabletop-arrival),body[data-effects="light"] .node.reachable circle {animation:none!important;}
+body.effects-paused *,body.effects-paused *::before,body.effects-paused *::after {animation-play-state:paused!important;}
+@media(max-width:700px) {
+ .hero {background-position:65% center;}
+ #tabletop-feedback {top:8px;font-size:.92rem;padding:9px 14px;}
+}
+@media(prefers-reduced-motion:reduce) {
+ #tabletop-weather {display:none;}
+ *,*::before,*::after {animation:none!important;scroll-behavior:auto!important;transition:none!important;}
+}
