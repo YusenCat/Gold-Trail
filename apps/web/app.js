@@ -3,6 +3,7 @@ import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
 import {createGameHud} from './modules/game-hud.js';
+import {createTurnPrompt, turnPrompt} from './modules/turn-prompt.js';
 import {createHallController} from './modules/hall.js';
 import { createApiClient } from './modules/api.js';
 import { createBoardRenderer } from './modules/board.js';
@@ -143,6 +144,7 @@ function renderHand(){
  $('#hand-title').textContent=state.game.phase==='finished'?'本局已结束':handActor?playerName(handActor.id)+' · 手牌 '+handActor.hand.length+'/5':'等待你的回合';
  $('#hand-hint').textContent=state.selectedCard?'已选中「'+card(state.selectedCard).name+'」 · 点击发光棋子或目的地':'点击卡牌选取目标 · 每回合至多两张';
  if(lan&&!state.canAct)$('#hand-hint').textContent='可查看你方手牌 · 等待你的行动或响应窗口';
+ if(state.game.pendingDecision&&!state.botPending&&(!lan||state.canAct))$('#hand-hint').textContent=state.game.pendingDecision.kind==='response'?'响应窗口 · 可使用亮起的响应牌，或在当前决策中放弃响应':'当前决策 · 仅亮起的卡牌可用，请先处理分箱、问话或选箱';
  if(!handActor){tray.append(el('p',state.game.phase==='finished'?'可回主菜单开始新的行程。':'对手正在行动。你的响应窗口出现时，手牌会自动切换。','empty-hand'));return;}
  if(!handActor.hand.length){tray.append(el('p','行囊里还没有功能牌。到驿站购买明牌，或在黑市盲抽。','empty-hand'));return;}
  handActor.hand.forEach((id)=>{
@@ -171,8 +173,7 @@ $('#map-detail').addEventListener('close',()=>{$('#map-home-viewport').append($(
 
 function guideFor(g,active){
  if(g.phase==='finished')return ['行程结算','本局胜负已定。保存这份战报，或从主菜单开启新的行程。'];
- if(g.pendingDecision)return ['需要回应','当前不是普通回合。先完成右侧“当前决策”，再继续行程。'];
- if(state.botPending)return ['对手行棋','人机正在落子；它结束后会自动交回你的角色。可用右上角暂停。'];
+ if(g.pendingDecision||state.botPending||(g.session.kind==='lan'&&!state.canAct)||state.decisionActorId!==g.activeCharacterId){const prompt=turnPrompt(state,playerName);return [prompt.title,prompt.detail];}
  if(!active)return ['轮前准备','关注事件旗帜；白驹与时辰铜锣会在这里生效。'];
  const sameNodeSmuggler=g.characters.find(c=>c.faction==='smuggler'&&c.nodeId===active.nodeId&&!c.deadUntilRound);
  if(active.faction==='officer'&&sameNodeSmuggler&&active.actionPoints<=0&&checkpointIds.has(active.nodeId))return ['稽查准备','你与'+playerName(sameNodeSmuggler.id)+'同处稽查站，但稽查仍需至少 1 点行动。此回合已无法发动，结束回合后留意对方是否离开。'];
@@ -212,6 +213,7 @@ function render(){
  if(state.screen==='library')renderLibrary();
  if(state.screen!=='play')return;
  const active=renderHud(g);
+ renderTurnPrompt();
  renderResult(g);renderBoard();renderDecision();renderOperations();renderHand();renderGuide(g,active);
  renderPlayerTableaux({state,el,button,playerName,nodeName,card,inspectCharacter,resourceIcon});
  const log=$('#log');log.replaceChildren();for(const entry of g.log.slice(-35).reverse())log.append(el('li',textCN(entry.message)));
@@ -230,6 +232,7 @@ const botController=createBotController({state,$,mutate,render});
 bindSaveControls({state,$,api,mutate,lobby,modal,el,field,select,notify,scheduleBot,show});
 bindReportView({state,$,render});
 const renderHud=createGameHud({state,$,el,phases,factionName,playerName,nodeName,textCN,resourceIcon,portrait,card});
+const renderTurnPrompt=createTurnPrompt({state,$,playerName});
 const hall=createHallController({state,$,render});
 async function init(){
  try{

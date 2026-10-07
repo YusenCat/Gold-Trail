@@ -22,6 +22,7 @@ return function renderHud(g){
  $('#autosave-state').textContent=(lan?'联机自动保留':'自动保留')+' · 第'+g.round+'轮';
  const track=$('#turn-track');track.replaceChildren();
  g.turnOrder.forEach((id,index)=>{const c=g.characters.find((c)=>c.id===id),piece=el('span',undefined,'turn-piece '+c.faction+(id===g.activeCharacterId?' active':''));if(id===g.activeCharacterId)piece.setAttribute('aria-current','step');piece.append(el('small',String(index+1)),el('strong',playerName(id)),el('span',g.phase==='finished'?'已结算':c.deadUntilRound?'等待复活':g.phase==='preEvent'?'轮前准备':id===g.activeCharacterId?'正在行动':index<g.turnIndex?'已行动':'待命'));track.append(piece);});
+ if(g.phase!=='finished'&&state.decisionActorId!==g.activeCharacterId){const index=g.turnOrder.indexOf(state.decisionActorId),piece=track.children[index];if(piece){piece.classList.add('responding');piece.lastElementChild.textContent='正在处理决策';}}
  $('#last-action').textContent=g.log.length?textCN(g.log.at(-1).message):'行程即将开始';
  const event=$('#event-banner');event.replaceChildren();
  if(g.phase==='finished')event.append(el('strong',g.winner==='draw'?'本局平分秋色':factionName(g.winner)+'获胜'),el('p','可保存战局，或回主菜单再来一局。'));

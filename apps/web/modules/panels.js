@@ -43,6 +43,7 @@ export function createGamePanels(deps) {
    if(state.botPending){panel.append(el('p',state.botPaused?'人机已暂停，可随时继续。':'人机正在思考与行动…','muted'));return;}
    if(state.game.session.kind==='lan'&&!state.canAct){panel.append(el('p',state.roomConnection!=='connected'?'正在恢复连接，暂时不能操作。':state.room.status==='paused'?'对局暂停。等待全员在线后，由房主继续。':'等待同伴操作，行程会自动更新。','muted'));return;}
    if(!actor)return;
+   if(state.game.pendingDecision||state.actions.some(a=>a.group==='decision')){panel.append(el('p','先完成当前决策，随后恢复地点行动与常规出牌。','muted'));return;}
    const moves=state.actions.filter((a)=>a.group==='movement');
    if(state.selectedCard)$('#move-actions').append(button('取消选牌',()=>{state.selectedCard=null;render();}));
    for(const a of moves.filter((a)=>!a.command.path))$('#move-actions').append(button(a.label,()=>execute(a)));

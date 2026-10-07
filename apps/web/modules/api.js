@@ -50,6 +50,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
     state.busy = true;
     clearTimeout(state.botTimer);
     document.body.classList.add('busy');
+    render();
     const payload = { ...body, revision: body.revision ?? state.game?.revision };
     try {
       let result;

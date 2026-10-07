@@ -429,3 +429,45 @@ dialog::backdrop { background:#17333b99; backdrop-filter:blur(5px); }
   #lan-player-status { font-size:.78rem; }
 }
 @media(prefers-reduced-motion:reduce) { button,.playing-card { transition:none; } }
+
+/* Shared turn guidance and touch navigation; uses the expedition paper palette. */
+.turn-prompt { display:flex; align-items:center; justify-content:space-between; gap:20px; margin:14px 0; padding:18px 22px; background:var(--paper-surface); border:1px solid #b29a73; border-left:5px solid #6e8177; border-radius:5px; box-shadow:0 5px 15px #49392718; }
+.turn-prompt[data-tone=attention] { border-left-color:#9a4535; background:linear-gradient(110deg,#f9e9cb,#f5eddc); }
+.turn-prompt[data-tone=waiting] { border-left-color:#365d73; }
+.turn-prompt h2 { margin:3px 0; font-size:1.25rem; overflow-wrap:anywhere; }
+.turn-prompt p { margin:0; color:#66563e; font-size:.83rem; }
+.turn-prompt-copy { min-width:0; }
+#turn-prompt-action { flex-shrink:0; min-height:44px; }
+#turn-prompt[data-tone=attention] #turn-prompt-action { background:#9a4535; border-color:#803c30; color:#fff8e8; }
+#decision-section:not([hidden]) { scroll-margin-top:18px; border-left:4px solid #9a4535; }
+.board-panel,.control-panel,.hand-table,.situation-panel,#end-turn,#lan-toolbar,#result-panel { scroll-margin-top:18px; }
+#mobile-play-nav { display:none; }
+@media(max-width:700px) {
+  body:has(#screen-play:not([hidden])) main { padding-bottom:calc(130px + env(safe-area-inset-bottom)); }
+  body:has(#screen-play:not([hidden])) #mobile-play-nav { display:block; position:fixed; z-index:30; bottom:0; left:0; right:0; padding:8px 12px calc(8px + env(safe-area-inset-bottom)); background:var(--paper-surface); border-top:2px solid #aa7937; box-shadow:0 -5px 22px #302c2626; }
+  #mobile-turn-label { margin:0 0 6px; color:#493927; font-weight:700; font-size:.78rem; line-height:1.5; overflow-wrap:anywhere; }
+  #mobile-play-nav>div { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+  #mobile-play-nav button { min-height:44px; padding:8px 4px; font-size:.8rem; }
+  #mobile-play-nav .needs-response { color:#fff8e8; background:#9a4535; border-color:#803c30; }
+  .turn-prompt { padding:14px; gap:12px; align-items:stretch; flex-direction:column; }
+  .turn-prompt h2 { font-size:1.16rem; }
+  #turn-prompt-action { align-self:flex-start; }
+  button,select,input:not([type=radio]):not([type=checkbox]),.tabs button,#map-expand { min-height:44px; }
+  input:not([type=radio]):not([type=checkbox]),select,textarea { font-size:16px; }
+  .game-toolbar .actions { gap:8px; flex-wrap:wrap; }
+  .control-panel .tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #decision button { min-height:48px; width:100%; margin:5px 0; text-align:left; }
+  #hand-tray { display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x proximity; gap:14px; padding:18px 9px 22px; }
+  .hand-card-slot { flex:0 0 min(64vw,220px); scroll-snap-align:start; }
+  .hand-card-slot .playing-card { transform:none; }
+  .hand-card-slot .playing-card.picked { transform:translateY(-6px); }
+  .hand-preview-button { min-height:44px; }
+  #hand-characters { flex-wrap:wrap; gap:8px; }
+  dialog:not(#report-projection) { box-sizing:border-box; max-height:calc(100dvh - 24px); max-width:calc(100vw - 24px); overflow-y:auto; padding:16px; }
+  #interaction { width:calc(100vw - 24px); }
+  #interaction .dialog-actions { position:sticky; bottom:-16px; background:var(--paper-surface); padding:12px 0; margin-bottom:-8px; border-top:1px solid #b29a73; z-index:1; }
+  #interaction .dialog-actions button { flex:1; min-height:48px; }
+  .action-choice { min-height:48px; padding:12px; }
+  #map-detail .atlas-viewport { max-height:calc(100dvh - 155px); }
+}
+.turn-piece.responding { border-color:#9a4535; box-shadow:inset 3px 0 #9a4535; }

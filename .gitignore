@@ -44,3 +44,4 @@
 **/.DS_Store
 **/Thumbs.db
 **/Desktop.ini
+!/CHANGELOG.md
