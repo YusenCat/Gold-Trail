@@ -79,7 +79,7 @@ function cardFace(item){
 }
 function showCardPreview(item){
  const dialog=$('#card-preview');$('#preview-kind').textContent=kinds[item.kind]||'卡牌';$('#preview-title').textContent=item.name;
- $('#preview-card').replaceChildren(cardFace(item));if(!dialog.open)dialog.showModal();
+ $('#preview-card').replaceChildren(cardFace(item),el('p',item.text,'preview-rule-copy'));if(!dialog.open)dialog.showModal();
 }
 $('#preview-close').onclick=()=>$('#card-preview').close();
 const renderLibrary = createLibraryRenderer({ state, $, el, button, kinds, cardFace, showCardPreview });
