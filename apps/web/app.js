@@ -1,4 +1,5 @@
 import {createModeFlow} from './modules/mode-flow.js';
+import {createOnboarding} from './modules/onboarding.js';
 import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
@@ -205,6 +206,7 @@ const { renderResult, renderDecision, renderOperations } = createGamePanels({ st
 function render(){
  lobby.renderLobby();
  hall.render();
+ onboarding.render();
  $('#home-load').hidden=!state.localAvailable||!!state.room;
  if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
  else {$('#resume').textContent='继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
@@ -234,6 +236,7 @@ bindReportView({state,$,render});
 const renderHud=createGameHud({state,$,el,phases,factionName,playerName,nodeName,textCN,resourceIcon,portrait,card});
 const renderTurnPrompt=createTurnPrompt({state,$,playerName});
 const hall=createHallController({state,$,render});
+const onboarding=createOnboarding({state,$,el,button,show,setup});
 async function init(){
  try{
   const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);

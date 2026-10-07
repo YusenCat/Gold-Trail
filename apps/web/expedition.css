@@ -471,3 +471,9 @@ dialog::backdrop { background:#17333b99; backdrop-filter:blur(5px); }
   #map-detail .atlas-viewport { max-height:calc(100dvh - 155px); }
 }
 .turn-piece.responding { border-color:#9a4535; box-shadow:inset 3px 0 #9a4535; }
+.learning-lesson h3 { line-height:1.5; }.learning-intro .actions { flex-wrap:wrap; gap:10px; }
+.coach-panel { background:var(--paper-surface); border:2px solid #aa7937; margin:12px 0; }
+.coach-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.coach-panel h2 { margin:8px 0; }.coach-panel .actions { flex-wrap:wrap; }
+.coach-highlight { outline:3px solid #aa7937; outline-offset:3px; }
+@media(max-width:700px){.coach-panel { padding:16px; }.coach-panel .actions button { flex:1; }.learning-lesson { padding:18px; }}

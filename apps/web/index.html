@@ -48,11 +48,12 @@
  </form>
 </section>
 <section id="screen-play" class="screen" hidden>
- <div class="game-toolbar"><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
+ <div class="game-toolbar"><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="coach-open" type="button">新手指引</button><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
  <section class="expedition-scoreboard" aria-label="轮次与阵营声望"><div class="faction-score smuggler"><span class="faction-sign">朱</span><div><small>走私者 · 阵营声望</small><strong id="score-smuggler">0</strong></div></div><div class="round-dial"><span>第 <strong id="round-number">01</strong> 轮</span><small id="round-phase">角色行动</small><small id="victory-goal">五十声望竞速</small></div><div class="faction-score officer"><div><small>官兵 · 阵营声望</small><strong id="score-officer">0</strong></div><span class="faction-sign">蓝</span></div></section>
  <div id="lan-toolbar" class="room-game-status panel" hidden><span id="lan-player-status" role="status" aria-live="polite"></span><div class="actions"><button id="lan-pause" type="button" hidden>暂停对局</button><button id="lan-rematch" type="button" hidden>再开一局</button><button id="lan-refresh" type="button">重新同步</button><button id="lan-lobby" type="button">查看房间</button></div><small id="lan-sync-hint">驿路已接通 · 自动同步与保存</small></div>
  <section id="result-panel" class="result-panel" hidden></section>
  <section id="turn-prompt" class="turn-prompt" aria-label="当前操作提示"><div class="turn-prompt-copy" role="status" aria-live="polite" aria-atomic="true"><p class="eyebrow">驿路传令 · 当前操作</p><h2 id="turn-prompt-title"></h2><p id="turn-prompt-detail"></p></div><button id="turn-prompt-action" type="button"></button></section>
+ <section id="coach-panel" class="coach-panel panel" aria-label="桌面新手指引" hidden><div class="coach-heading"><span id="coach-progress" class="eyebrow"></span><button id="coach-close" type="button">暂时收起</button></div><div role="status" aria-live="polite"><h2 id="coach-title"></h2><p id="coach-detail"></p></div><div class="actions"><button id="coach-previous" type="button">上一步</button><button id="coach-locate" type="button">带我找到它</button><button id="coach-next" type="button">下一步</button></div></section>
  <div class="layout">
   <aside class="intel-sidebar" aria-label="对局情报">
    <section class="intel-section situation-panel"><h2>当前局势</h2><p id="summary"></p><div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div><p id="last-action" class="last-action" role="status" aria-live="polite"></p><div id="event-banner" class="event-banner"></div><section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section></section>
@@ -70,15 +71,10 @@
  <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-characters" class="actions" hidden></div><div id="hand-tray"></div></section>
 </section>
 <section id="screen-help" class="screen" hidden>
- <div class="section-heading"><div><p class="eyebrow">行前必读</p><h2>新手驿路指南</h2></div><button class="return-game">返回上一页</button></div>
- <div class="guide-grid">
-  <article class="panel"><h3>一 · 怎样获胜</h3><p>从漠河金矿采得碎金，再押运回阵营交金点。走私者在边境黑市交金，官兵在墨尔根交金。每兑换一枚碎金，获得一官银和一点阵营声望。</p></article>
-  <article class="panel"><h3>二 · 轮到你时</h3><p>每轮先揭示事件并扣粮，再按顺序行动。通常每名角色有三点行动力。点击亮起的节点移动，或在“地点行动”中采矿、补给、交易。最后结束回合。</p></article>
-  <article class="panel"><h3>三 · 别忘了粮草</h3><p>轮初在驿道上消耗一粮。粮草不够就会饿死、掉落携带物，并在下一轮驿站复活。驿站可耗尽剩余行动补满粮草；黑市补给另收一官银。</p></article>
-  <article class="panel"><h3>四 · 出牌与收缴</h3><p>自己的回合通常最多打两张功能牌，响应牌在专门窗口打出。收缴时目标先分甲乙两箱，发动者问系统问题，再选一箱。回答永远真实，另一箱仍归目标。</p></article>
- </div>
- <div class="panel"><h3>现在可以做什么？</h3><p>操作区只列出后端确认合法的动作。卡牌置灰时查看旁边说明；事件影响、角色资源和剩余行动都会显示在对局里。人机行动时会逐步播放战报，遇到你的响应就停下来等待。</p></div>
- <details class="panel"><summary>展开完整规则书与补充裁定</summary><pre id="full-rules">正在载入规则书…</pre></details>
+ <div class="section-heading"><div><p class="eyebrow">从第一程开始</p><h2>新手驿路学堂</h2></div><button class="return-game">返回上一页</button></div>
+ <section class="panel learning-intro"><h3>十分钟，学会看地图、押运与应对收缴</h3><p id="learning-mode-note"></p><div class="actions"><button id="learn-practice" type="button">开启人机练习</button><button id="learn-tour" type="button">带我认识当前棋盘</button></div><p class="muted">练习仍是正常人机对局，开始前可保存已有进度。也可只阅读下面九节课程。</p></section>
+ <div id="learning-lessons" class="guide-grid"></div>
+ <details class="panel"><summary>完整规则与全部卡牌</summary><pre id="full-rules">正在载入规则书…</pre></details>
 </section>
 <section id="screen-library" class="screen" hidden>
  <div class="section-heading"><div><p class="eyebrow">知己知彼</p><h2>卡牌图鉴</h2></div><button class="return-game">返回上一页</button></div>
