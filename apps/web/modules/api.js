@@ -62,6 +62,10 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
       }
       if (payload.commandId) state.pendingLanCommand = null;
       absorb(result);
+      if(path==='/api/game/new'||path.endsWith('/saves/load')){
+        state.actionDieGeneration=(state.actionDieGeneration||0)+1;
+        state.actionDieFreshStart=path==='/api/game/new';
+      }
       $('#notice').hidden = true;
       return true;
     } catch (error) {

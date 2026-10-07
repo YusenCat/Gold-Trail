@@ -1,7 +1,7 @@
 import balanceData from '../../../../content/balance.v1.json' with { type: 'json' };
 import cardsData from '../../../../content/cards.v1.json' with { type: 'json' };
 import { RandomStream } from '../random.ts';
-import type { CharacterState, Faction, GameState } from '../state.ts';
+import type { CharacterState, Faction, GameState, GameLogEntry } from '../state.ts';
 
 export class RuleError extends Error {}
 export const cardById = new Map(cardsData.cards.map((card) => [card.id, card]));
@@ -25,8 +25,8 @@ export function isAlive(item: CharacterState): boolean {
   return item.deadUntilRound === null;
 }
 
-export function log(state: GameState, type: string, message: string, visibility: 'public' | string[] = 'public'): void {
-  state.log.push({ id: state.log.length + 1, round: state.round, type, message, visibility });
+export function log(state: GameState, type: string, message: string, visibility: 'public' | string[] = 'public', actionDie?: GameLogEntry['actionDie']): void {
+  state.log.push({ id: state.log.length + 1, round: state.round, type, message, visibility, ...(actionDie ? {actionDie} : {}) });
 }
 
 export function charge(actor: CharacterState, ap: number): void {

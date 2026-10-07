@@ -52,6 +52,8 @@ export interface GameLogEntry {
   type: string;
   message: string;
   visibility: 'public' | string[];
+  /** Public result of the action die, before and after AP modifiers. */
+  actionDie?: { actorId: string; roll: number; actionPoints: number };
 }
 
 export interface DroppedItems {

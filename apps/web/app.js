@@ -2,6 +2,7 @@ import {createModeFlow} from './modules/mode-flow.js';
 import {createOnboarding} from './modules/onboarding.js';
 import {createSurvivalAdvisor} from './modules/survival-advisor.js';
 import {createTabletopEffects} from './modules/tabletop-effects.js';
+import {createActionDie} from './modules/action-die.js';
 import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
@@ -212,6 +213,7 @@ function render(){
  lobby.renderLobby();
  hall.render();
  onboarding.render();
+  actionDie.render();
   if(state.screen!=='play')tabletopEffects.render();
  $('#home-load').hidden=!state.localAvailable||!!state.room;
  if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
@@ -247,6 +249,7 @@ const hall=createHallController({state,$,render});
 const onboarding=createOnboarding({state,$,el,button,show,setup});
 const renderSurvival=createSurvivalAdvisor({state,$,playerName,nodeName,el});
 const tabletopEffects=createTabletopEffects({state,$,textCN,playerName});
+const actionDie=createActionDie({state,$,playerName});
 async function init(){
  try{
   const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);

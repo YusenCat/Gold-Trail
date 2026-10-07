@@ -148,7 +148,7 @@ export function startTurn(state: GameState): void {
   actor.marketRefreshedThisTurn = false;
   actor.freeMoveAvailableThisTurn = eventActive(state, 'V_RUSSIAN_PARTY') && actor.faction === 'smuggler';
   actor.untargetableThisTurn = false;
-  log(state, 'turnStart', `${id}掷出 ${actor.actionRoll} 点行动骰，获得 ${actor.actionPoints} 行动点。`);
+  log(state, 'turnStart', `${id}掷出 ${actor.actionRoll} 点行动骰，获得 ${actor.actionPoints} 行动点。`, 'public', {actorId:id,roll:actor.actionRoll!,actionPoints:actor.actionPoints});
 }
 
 export function refillMarketAtRoundEnd(state: GameState): void {

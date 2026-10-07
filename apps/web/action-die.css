@@ -1,0 +1,25 @@
+.action-die-panel {display:flex;align-items:center;gap:22px;min-height:118px;margin:12px 0;padding:14px 24px;border:1px solid #b29a6d;border-left:5px solid #b18a44;border-radius:5px;background:linear-gradient(110deg,#f9efda,#ead9b6);box-shadow:inset 0 1px 0 #fff8e8,0 4px 0 -2px #7b654b,0 8px 15px #49382620;color:#523d26;}
+.action-die-panel[hidden] {display:none;}
+.action-die-scene {flex:0 0 84px;display:grid;place-items:center;width:84px;height:84px;perspective:480px;}
+.action-die-cube {position:relative;width:54px;height:54px;transform-style:preserve-3d;transform:rotateX(-12deg) rotateY(-18deg) rotateX(var(--die-x,0deg)) rotateY(var(--die-y,0deg));}
+.action-die-face {position:absolute;inset:0;display:grid;place-items:center;border:2px solid #ab8a54;border-radius:8px;background:radial-gradient(circle at 30% 20%,#fffbea,#ebd8af);color:#674522;font:700 32px/1 "KaiTi","STKaiti",serif;box-shadow:inset 0 0 0 3px #fff3d7,inset 0 -5px 9px #a9854930;backface-visibility:hidden;}
+.action-die-face.front {transform:translateZ(27px);}
+.action-die-face.back {transform:rotateY(180deg) translateZ(27px);}
+.action-die-face.right {transform:rotateY(90deg) translateZ(27px);}
+.action-die-face.left {transform:rotateY(-90deg) translateZ(27px);}
+.action-die-face.top {transform:rotateX(90deg) translateZ(27px);}
+.action-die-face.bottom {transform:rotateX(-90deg) translateZ(27px);}
+.action-die-cube.rolling {animation:action-die-tumble var(--roll-duration,950ms) cubic-bezier(.2,.65,.3,1) both;}
+.action-die-copy {min-width:0;}
+.action-die-copy h2 {color:#65492b;font:700 1.15rem/1.5 "KaiTi","STKaiti",serif;margin:0 0 3px;}
+.action-die-copy p {font-weight:700;color:#715126;}
+.action-die-copy small {font-size:.75rem;color:#846f50;}
+@keyframes action-die-tumble {
+ 0% {transform:rotateX(-12deg) rotateY(-18deg) translateY(-14px) rotateX(calc(var(--die-x) + 540deg)) rotateY(calc(var(--die-y) + 720deg));}
+ 45% {transform:rotateX(-12deg) rotateY(-18deg) translateY(5px) rotateX(calc(var(--die-x) + 180deg)) rotateY(calc(var(--die-y) + 270deg));}
+ 75% {transform:rotateX(-12deg) rotateY(-18deg) translateY(-5px) rotateX(calc(var(--die-x) + 25deg)) rotateY(calc(var(--die-y) + 30deg));}
+ 100% {transform:rotateX(-12deg) rotateY(-18deg) translateY(0) rotateX(var(--die-x)) rotateY(var(--die-y));}
+}
+@media(max-width:700px) {.action-die-panel {gap:12px;padding:12px;}.action-die-scene {flex-basis:72px;width:72px;}.action-die-copy h2 {font-size:1rem;}.action-die-copy p {font-size:.86rem;}}
+@media(prefers-reduced-motion:reduce) {.action-die-cube.rolling {animation:none;}}
+body[data-effects="off"] .action-die-cube.rolling {animation:none;}
