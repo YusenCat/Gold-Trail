@@ -150,20 +150,22 @@ function renderHand(){
  if(lan)for(const c of state.game.characters.filter((c)=>c.faction===state.me?.faction))choices.append(button(playerName(c.id)+(state.me.characterIds.includes(c.id)?' · 你':' · 队友'),()=>{state.handCharacterId=c.id;state.selectedCard=null;state.previewPath=null;render();}));
  const chosen=lan&&state.handCharacterId?state.game.characters.find((c)=>c.id===state.handCharacterId&&c.faction===state.me?.faction):visible;
  const handActor=chosen||visible;
+ const teammateHand=lan&&handActor&&!state.me.characterIds.includes(handActor.id);
  $('#hand-hint').hidden=!handActor?.hand.length;
  $('#hand-title').textContent=state.game.phase==='finished'?'本局已结束':handActor?playerName(handActor.id)+' · 手牌 '+handActor.hand.length+'/5':'等待你的回合';
  $('#hand-hint').textContent=state.selectedCard?'已选中「'+card(state.selectedCard).name+'」 · 点击发光棋子或目的地':'点击卡牌选取目标 · 每回合至多两张';
  if(lan&&!state.canAct)$('#hand-hint').textContent='可查看你方手牌 · 等待你的行动或响应窗口';
  if(state.game.pendingDecision&&!state.botPending&&(!lan||state.canAct))$('#hand-hint').textContent=state.game.pendingDecision.kind==='response'?'响应窗口 · 可使用亮起的响应牌，或在当前决策中放弃响应':'当前决策 · 仅亮起的卡牌可用，请先处理分箱、问话或选箱';
+ if(teammateHand)$('#hand-hint').textContent='队友手牌 · 只可查看，由队友亲自出牌';
  if(!handActor){tray.append(el('p',state.game.phase==='finished'?'可回主菜单开始新的行程。':'对手正在行动。你的响应窗口出现时，手牌会自动切换。','empty-hand'));return;}
  if(!handActor.hand.length){tray.append(el('p','暂无手牌','empty-hand'));return;}
  handActor.hand.forEach((id)=>{
-  const item=card(id),available=lan&&!state.canAct?[]:state.actions.filter((a)=>a.command.type==='PLAY_TACTIC'&&a.command.cardId===id&&a.command.actorId===handActor.id),row=button('',()=>selectCard(id),!available.length),slot=el('div',undefined,'hand-card-slot');
+  const item=card(id),available=teammateHand||(lan&&!state.canAct)?[]:state.actions.filter((a)=>a.command.type==='PLAY_TACTIC'&&a.command.cardId===id&&a.command.actorId===handActor.id),row=button('',()=>selectCard(id),!available.length),slot=el('div',undefined,'hand-card-slot');
   row.className='playing-card card-illustrated'+(available.length?' playable':'')+(state.selectedCard===id?' picked':'');
   row.setAttribute('aria-label',item.name+'：'+item.text);
   row.setAttribute('aria-pressed',String(state.selectedCard===id));
   row.append(cardFace(item));
-  row.append(el('small',available.length?'点击打出':item.timing==='responseToSearchOrRobbery'?'等待响应时机':'查看牌面与效果','card-footer'));
+  row.append(el('small',teammateHand?'队友手牌 · 只可查看':available.length?'点击打出':item.timing==='responseToSearchOrRobbery'?'等待响应时机':'查看牌面与效果','card-footer'));
   slot.append(row);const look=button('放大查看',()=>showCardPreview(item));look.className='hand-preview-button';look.setAttribute('aria-label','放大查看'+item.name);slot.append(look);tray.append(slot);
  });
 }
