@@ -13,6 +13,7 @@
 !/Dockerfile
 !/.dockerignore
 !/deploy/
+!/render.yaml
 
 # Runtime rulebook and the release's player playtest record.
 /docs/*
@@ -38,6 +39,8 @@
 !/apps/server/public-http.test.ts
 !/apps/server/room-transfer.test.ts
 !/apps/server/room-lifecycle.test.ts
+!/apps/server/render-start.test.ts
+!/apps/server/room-recovery.test.ts
 
 # Card PNGs are runtime art. UI PNGs are originals; runtime uses WebP.
 /apps/web/assets/ui/*.png

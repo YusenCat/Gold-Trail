@@ -1,6 +1,6 @@
 # 公网部署准备（4.0开发中）
 
-当前阶段已实现public模式的请求边界、私密邀请、公开房间列表、一次性换设备和房间回收；完整浏览器对局与公网验收仍按开发规划推进。不要将本页理解为4.0已经发布。
+当前阶段已实现public模式的请求边界、私密邀请、公开房间列表、一次性换设备和房间回收，并完成本机双人、四人各一局30轮视觉试玩；真实公网验收仍按开发规划推进。不要将本页理解为4.0已经发布。
 
 ## 配置
 
@@ -22,6 +22,16 @@
 使用Node.js24或本仓库Dockerfile，启动`node apps/server/server.ts`；不使用Windows桌面启动器。设置上表变量，绑定持久目录。先获取平台分配的HTTPS域名，再设置`GAME_PUBLIC_ORIGIN`，不能填写本机地址。
 
 实例数为1；现有JSON恢复文件不支持多实例共享写入。更新部署会断开SSE，客户端重新连接，房间恢复后等待全员在线再继续。代理支持长连接并关闭事件流缓冲。
+
+### Render Blueprint
+
+仓库根目录提供`render.yaml`，使用原生Node24、单实例、`/var/data`下的1GB持久磁盘及`/api/health`检查。无需自己维护Docker或购买域名；平台提供HTTPS站点。模板默认新加坡区域、付费`0.5c-512mb`实例，创建前可调整区域和计划并核对费用。模板关闭自动部署，后续更新需手工部署指定提交，避免开发提交打断正在进行的对局。配置依据[Blueprint参考](https://render.com/docs/blueprint-spec)与[持久磁盘说明](https://render.com/docs/disks)。
+
+在Render创建Blueprint，选择本仓库开发分支`codex/public-multiplayer-4`及根目录`render.yaml`；4.0正式合并后再切换到发布分支。构建先执行`npm run test:online`，通过后运行`node deploy/render-start.mjs`。启动器强制公网模式，并使用平台的`RENDER_EXTERNAL_URL`作为固定公网地址，仍由服务校验HTTPS、Host及Origin；没有该值时拒绝启动，不回退局域网模式。变量来源见[平台环境变量](https://render.com/docs/environment-variables)。
+
+使用自定义域名时，在平台绑定域名后明确设置`GAME_PUBLIC_ORIGIN=https://你的域名`并重新部署；该值优先于平台默认地址，此时必须使用配置域名访问。持久目录保存房间和凭证注册表；不要用免费临时磁盘服务代替这个配置。不默认信任平台未知的代理IP，未配置`GAME_TRUSTED_PROXIES`时按直接连接来源限流；需增加按真实客户端IP的限流时先确认平台代理的明确IP，再配置，不能填写通配符。
+
+首次部署后，用两个不同网络的设备完成创建、分享、加入、开局；再验证刷新、换设备与服务重启恢复。平台重新部署会短暂中断并使恢复的房间暂停，必须全员在线后继续。Blueprint本地验证不能证明实际挂盘、证书和跨网络恢复正常。
 
 ## 已有服务器：Docker＋Caddy
 
@@ -49,4 +59,6 @@ GAME_DOMAIN=game.example.com docker compose -f deploy/compose.yaml up -d --build
 
 ## 当前验证边界
 
-公网请求边界、loopback代理隔离、错误Host／Origin、Secure Cookie、2／4人建房与原局域网接口已通过Node测试。当前开发机没有Docker，容器构建和Caddy证书尚未实测；尚未提供真实公网主机，因此跨网络手机验收仍未完成。正式发布前必须完成容器运行、持久卷恢复和不同网络对局验收。
+公网请求边界、loopback代理隔离、错误Host／Origin、Secure Cookie、2／4人建房与原局域网接口已通过Node测试。当前开发机没有Docker，容器构建和Caddy证书尚未实测；也可使用原生Node托管模板。尚未提供真实公网主机或托管账号，因此跨网络手机验收仍未完成。正式发布前必须完成所选部署方式的实际运行、持久磁盘恢复和不同网络对局验收。
+
+Render模板已通过官方JSON Schema校验；本机实际启动测试验证平台URL、自定义域名优先、内部健康检查、错误Host、本地接口隔离，以及缺失／无效URL启动失败。测试证明启动配置行为，不证明Render已经创建服务、挂载磁盘或签发证书。

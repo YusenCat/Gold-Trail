@@ -1,0 +1,25 @@
+# Paid service and disk: review the plan and region before creating the Blueprint.
+services:
+  - type: web
+    name: gold-trail
+    runtime: node
+    plan: 0.5c-512mb
+    region: singapore
+    numInstances: 1
+    autoDeployTrigger: "off"
+    buildCommand: npm run test:online
+    startCommand: node deploy/render-start.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.13.0
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: GAME_MODE
+        value: public
+      - key: GAME_SAVE_DIR
+        value: /var/data/saves
+    disk:
+      name: game-data
+      mountPath: /var/data
+      sizeGB: 1

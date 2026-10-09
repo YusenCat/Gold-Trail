@@ -6,6 +6,6 @@
   "scripts": {
     "start": "node tools/start-game.mjs",
     "dev": "node apps/server/server.ts",
-    "test:online": "node --test apps/server/deployment.test.ts apps/server/public-http.test.ts apps/server/room-transfer.test.ts apps/server/room-lifecycle.test.ts"
+    "test:online": "node --test apps/server/deployment.test.ts apps/server/public-http.test.ts apps/server/room-transfer.test.ts apps/server/room-lifecycle.test.ts apps/server/render-start.test.ts apps/server/room-recovery.test.ts"
   }
 }
