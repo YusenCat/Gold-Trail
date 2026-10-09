@@ -31,6 +31,8 @@ return function renderHud(g){
  else event.append(el('strong','轮前准备'),el('p','在事件揭示前，处理白驹与铜锣。'));
  const info=$('#active-character');info.replaceChildren();
  if(active){
+ const controls=$('.control-panel'),actorKey=(g.metrics?.id??state.room?.id??g.session.kind)+':'+(state.room?.epoch??0)+':'+active.id;
+ if(controls.dataset.actorKey!==actorKey){controls.scrollTop=0;controls.dataset.actorKey=actorKey;}
  info.dataset.faction=active.faction;
  info.append(portrait(active.id,el));
  info.append(el('strong',playerName(active.id)+' · '+nodeName(active.nodeId)));
