@@ -1,0 +1,223 @@
+/* 3.5: one landscape, with the map and controls arranged around the player. */
+:root {
+  --sans:"Microsoft YaHei UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+  --serif:var(--sans);
+  --paper-surface:linear-gradient(125deg,#fffaf0ed,#efe8d5cf 55%,#ddd9c39c);
+  --scene-shadow:0 12px 36px #24333118;
+  font-family:var(--sans);
+}
+body {
+  font-family:var(--sans);font-size:14px;min-height:100vh;
+  background:linear-gradient(180deg,#e8ebdf9c,#e8ebdf18 45%,#d2d6c552),url('/assets/ui/expedition-world-v2.webp') center/cover fixed;
+}
+body::before {content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,#f4eed222,transparent 75%);z-index:-1;}
+main,body:has(#screen-play:not([hidden])) main {max-width:1920px;padding:22px clamp(16px,3vw,64px) 44px;}
+h1,h2,h3,button,input,select,textarea,summary,pre {font-family:var(--sans);}
+h1,h2,h3 {letter-spacing:.01em;}
+.app-header,body:has(#screen-play:not([hidden])) .app-header {background:transparent;border:0;box-shadow:none;min-height:58px;padding:0 0 20px;margin:0 0 14px;gap:18px;}
+.app-header .eyebrow {display:none;}
+.app-header h1,body:has(#screen-play:not([hidden])) .app-header h1 {font-size:clamp(1.15rem,2vw,1.85rem);font-weight:700;letter-spacing:.06em;color:#283c35;text-shadow:0 1px 12px #fffbe8;}
+.app-header nav button {background:#faf6e2a6;border:1px solid #fffff07a;border-radius:20px;padding:9px 15px;backdrop-filter:blur(8px);}
+button {border-radius:9px;box-shadow:0 2px 8px #51482710;transition:background .15s,border-color .15s;}
+.panel,.guide-grid .panel,.intel-sidebar,.control-panel,.player-tableau,.catalogue-card,.home-resume,.hall-network,.hall-secondary button,.mode-card {
+  background:var(--paper-surface);border:1px solid #fff9e880;border-radius:16px;box-shadow:var(--scene-shadow);backdrop-filter:blur(8px);
+}
+.panel h2 {font-size:1.18rem;}
+.section-heading {background:transparent;}
+.eyebrow {letter-spacing:.06em;}
+/* The hall is an open scene, with the invitation choices to its right. */
+#screen-home {display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px 38px;align-items:start;}
+#screen-home .hero {grid-column:1;grid-row:1 / span 4;align-self:center;background:none;border:0;box-shadow:none;min-height:390px;padding:60px 18px;}
+.hero::after,.mode-card::before {display:none;}
+.hero h2 {font:700 clamp(2.3rem,4.3vw,4.6rem)/1.4 var(--sans);color:#243b32;text-shadow:0 2px 22px #fffce9;letter-spacing:.04em;}
+.hero .eyebrow,.hero>p:not(.eyebrow) {color:#36473a;text-shadow:0 1px 10px #fffbe9;}
+.hero>p {display:none;}
+#screen-home .hall-heading {grid-column:2;display:block;background:transparent;padding:8px 4px;margin:0;box-shadow:none;}
+.hall-heading .eyebrow,#hall-mode-note,.hall-service-state {display:none;}
+#screen-home .hall-mode-grid {grid-column:2;gap:14px;margin:0;}
+.hall-mode-grid .mode-card {min-height:210px;padding:22px;gap:12px;text-align:left;}
+.hall-mode-grid .mode-card strong {font-size:1.32rem;}
+.hall-mode-grid .mode-card>span:not(.mode-icon) {font-size:.85rem;}
+#screen-home .hall-secondary {grid-column:2;gap:14px;margin:0;}
+.hall-secondary button {display:block;padding:18px;}.hall-secondary span {display:block;margin-top:5px;}
+#screen-home .hall-network {grid-column:2;margin:0;padding:16px 20px;}
+.hall-network .field {grid-template-columns:1fr;gap:6px;}
+#screen-home .home-resume {grid-column:1/-1;justify-self:end;max-width:640px;margin:8px 0;padding:15px 20px;}
+.home-resume p {margin:8px 0 0;}
+/* Flatten the layout wrapper so every play module gets a deliberate place. */
+#screen-play {display:grid;grid-template-columns:minmax(210px,.85fr) minmax(0,2.7fr) minmax(270px,1fr);column-gap:26px;row-gap:16px;align-items:start;}
+#screen-play .layout {display:contents;}
+.game-toolbar {grid-column:1;grid-row:1;position:relative;align-self:center;justify-self:start;background:transparent;padding:0;z-index:24;}
+.game-toolbar>summary {list-style:none;cursor:pointer;border:1px solid #fff9e888;border-radius:24px;background:#f7f1dfce;backdrop-filter:blur(8px);padding:10px 20px;color:#354d3e;font-weight:700;min-height:44px;}
+.game-toolbar>summary::-webkit-details-marker {display:none;}
+.game-toolbar>summary::after {content:" ＋";}.game-toolbar[open]>summary::after {content:" −";}
+.game-toolbar>.actions {position:absolute;top:52px;left:0;width:300px;max-width:calc(100vw - 40px);display:flex;justify-content:flex-start;gap:9px;padding:18px;background:#f2eddf;border:1px solid #c9c4b0;border-radius:16px;box-shadow:0 18px 50px #24352c40;}
+.game-toolbar button {min-height:40px;border-radius:8px;}
+.sound-controls {width:100%;}.autosave-state {display:none;}
+#screen-play .expedition-scoreboard {grid-column:2;grid-row:1;margin:0;min-height:78px;padding:10px 24px;background:linear-gradient(100deg,#fff8e4b5,#e8ebd4e6 50%,#fff8e48a);border:1px solid #fff9e899;border-radius:50px;box-shadow:var(--scene-shadow);backdrop-filter:blur(8px);}
+.faction-score {min-width:0;gap:10px;}.faction-sign {display:none;}.faction-score small {font-size:.72rem;color:#514f42;letter-spacing:0;}
+.faction-score strong,.round-dial strong {font-family:var(--sans);font-size:1.85rem;line-height:1.2;font-variant-numeric:tabular-nums;}
+.round-dial small {font-size:.66rem;}.round-dial>span {font-size:.7rem;}
+#round-phase {display:none;}
+#tutorial-panel {grid-column:1;grid-row:2;margin:18px 0 0;padding:21px;border:1px solid #fff8dbad;border-left:3px solid #a87f47;border-radius:3px 18px 18px 3px;background:linear-gradient(115deg,#fffae9ee,#eee3cbb5);box-shadow:var(--scene-shadow);}
+#tutorial-panel h2 {font-size:1.24rem;margin:7px 0 12px;}
+#tutorial-panel p {font-size:.86rem;line-height:1.8;}
+#tutorial-panel .actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+#tutorial-panel button {min-height:40px;padding:9px 12px;font-size:.77rem;flex:1 1 90px;}
+#tutorial-panel #tutorial-exit {flex-basis:100%;border:0;background:none;box-shadow:none;color:#706d5c;}
+#tutorial-result:empty {display:none;}
+#screen-play #turn-prompt {grid-column:3;grid-row:1;display:block;margin:0;padding:12px 16px;background:linear-gradient(115deg,#e8efdedb,#e9e8d29c);border:0;border-left:3px solid #53765c;border-radius:3px 14px 14px 3px;box-shadow:none;min-height:78px;}
+#turn-prompt h2 {font-size:.91rem;line-height:1.6;margin:0;}
+#turn-prompt-detail {font-size:.77rem;line-height:1.65;margin:6px 0 0;}
+#turn-prompt-action {display:none;}
+#screen-play #action-die {grid-column:1;grid-row:3;background:linear-gradient(110deg,#f7edcba8,#f1edce44);border:0;border-radius:18px;margin:0;padding:8px 12px;min-height:86px;gap:10px;box-shadow:none;}
+.action-die-scene {width:62px;height:70px;flex-basis:62px;transform:scale(.82);}
+.action-die-copy h2 {font-size:.8rem;}.action-die-copy p {font-size:.75rem;}
+#screen-play .action-feedback-status {grid-column:2;grid-row:7;background:#eef0dcbd;border:0;border-radius:12px;margin:0;padding:10px 18px;font-size:.83rem;}
+#screen-play .intel-sidebar {grid-column:1;grid-row:4;max-height:none;padding:17px;background:linear-gradient(130deg,#f4f2dfcc,#e3e6d366);border:0;box-shadow:none;}
+.intel-sidebar h2 {font-size:.9rem;}.intel-section {padding:0;}
+#summary,#last-action,#turn-hint,#guide-strip {display:none;}
+.turn-track {gap:6px;}.turn-piece,.intel-sidebar .turn-piece {background:#fffae95c;border-radius:7px;font-size:.71rem;}
+.turn-piece.active {background:#fff8e6bf;}
+.event-banner,.intel-sidebar .event-banner {background:#d9dfc894;border-radius:10px;padding:12px;margin-top:12px;}
+.event-banner strong {font-size:.8rem;}.event-banner p {font-size:.78rem;}
+.report-panel {margin-top:18px;padding-top:14px;border-top:1px solid #6c7a5429;}
+.intel-sidebar .log {font:400 .8rem/1.9 var(--sans);max-height:190px;padding-left:18px;}
+.log li {padding:5px 0;color:#485047;}.report-tools {margin:6px 0;}
+#report-project {font-size:.7rem;min-height:32px;background:#ecebd4a6;}
+#screen-play .board-panel {grid-column:2;grid-row:2 / span 4;align-self:start;margin:10px 0 0;border:1px solid #f9f5dc99;border-radius:34px 7px 34px 7px;background:radial-gradient(ellipse at 50% 45%,#f5e9cce8 45%,#e7dfc4c7 78%,#e1dcc093);box-shadow:0 18px 48px #23332624,inset 0 0 35px #fff6dc5c;padding:14px 18px 9px;backdrop-filter:blur(4px);transform:none;}
+.board-panel::before,.board-panel::after,.board-image,.board-seal {display:none;}
+.board-heading {padding:5px 4px 8px;}.board-heading h2 {font-size:1.12rem;letter-spacing:.12em;}
+.atlas-controls button {padding:7px 12px;min-height:34px;border-radius:20px;font-size:.72rem;}
+.board-status {margin:2px 0 6px;padding:7px;background:#fffae24a;border:0;font-size:.73rem;border-radius:20px;}
+#board-prompt {font-size:.73rem;text-align:center;min-height:24px;color:#54614c;padding:5px;}
+#move-actions {display:none;}
+#screen-play .control-panel {grid-column:3;grid-row:2 / span 6;align-self:start;margin-top:28px;max-height:min(940px,calc(100vh - 280px));overflow:auto;overscroll-behavior:contain;padding:18px;border:1px solid #fff7e67a;border-top:3px solid #526b52;border-radius:5px 20px 20px 20px;background:linear-gradient(130deg,#f4f1dfe8,#e5e5cfbb);box-shadow:var(--scene-shadow);}
+#turn-title {display:none;}
+#active-character>strong {font-size:1rem;line-height:1.65;}
+.resource-token {background:#fffae578;border:0;border-radius:9px;padding:9px 2px;}
+.resource-token strong {font-family:var(--sans);font-size:1.6rem;}.resource-token small {font-size:.66rem;}
+.tabs {border:0;border-radius:10px;background:#435d4620;padding:3px;gap:3px;}
+.tabs button {border:0;border-radius:7px;background:none;font-size:.76rem;min-height:38px;padding:6px;}
+.tabs button.selected {background:#4b634d;color:#fff8e6;}
+#actions>button.table-action,.control-panel #actions>button.table-action {background:#fff8e58c;border:1px solid #fffbe48a;min-height:53px;border-radius:10px;}
+#end-turn {padding-top:12px;margin-top:12px;}
+#end-turn button {background:#425c46;border:0;border-radius:10px;min-height:44px;}
+#end-turn:not(:empty) {position:sticky;bottom:-18px;background:linear-gradient(0deg,#e6e5cf 75%,#e6e5cf00);padding:18px 0 12px;z-index:5;}
+.is-tutorial .control-panel .tabs {display:none;}
+.atlas-terrain>rect {opacity:.18;}
+#board-prompt {background:none;border:0;}
+.market-card {background:#fbf3db88;border:0;border-radius:9px;overflow:hidden;}
+.market-art-preview small {display:none;}
+#screen-play #coach-panel {grid-column:1;grid-row:5;margin:0;padding:16px;}
+#screen-play #survival-alert {grid-column:2;grid-row:6;margin:0;}
+#screen-play #lan-toolbar {grid-column:1/-1;grid-row:8;margin:0;}
+#lan-sync-hint {display:none;}
+#screen-play #result-panel {grid-column:2;grid-row:2;z-index:5;align-self:start;}
+#screen-play:has(#result-panel:not([hidden])) .board-panel {grid-row:3 / span 3;}
+#screen-play:has(#result-panel:not([hidden])) .control-panel,#screen-play:has(#result-panel:not([hidden])) #action-die {display:none;}
+.result-score-item small {color:#64543b;}
+#screen-play .hand-table {grid-column:2;grid-row:9;margin:2px 0 0;min-height:120px;padding:18px 20px;border:0;border-radius:24px;background:linear-gradient(115deg,#263e32db,#3c5142a8);box-shadow:var(--scene-shadow);backdrop-filter:blur(8px);}
+.hand-table::before {display:none;}.hand-heading h2 {font-size:1.06rem;}.hand-heading .eyebrow {display:none;}
+.hand-heading .muted {font-size:.75rem;}.empty-hand {border:0;padding:12px;font-size:.85rem;}
+#screen-play .tableaux-section {grid-column:1/-1;grid-row:10;margin-top:16px;}
+.tableaux-caption {background:none;border:0;padding:8px 4px;}.tableaux-caption h2 {font-size:1.1rem;}.tableaux-caption .eyebrow {display:none;}
+.tableaux-grid {gap:22px;}.player-tableau {border-top:2px solid var(--faction);background:linear-gradient(125deg,#f6f1dccf,#e0dfc5a8);}
+.player-tableau.current {box-shadow:0 0 0 1px #9c804b,0 12px 30px #27362d25;}
+.tableau-title h3 {font-size:1.18rem;}.tableau-resources strong {font-family:var(--sans);font-size:1.45rem;}
+.tableau-faction {display:none;}
+dialog,#card-preview {border:1px solid #fff5d5ab;border-radius:18px;background:linear-gradient(125deg,#fff9ecef,#e5e6cffa);backdrop-filter:blur(16px);}
+dialog::backdrop {background:#1a302d70;backdrop-filter:blur(5px);}
+#decision-section:not([hidden]) {background:linear-gradient(125deg,#fff8e4b8,#d3ddc3a8);border:1px solid #fff8dc99;border-left:3px solid #60775b;border-radius:12px;box-shadow:none;color:#354631;}
+#decision-section>h2,#decision .muted {color:#52624a;}
+.survival-alert {background:linear-gradient(110deg,#f8eccfdb,#e8dec1b3);border:0;border-left:3px solid #a98240;border-radius:14px;backdrop-filter:blur(8px);}
+.survival-alert[data-urgency=urgent] {background:linear-gradient(110deg,#f6e1d4df,#ead1c0b8);border-left-color:#9a4535;}
+#tabletop-feedback {font-family:var(--sans);font-size:.92rem;border:1px solid #e9edcb66;border-radius:24px;background:#284234ed;}
+/* Tablet and small landscape: a map column plus an action column. */
+@media(min-width:1151px) {
+ #screen-play:not(.is-tutorial) #action-die {grid-row:2;}
+ #screen-play:not(.is-tutorial) .intel-sidebar {grid-row:3 / span 2;}
+}
+@media(max-width:1150px) and (min-width:701px) {
+ main,body:has(#screen-play:not([hidden])) main {padding:16px 20px 35px;}
+ #screen-play {grid-template-columns:minmax(0,1fr) 280px;gap:14px 20px;}
+ .game-toolbar {grid-column:2;grid-row:1;justify-self:end;}
+ .game-toolbar>.actions {left:auto;right:0;}
+ #screen-play .expedition-scoreboard {grid-column:1;grid-row:1;}
+ #screen-play .board-panel {grid-column:1;grid-row:2 / span 3;}
+ #screen-play #turn-prompt {grid-column:2;grid-row:2;}
+ #screen-play .control-panel {grid-column:2;grid-row:3 / span 5;margin-top:0;max-height:75vh;}
+ #tutorial-panel {grid-column:1;grid-row:2;margin:0;}
+ #screen-play.is-tutorial .board-panel {grid-row:3 / span 3;}
+ #screen-play #action-die {grid-column:1;grid-row:6;}
+ #screen-play .intel-sidebar {grid-column:1;grid-row:7;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ .report-panel {margin:0;padding:0;border:0;}
+ #screen-play #coach-panel {grid-column:1;grid-row:8;}
+ #screen-play #survival-alert {grid-column:1;grid-row:9;}
+ #screen-play #lan-toolbar {grid-column:1/-1;grid-row:10;}
+ #screen-play .action-feedback-status {grid-column:1;grid-row:11;}
+ #screen-play .hand-table {grid-column:1/-1;grid-row:12;}
+ #screen-play .tableaux-section {grid-row:13;}
+ #screen-play #result-panel {grid-column:1;grid-row:2;}
+ #screen-play:has(#result-panel:not([hidden])) .board-panel {grid-row:3 / span 2;}
+ #screen-home {gap:18px;grid-template-columns:1fr 1fr;}
+ .hall-mode-grid .mode-card {padding:16px;}.hall-mode-grid .mode-card>span:not(.mode-icon) {display:none;}
+}
+/* Portrait keeps the map near the top; the bottom dock jumps to live decisions. */
+@media(max-width:700px) {
+ main,body:has(#screen-play:not([hidden])) main {padding:14px 12px 95px;}
+ body {background-position:43% center;}
+ .app-header,body:has(#screen-play:not([hidden])) .app-header {display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:0 2px 12px;margin:0;}
+ .app-header nav {width:auto;display:flex;gap:6px;}.app-header nav button {min-height:40px;padding:8px 11px;font-size:.75rem;}
+ #screen-home {display:flex;flex-direction:column;gap:15px;}
+ #screen-home>* {width:100%;}
+ #screen-home .hero {min-height:250px;padding:25px 10px;}.hero h2 {font-size:2.5rem;}
+ #screen-home .hall-mode-grid {display:grid;gap:12px;}.hall-mode-grid .mode-card {min-height:170px;padding:17px;}
+ .hall-mode-grid .mode-card>span:not(.mode-icon) {display:none;}
+ .hall-secondary button {padding:15px;}.hall-secondary span {font-size:.72rem;}
+ #screen-home .home-resume {max-width:none;}
+ #screen-play {display:flex;flex-direction:column;gap:14px;}
+ #screen-play>*:not(.layout),#screen-play .layout>* {width:100%;min-width:0;}
+ #screen-play .game-toolbar {order:0;width:auto;align-self:flex-end;margin-bottom:-4px;}
+ .game-toolbar>summary {min-height:36px;padding:7px 14px;font-size:.76rem;}
+ .game-toolbar>.actions {right:0;left:auto;top:44px;}
+ #screen-play .expedition-scoreboard {order:1;min-height:78px;padding:12px 16px;border-radius:24px;}
+ .faction-score strong,.round-dial strong {font-size:1.5rem;}.faction-score small {font-size:.63rem;}
+ #screen-play #lan-toolbar {order:2;}
+ #screen-play #tutorial-panel {order:3;margin:0;padding:16px 18px;}
+ #tutorial-panel h2 {font-size:1.12rem;margin:5px 0 9px;}#tutorial-panel p {font-size:.82rem;}
+ #tutorial-panel .actions {gap:7px;margin-top:10px;}#tutorial-panel button {flex:1;min-height:42px;}
+ #tutorial-panel #tutorial-exit {flex:0 1 auto;font-size:.7rem;}
+ #screen-play #result-panel {order:3;}
+ #screen-play .board-panel {order:4;margin:0;padding:10px 6px 5px;border-radius:23px 5px 23px 5px;}
+ .board-heading {padding:4px 9px 6px;}.board-heading h2 {font-size:.97rem;}
+ .board-status {font-size:.65rem;margin:0 5px;}.atlas-viewport #board.expedition-map {min-height:0;}
+ #screen-play #turn-prompt {order:5;padding:12px 16px;}
+ #screen-play #turn-prompt-action {display:block;margin-top:8px;min-height:40px;width:100%;}
+ #screen-play #action-die {order:6;min-height:78px;}
+ #screen-play #survival-alert {order:7;}
+ #screen-play .control-panel {order:8;max-height:none;overflow:visible;margin:0;padding:17px;}
+ #screen-play .action-feedback-status {order:9;}
+ #screen-play .hand-table {order:10;min-height:110px;padding:18px 14px;}
+ #screen-play .tableaux-section {order:11;margin:0;}
+ .tableaux-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.player-tableau {padding:12px;}
+ .tableau-title h3 {font-size:1rem;}.tableau-resources strong {font-size:1.2rem;}
+ #screen-play .intel-sidebar {order:12;display:block;}
+ #screen-play #coach-panel {order:13;}
+ #mobile-play-nav {background:#f2f0dded;border:1px solid #fffbe6aa;box-shadow:0 -5px 28px #20322723;backdrop-filter:blur(12px);border-radius:18px 18px 0 0;}
+ #mobile-play-nav p {font:600 .76rem/1.5 var(--sans);color:#3e5843;}
+ #mobile-play-nav button {background:#fffae777;border:0;border-radius:8px;min-height:42px;}
+ #mobile-play-nav button.needs-response {background:#4b674e;color:#fff5da;}
+ #interaction .dialog-actions {background:#e9e8d5e8;}
+}
+@media(max-width:380px) {.tableau-heading {gap:6px;}.tableau-resources {gap:2px;} .faction-score small {font-size:.58rem;} .round-dial strong {margin:0 3px;} .hall-mode-grid .mode-card strong {font-size:1.13rem;} }
+@media(orientation:landscape) and (max-height:550px) and (min-width:701px) {
+ main,body:has(#screen-play:not([hidden])) main {padding:10px 14px 28px;}
+ .app-header,body:has(#screen-play:not([hidden])) .app-header {min-height:40px;margin:0;padding-bottom:9px;}
+ #screen-play {grid-template-columns:minmax(0,1fr) 250px;gap:10px 16px;}
+ #screen-play .control-panel {max-height:80vh;}
+ .tableaux-grid {grid-template-columns:repeat(4,minmax(0,1fr));}
+}
+/* Keep native hidden semantics stronger than responsive layout declarations. */
+.action-feedback-status {position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap;padding:0!important;margin:0!important;border:0!important;}
+[hidden] {display:none!important;}

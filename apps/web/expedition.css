@@ -2,7 +2,7 @@
 :root {
   color-scheme:light; --gold:#aa7937; --ink:#302c26; --paper:#f5eddc;
   --road-smuggler:#9a4535; --road-officer:#365d73;
-  --serif:"STSong","SimSun","Songti SC",serif; --sans:"Microsoft YaHei",system-ui,sans-serif;
+  --serif:var(--sans); --sans:"Microsoft YaHei UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
   --paper-surface:radial-gradient(ellipse at 10% 0%,#fffaf1b3,transparent 65%),repeating-linear-gradient(2deg,#95764b04 0 1px,transparent 1px 4px),linear-gradient(135deg,#f8f1e2,#eadcc2);
   font-family:var(--sans); background:#d1c2a6; color:var(--ink);
 }
@@ -97,7 +97,7 @@ legend { color:#655239; font-size:.86rem; font-weight:700; }
 .lobby-banner .eyebrow { color:#dec9a3; }
 .lobby-banner .muted { color:#e5e5d9; }
 .lobby-room-label { display:block; font:500 .9rem/1.5 var(--sans); letter-spacing:.04em; margin-top:12px; color:#ead8b4; }
-.room-code { font:700 1.2rem/1 Georgia,serif; letter-spacing:.2em; color:#fff1c9; margin-left:9px; }
+.room-code { font:700 1.2rem/1 var(--sans); letter-spacing:.2em; color:#fff1c9; margin-left:9px; }
 .room-connection { color:#d6e9db; font-size:.78rem; }
 .lobby-banner button { background:#f4eddfdf; }
 #screen-lobby>.panel { margin:18px 0 4px; padding:18px 24px; border-left:5px solid #ad8a53; }
@@ -149,14 +149,14 @@ legend { color:#655239; font-size:.86rem; font-weight:700; }
 .expedition-scoreboard { display:flex; justify-content:space-between; align-items:center; padding:12px 28px; margin-bottom:14px; border-radius:4px; background:var(--paper-surface); box-shadow:0 5px 15px #4c3d2822; border-block:2px solid #b6996c; }
 .faction-score { display:flex; gap:15px; align-items:center; min-width:180px; }
 .faction-score small { font-size:.73rem; color:#87765e; letter-spacing:.06em; display:block; }
-.faction-score strong { font:700 2.65rem/1.1 Georgia,serif; color:#984432; }
+.faction-score strong { font:700 2.65rem/1.1 var(--sans); color:#984432; }
 .faction-score.officer { text-align:right; justify-content:flex-end; }
 .faction-score.officer strong { color:#365d73; }
 .faction-sign { border:1px solid #a65a46; color:#984432; padding:8px 12px; font:700 1.7rem var(--serif); background:#a65a460d; border-radius:50% 50% 3px 3px; }
 .officer .faction-sign { color:#365d73; border-color:#365d73; background:#365d730d; }
 .round-dial { display:grid; text-align:center; }
 .round-dial>span { color:#655036; font:600 .8rem var(--sans); }
-.round-dial strong { font:700 2.6rem/1 Georgia,serif; vertical-align:middle; margin:0 8px; }
+.round-dial strong { font:700 2.6rem/1 var(--sans); vertical-align:middle; margin:0 8px; }
 .round-dial small { font-size:.72rem; color:#76674f; }
 .room-game-status { background:#29434aee; border:0; border-left:4px solid #b99963; color:#fcf0da; padding:13px 20px; box-shadow:0 3px 10px #23373722; }
 .room-game-status small { color:#c1d3cd; font-size:.73rem; }
@@ -203,7 +203,7 @@ legend { color:#655239; font-size:.86rem; font-weight:700; }
 .resource-grid { gap:6px; margin:3px 0 8px; }
 .resource-token { background:linear-gradient(#fff8e7,#e8d9b9); border:1px solid #bfa47980; border-radius:3px; padding:7px 2px; box-shadow:inset 0 1px #fff8; }
 .resource-token small { color:#806947; font-size:.64rem; }
-.resource-token strong { color:#6d4e29; font:700 1.8rem Georgia,serif; }
+.resource-token strong { color:#6d4e29; font:700 1.8rem var(--sans); }
 .resource-icon { filter:drop-shadow(0 1px 1px #6d4c2b55); }
 .tabs { border:1px solid #b5a07c; border-radius:3px; }
 .tabs button { background:#e6d9c1; color:#80694b; }
@@ -242,7 +242,7 @@ legend { color:#655239; font-size:.86rem; font-weight:700; }
 .tableau-status { color:var(--faction); font-size:.66rem; white-space:nowrap; }
 .tableau-resources { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); padding:6px 0 11px; gap:8px; }
 .tableau-resources>div { display:grid; grid-template-columns:20px 1fr; align-items:center; gap:0 4px; }
-.tableau-resources strong { font:700 1.7rem/1.2 Georgia,serif; color:#644b2e; }
+.tableau-resources strong { font:700 1.7rem/1.2 var(--sans); color:#644b2e; }
 .tableau-resources small { grid-column:2; font-size:.62rem; color:#927b5b; }
 .tableau-equipment { display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:31px; padding:9px 0; border-block:1px dashed #bba78388; }
 .tableau-equipment>small { font-size:.65rem; color:#8a7558; margin-right:5px; }
@@ -320,7 +320,8 @@ dialog::backdrop { background:#17333b99; backdrop-filter:blur(5px); }
 .atlas-blocked-mark { font:700 19px var(--serif); text-anchor:middle; fill:#993e30; paint-order:stroke; stroke:#fff5df; stroke-width:5; }
 .atlas-route-preview { fill:none; stroke:#b87914; stroke-width:8; stroke-dasharray:12 9; stroke-linecap:round; pointer-events:none; }
 .atlas-node { cursor:default; }
-.atlas-node.reachable { cursor:pointer; }
+.atlas-node.reachable { cursor:pointer; pointer-events:bounding-box; }
+.atlas-node[aria-disabled="true"] { cursor:wait; }
 .atlas-hit-area { fill:transparent; stroke:none; }
 .atlas-node-ring { fill:#f7ecd0; stroke:#967956; stroke-width:3; filter:drop-shadow(0 2px 2px #6d553b30); }
 .city-node .atlas-node-ring { fill:#ede2bd; stroke:#8a7758; stroke-width:2.5; }

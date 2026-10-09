@@ -1,4 +1,5 @@
 import { randomBytes, randomUUID, createHash } from 'node:crypto';
+import {beginMetrics,trackCommand} from './match-statistics.ts';
 import { applyCommand, createInitialGame, startGame, type GameCommand, type GameState, type Faction, type Mode } from '../../packages/rules/src/index.ts';
 
 export class RoomError extends Error {
@@ -86,7 +87,8 @@ export class RoomStore {
     let code: string;
     do { code = randomBytes(4).toString('hex').slice(0, 6).toUpperCase(); }
     while ([...this.rooms.values()].some((r) => r.code === code));
-    const game = createInitialGame(randomBytes(4).readUInt32LE(), body.mode);
+    const seed=randomBytes(4).readUInt32LE();
+    const game = createInitialGame(seed, body.mode);beginMetrics(game,seed);
     game.session.kind = 'lan';
     const room: Room = {
       id: randomUUID(), code, capacity: body.capacity, mode: body.mode, hostId: playerId,
@@ -149,6 +151,7 @@ export class RoomStore {
   start(room: Room, member: RoomMember): void {
     this.host(room, member); this.lobby(room);
     if (room.members.length !== room.capacity || !room.members.every((m) => m.seat && m.ready && m.online)) throw new RoomError('需要满员在线、选位并且全员准备');
+    if(room.game.metrics)room.game.metrics.startedAt=Date.now();
     room.game = startGame(room.game);
     room.status = 'playing'; room.revision++;
   }
@@ -166,6 +169,7 @@ export class RoomStore {
     if (!room.members.every((m) => m.online)) throw new RoomError('请等待所有成员重新连接', 409);
     if (command.revision !== room.game.revision) throw new RoomError('局面已更新，请刷新后重试', 409);
     const next = applyCommand(room.game, command);
+    trackCommand(room.game,next,command);
     room.game = next; room.revision++;
     if (next.phase === 'finished') room.status = 'finished';
     if (typeof id === 'string') {
@@ -187,7 +191,8 @@ export class RoomStore {
   rematch(room: Room, member: RoomMember): void {
     this.host(room, member);
     if (room.status !== 'finished') throw new RoomError('结束后才能再开一局', 409);
-    const game = createInitialGame(randomBytes(4).readUInt32LE(), room.mode);
+    const seed=randomBytes(4).readUInt32LE();
+    const game = createInitialGame(seed, room.mode);beginMetrics(game,seed);
     game.session.kind = 'lan'; game.revision = room.game.revision + 1;
     room.game = game; room.status = 'lobby'; room.pauseReason = null;
     room.epoch++; room.receipts = []; this.changed(room);

@@ -37,7 +37,7 @@ export function createOnboarding({state,$,el,button,show,setup}) {
  function render(){
   $('#learn-practice').disabled=!state.localAvailable;
   $('#learn-tour').disabled=!state.game?.log.length||state.game.phase==='finished';
-  $('#learning-mode-note').textContent=state.localAvailable?'建议先用走私者人机练习。指引不替你操作，也不会修改已有行程。':'你正连接朋友的主机：可阅读全部课程，或在联机开始后开启桌面指引。';
+  $('#learning-mode-note').textContent=state.localAvailable?'先完成实操教学，再开始人机练习。':'联机开始后，可开启棋盘指引。';
   if(state.coachPending&&state.screen==='play'&&state.game?.session.kind==='solo'){open=true;index=0;state.coachPending=false;}
   clear();const panel=$('#coach-panel');panel.hidden=!open||state.screen!=='play';if(panel.hidden)return;
   const [title,detail,selector]=steps[index];$('#coach-progress').textContent='新手旅程 '+(index+1)+' / '+steps.length;$('#coach-title').textContent=title;$('#coach-detail').textContent=detail;

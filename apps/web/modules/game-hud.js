@@ -8,7 +8,7 @@ return function renderHud(g){
  $('#round-phase').textContent=phases[g.phase];
  $('#score-smuggler').textContent=g.reputation.smuggler;
  $('#score-officer').textContent=g.reputation.officer;
- $('#victory-goal').textContent=g.mode==='race'?'五十声望竞速':'三十轮火并';
+ $('#victory-goal').textContent=state.tutorial?'实操教学':g.mode==='race'?'五十声望竞速':'三十轮火并';
  const host=lan&&state.me.playerId===state.room.hostId;
  $('#save').hidden=$('#load').hidden=lan&&!host;
  $('#save').disabled=state.busy||(lan&&state.roomConnection!=='connected');
@@ -25,6 +25,7 @@ return function renderHud(g){
  if(g.phase!=='finished'&&state.decisionActorId!==g.activeCharacterId){const index=g.turnOrder.indexOf(state.decisionActorId),piece=track.children[index];if(piece){piece.classList.add('responding');piece.lastElementChild.textContent='正在处理决策';}}
  $('#last-action').textContent=g.log.length?textCN(g.log.at(-1).message):'行程即将开始';
  const event=$('#event-banner');event.replaceChildren();
+ event.hidden=!!state.tutorial;
  if(g.phase==='finished')event.append(el('strong',g.winner==='draw'?'本局平分秋色':factionName(g.winner)+'获胜'),el('p','可保存战局，或回主菜单再来一局。'));
  else if(g.activeEventId)event.append(el('strong','本轮事件 · '+card(g.activeEventId).name),el('p',card(g.activeEventId).text));
  else event.append(el('strong','轮前准备'),el('p','在事件揭示前，处理白驹与铜锣。'));

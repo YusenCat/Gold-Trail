@@ -53,6 +53,8 @@ export function createTurnPrompt({state, $, playerName}) {
   function text(selector, value) { if ($(selector).textContent !== value) $(selector).textContent = value; }
   return function renderTurnPrompt() {
     current = turnPrompt(state, playerName);
+    if(state.tutorial?.finished)current={tone:'ready',title:'实操教学已完成',detail:'返回原对局或进入人机练习，开始完整征程。',target:'#tutorial-panel',action:'查看教学结果'};
+    else if(state.tutorial?.completed)current={tone:'ready',title:'本步操作已完成',detail:'先查看操作结果，再点击“理解了，继续”。',target:'#tutorial-panel',action:'查看本步结果'};
     $('#turn-prompt').dataset.tone = current.tone;
     text('#turn-prompt-title', current.title);
     text('#turn-prompt-detail', current.detail);

@@ -20,7 +20,7 @@
 }
 #tabletop-weather {position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:35;}
 #tabletop-weather i {position:absolute;top:-12px;left:var(--x);width:var(--size);height:var(--size);border-radius:50%;background:#fffbec;opacity:.45;animation:tabletop-snow var(--duration) var(--delay) linear infinite;}
-#tabletop-feedback {position:fixed;z-index:36;top:18px;left:50%;transform:translateX(-50%);max-width:min(640px,calc(100vw - 28px));padding:12px 24px;border:1px solid #c6a66b;border-radius:6px;background:linear-gradient(120deg,#203a32f5,#142b26f5);color:#fff0cf;box-shadow:0 5px 0 -2px #6e5336,0 12px 28px #10221e45;font-family:"KaiTi","STKaiti",serif;font-size:1.1rem;pointer-events:none;text-align:center;overflow-wrap:anywhere;}
+#tabletop-feedback {position:fixed;z-index:36;top:18px;left:50%;transform:translateX(-50%);max-width:min(640px,calc(100vw - 28px));padding:12px 24px;border:1px solid #c6a66b;border-radius:6px;background:linear-gradient(120deg,#203a32f5,#142b26f5);color:#fff0cf;box-shadow:0 5px 0 -2px #6e5336,0 12px 28px #10221e45;font-family:var(--sans);font-size:1.1rem;pointer-events:none;text-align:center;overflow-wrap:anywhere;}
 #tabletop-feedback.reveal,.tabletop-reveal {animation:tabletop-reveal .65s ease-out;}
 .pawn-medallion.tabletop-arrival {animation:tabletop-arrival .85s ease-out!important;}
 .tabletop-gold {animation:tabletop-gold 1s ease-out;}

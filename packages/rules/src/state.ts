@@ -121,7 +121,9 @@ export interface GameState {
   mode: Mode;
   /** Simulation setup only; normal games default to the published smuggler-first order. */
   startingFaction?: Faction;
-  session: { kind: 'hotseat' | 'solo' | 'lan'; humanFaction: Faction };
+  session: { kind: 'hotseat' | 'solo' | 'lan'; humanFaction: Faction; difficulty?: 'easy' | 'normal' | 'hard' };
+  tutorial?: { stage: number; completed: boolean; seed: number };
+  metrics?: { id: string; seed: number; startedAt: number; actions: number; equipmentPurchases: number; equipmentBuyers: string[] };
   revision: number;
   round: number;
   phase: Phase;

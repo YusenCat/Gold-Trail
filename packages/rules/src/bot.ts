@@ -21,10 +21,10 @@ export function chooseBotCommand(state: GameState, supplied?: LegalAction[]): Ga
   const fullActor = state.characters.find((c) => c.id === id)!;
   const candidates = supplied ?? legalActions(state);
   const view = publicView(state, fullActor.faction);
-  return selectFromObservation(view, id, candidates);
+  return selectFromObservation(view, id, candidates, state.session.difficulty ?? 'normal');
 }
 
-export function selectFromObservation(view: GameState, id: string, candidates: LegalAction[]): GameCommand | null {
+export function selectFromObservation(view: GameState, id: string, candidates: LegalAction[], difficulty: 'easy' | 'normal' | 'hard' = 'normal'): GameCommand | null {
   const actor = view.characters.find((c) => c.id === id)!;
   const depot = actor.faction === 'smuggler' ? 'BAZAAR' : 'MRG';
   const blocked = new Set(view.blockedEdges);
@@ -125,6 +125,25 @@ export function selectFromObservation(view: GameState, id: string, candidates: L
     return -90;
   };
   let best: LegalAction | undefined, bestScore = -Infinity;
-  for (const action of candidates) { const value = score(action); if (value > bestScore) { best = action; bestScore = value; } }
+  for (const action of candidates) {
+    const c = action.command;
+    let value = score(action);
+    // All levels observe the same public information and use the same legal commands.
+    if (difficulty === 'easy') {
+      if (['INSPECT','MINE_SEARCH','PLAY_TACTIC','BUY_MARKET'].includes(c.type)) value -= 65;
+      if (c.type === 'MOVE') value += publicJitter(view, id, JSON.stringify(c)) * 22;
+    }
+    if (difficulty === 'hard') {
+      if (c.type === 'MOVE') {
+        const end = c.path.at(-1)!;
+        // Reserve AP for a productive arrival and prefer a safe overnight stop.
+        if (end === destination && actor.actionPoints > (action.actionPointCost ?? c.path.length)) value += 24;
+        if (actor.food <= 1 && !isSafeNode(end)) value -= 24;
+      }
+      if (c.type === 'PLAY_TACTIC' && value > 5) value += 15;
+      if (c.type === 'BUY_MARKET' && ['E_PICKAXE','E_MINER_CONTRACT'].includes(view.marketSlots[c.slot] ?? '') && view.round < 12) value += 22;
+    }
+    if (value > bestScore) { best = action; bestScore = value; }
+  }
   return best?.command ?? null;
 }

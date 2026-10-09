@@ -2,7 +2,7 @@
 .mode-grid:has(#mode-lan) { grid-template-columns: repeat(4,minmax(0,1fr)); }
 .room-entry-grid { display:grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap:20px; align-items:start; }
 .room-entry-grid .panel { margin:18px 0; min-width:0; }
-.room-entry-grid h2, #screen-lobby h2 { font-family:"KaiTi","STKaiti",serif; font-size:1.4rem; }
+.room-entry-grid h2, #screen-lobby h2 { font-family:var(--sans); font-size:1.4rem; }
 .room-entry-grid .field + .field { margin-top:18px; }
 .room-note { margin-top:14px; }
 .room-code { color:var(--gold); letter-spacing:.14em; font-family:system-ui,sans-serif; }
@@ -10,7 +10,7 @@
 .room-invite input { flex:1; min-width:200px; }
 .room-seats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
 .room-seat { text-align:left; grid-template-columns:auto 1fr; align-items:center; }
-.room-seat.choice > .mode-icon { grid-column:1; grid-row:1 / span 2; background:#423b23; background-image:none; color:var(--gold); font:24px "KaiTi",serif; border:1px solid #a7894d; border-radius:6px; }
+.room-seat.choice > .mode-icon { grid-column:1; grid-row:1 / span 2; background:#423b23; background-image:none; color:var(--gold); font:24px var(--sans); border:1px solid #a7894d; border-radius:6px; }
 .room-seat > strong { grid-column:2; }
 .room-seat small { grid-column:2; overflow-wrap:anywhere; }
 .room-seat.selected { border-color:#cfaa5c; background:#41452c; }
@@ -27,7 +27,7 @@
 @media(max-width:700px) { .room-entry-grid { grid-template-columns:minmax(0,1fr); gap:0; } .room-seats { grid-template-columns:minmax(0,1fr); } }
 @media(max-width:460px) { .mode-grid:has(#mode-lan) { grid-template-columns:minmax(0,1fr); } }
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: radial-gradient(circle at top, #243125, #111611 58%); }
+body { margin: 0; min-width: 0; background: radial-gradient(circle at top, #243125, #111611 58%); }
 main { max-width: 1440px; margin: auto; padding: 28px; }
 header, .layout, .bottom-grid { display: grid; gap: 20px; }
 header { grid-template-columns: 1fr auto; align-items: center; margin-bottom: 22px; }
@@ -65,7 +65,7 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 
 :root { --gold: #d9b568; --ink: #17231d; --paper: #dfcda9; }
 body { line-height: 1.65; }
-h1 { font-family: "STKaiti", "KaiTi", "Microsoft YaHei", serif; font-weight: 600; }
+h1 { font-family: var(--sans); font-weight: 600; }
 button { transition: background .15s, border-color .15s; min-height: 42px; }
 button:focus-visible, input:focus-visible, select:focus-visible, .node:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 button:disabled { opacity: .4; }
@@ -76,7 +76,7 @@ button:disabled { opacity: .4; }
 .event-banner strong { color: var(--gold); white-space: nowrap; }
 .event-banner p { font-size: .9rem; color: #d3c6aa; }
 .board-heading { position: relative; padding: 18px 24px 0; color: #4a341e; }
-.board-heading h2 { color: #4a341e; font-family: "KaiTi",serif; font-size: 1.35rem; margin-bottom: 2px; }
+.board-heading h2 { color: #4a341e; font-family: var(--sans); font-size: 1.35rem; margin-bottom: 2px; }
 .board-heading p { font-size: .8rem; }
 .board-panel { align-self: start; background: var(--paper); box-shadow: inset 0 0 60px #80623533; }
 .board-image { opacity: .1; }
@@ -93,7 +93,7 @@ button:disabled { opacity: .4; }
 .character p { font-size: .9rem; }
 dialog { color: #f7ecd5; background: #1d2a20; border: 1px solid #b18e4d; border-radius: 12px; padding: 26px; width: min(520px,calc(100vw - 32px)); max-height: 85vh; box-shadow: 0 20px 80px #0009; }
 dialog::backdrop { background: #080e0bd9; backdrop-filter: blur(4px); }
-dialog h2 { font-size: 1.4rem; font-family: "KaiTi",serif; }
+dialog h2 { font-size: 1.4rem; font-family: var(--sans); }
 #dialog-fields { display: grid; gap: 12px; margin: 20px 0; }
 input, select { font: inherit; border: 1px solid #82734f; border-radius: 6px; padding: 10px; color: #f7ecd5; background: #111d16; min-width: 0; max-width: 100%; }
 .field { display: grid; gap: 6px; }
@@ -109,7 +109,7 @@ input[type=checkbox] { width: 20px; height: 20px; accent-color: #b5914e; }
 .app-header nav, .game-toolbar, .section-heading, .tabs, .home-resume { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .app-header h1 { font-size: clamp(1.65rem,3vw,2.6rem); }
 .hero { position: relative; padding: 50px 38px; margin: 30px 0; overflow: hidden; border: 1px solid #8e764c; border-radius: 14px; background: linear-gradient(90deg,#203127fa 25%,#17231ddb 70%),url('/assets/board-background.jpg') center/cover; }
-.hero h2 { font: 500 clamp(2.2rem,5vw,4rem)/1.35 "KaiTi","STKaiti",serif; letter-spacing: .08em; color: #f0deb5; margin: 18px 0; }
+.hero h2 { font: 500 clamp(2.2rem,5vw,4rem)/1.35 var(--sans); letter-spacing: .08em; color: #f0deb5; margin: 18px 0; }
 .hero p { color: #c3c5aa; max-width: 630px; }
 .mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
 .mode-card { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 15px; padding: 26px; background: #213025; border-color: #6f714d; border-radius: 12px; }
@@ -117,7 +117,7 @@ input[type=checkbox] { width: 20px; height: 20px; accent-color: #b5914e; }
 .mode-card strong { color: #f3dc9f; font-size: 1.35rem; }
 .mode-card span:not(.mode-icon) { color: #bfc2ac; font-size: .92rem; }
 .mode-card small { color: #d5b372; margin-top: auto; }
-.mode-icon { display: grid; place-items: center; width: 45px; height: 45px; border: 1px solid #a7894d; font: 26px "KaiTi",serif; background: #423b23; transform: rotate(-3deg); }
+.mode-icon { display: grid; place-items: center; width: 45px; height: 45px; border: 1px solid #a7894d; font: 26px var(--sans); background: #423b23; transform: rotate(-3deg); }
 .home-resume { margin-top: 25px; padding: 20px 0; }
 .home-resume p { flex-basis: 100%; }
 .panel { margin: 18px 0; padding: 25px; border: 1px solid #647052; border-radius: 12px; background: #1c2a20; }
@@ -182,20 +182,20 @@ main { max-width: 1600px; }
 .board-panel { border: 7px solid #493c28; border-radius: 18px; background: radial-gradient(ellipse at 40% 30%,#e7dcbc,#c6b68f); box-shadow: 0 16px 35px #0005,inset 0 0 65px #73542b44; }
 .board-image { display: block; inset: 0; opacity: 1; background-image: url('/assets/board-map.png'); background-size: 290% auto; background-position: 57% 23%; filter: saturate(.82) contrast(1.03); }
 .board-heading { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px 0; }
-.board-seal { color: #954b3a; border: 2px solid #954b3a; font: 16px/1.1 "KaiTi",serif; padding: 4px; transform: rotate(5deg); opacity: .75; }
+.board-seal { color: #954b3a; border: 2px solid #954b3a; font: 16px/1.1 var(--sans); padding: 4px; transform: rotate(5deg); opacity: .75; }
 .board-heading h2 { letter-spacing: .18em; }
 #board { min-height: 0; }
 .landscape { pointer-events: none; }
 .mountain { fill: #65745614; stroke: #697358; stroke-width: .018; opacity: .4; }
-.map-title { fill: #657052; font: .34px "KaiTi",serif; letter-spacing: .12px; opacity: .65; }
-.map-region { fill: #80694b; font: .19px "KaiTi",serif; text-anchor: middle; letter-spacing: .035px; }
-.map-caption { fill: #867655; font: .16px "KaiTi",serif; }
+.map-title { fill: #657052; font: .34px var(--sans); letter-spacing: .12px; opacity: .65; }
+.map-region { fill: #80694b; font: .19px var(--sans); text-anchor: middle; letter-spacing: .035px; }
+.map-caption { fill: #867655; font: .16px var(--sans); }
 .route { stroke: #5d4225; stroke-width: .055; stroke-linecap: round; filter: drop-shadow(0 .015px .012px #f6e8bd); }
 .blocked-route { stroke: #a34433; stroke-dasharray: .1 .08; stroke-width: .09; }
 .route-preview { fill: none; stroke: #b47318; stroke-width: .1; stroke-dasharray: .12 .08; pointer-events: none; }
 .node circle { stroke: #857149; stroke-width: .032; fill: #e6d7b0; }
 .node.safe circle { fill: #d1b576; stroke: #6c5530; }
-.node text { font-size: .235px; font-family: "KaiTi","STKaiti",serif; stroke-width: .045; }
+.node text { font-size: .235px; font-family: var(--sans); stroke-width: .045; }
 .node.reachable circle { fill: #fff0b8; stroke: #ba8831; stroke-width: .06; }
 .node.reachable:focus-visible { outline: none; }
 .node.reachable:focus-visible circle { stroke: #284f49; stroke-width: .1; }
@@ -220,22 +220,22 @@ main { max-width: 1600px; }
 .move-actions:empty { display: none; }
 .map-instruction { color: #645234; font-size: .78rem; }
 .control-panel { background: linear-gradient(140deg,#26352a,#19251e); border-color: #756848; border-radius: 12px; max-height: 740px; }
-#active-character>strong { font-family: "KaiTi",serif; font-size: 1.35rem; color: #eed7a2; }
+#active-character>strong { font-family: var(--sans); font-size: 1.35rem; color: #eed7a2; }
 #actions>button { flex: 1 1 120px; text-align: left; border-color: #6c6948; background: #35412e; padding: 12px; font-size: .88rem; }
 #actions>button:hover { background: #4b573a; border-color: #c7a66c; }
 #end-turn button { background: #74552d; border-color: #b38d4e; }
 .event-banner { border-left: 4px solid #c3a068; padding: 10px 18px; margin-bottom: 16px; }
 .hand-table { margin-top: 18px; padding: 20px 24px; border: 1px solid #766445; border-radius: 14px; background: radial-gradient(ellipse at bottom,#344534,#1c2b21); box-shadow: inset 0 1px #a58c4744,0 12px 32px #0003; }
 .hand-heading { display: flex; gap: 14px; justify-content: space-between; align-items: center; }
-.hand-heading h2 { margin: 0; font-family: "KaiTi",serif; font-size: 1.3rem; }
+.hand-heading h2 { margin: 0; font-family: var(--sans); font-size: 1.3rem; }
 #hand-tray { display: flex; gap: 14px; padding: 22px 4px 10px; overflow-x: auto; align-items: stretch; }
 .playing-card { position: relative; display: flex; flex-direction: column; flex: 0 0 172px; min-height: 250px; padding: 13px; color: #382e21; border: 2px solid #9a8050; border-radius: 11px; background: linear-gradient(140deg,#f0e2be,#ceba8e); box-shadow: 0 8px 12px #0004,inset 0 0 0 4px #e6d5ad; text-align: left; transition: transform .18s,box-shadow .18s; }
 .playing-card:hover { background: linear-gradient(140deg,#fff0cc,#ddc794); }
 .playing-card.playable:hover,.playing-card.picked { transform: translateY(-9px); box-shadow: 0 14px 20px #0005,0 0 0 2px #e1ba64; }
 .playing-card:disabled { opacity: .72; cursor: default; }
 .playing-card .card-category { font-size: .7rem; color: #756041; border-bottom: 1px solid #9e855c66; padding-bottom: 5px; }
-.card-emblem { align-self: center; display: grid; place-items: center; width: 53px; height: 53px; margin: 12px 0 9px; border: 1px solid #957749; border-radius: 50%; color: #8b4431; font: 33px "KaiTi",serif; background: #baa06a22; }
-.playing-card strong { font: bold 1.2rem "KaiTi",serif; text-align: center; margin-bottom: 8px; }
+.card-emblem { align-self: center; display: grid; place-items: center; width: 53px; height: 53px; margin: 12px 0 9px; border: 1px solid #957749; border-radius: 50%; color: #8b4431; font: 33px var(--sans); background: #baa06a22; }
+.playing-card strong { font: bold 1.2rem var(--sans); text-align: center; margin-bottom: 8px; }
 .playing-card p { font-size: .77rem; line-height: 1.65; flex: 1; }
 .playing-card .card-footer { font-size: .7rem; padding-top: 9px; margin-top: 10px; border-top: 1px solid #9e855c66; color: #7d4332; }
 .playing-card.card-illustrated { padding: 0; overflow: hidden; border: 2px solid #c1a56a; border-radius: 9px; background: #151610; box-shadow: 0 8px 15px #0007, inset 0 0 0 2px #392a1a; }
@@ -247,7 +247,7 @@ main { max-width: 1600px; }
 .pawn-group { animation: pawn-arrive .34s ease-out both; }
 .empty-hand { color: #b5bba1; padding: 25px 12px; border: 1px dashed #79856866; border-radius: 10px; width: 100%; text-align: center; }
 .action-choices { display: grid; gap: 9px; }
-.search-box { flex: 1; min-height: 100px; border: 3px double #c5a269; background: linear-gradient(#795633 0 35%,#b08a4d 36% 40%,#564027 41%); box-shadow: inset 0 0 0 5px #251c1866,0 5px 10px #0004; font: 1.15rem "KaiTi",serif; }
+.search-box { flex: 1; min-height: 100px; border: 3px double #c5a269; background: linear-gradient(#795633 0 35%,#b08a4d 36% 40%,#564027 41%); box-shadow: inset 0 0 0 5px #251c1866,0 5px 10px #0004; font: 1.15rem var(--sans); }
 .search-box:hover { background: linear-gradient(#967043 0 35%,#d2ae65 36% 40%,#715531 41%); }
 .action-choice { cursor: pointer; display: flex; gap: 12px; padding: 12px; border: 1px solid #667151; border-radius: 8px; background: #243327; }
 .action-choice:has(input:checked) { background: #49472c; border-color: #c6a058; }
@@ -260,9 +260,9 @@ main { max-width: 1600px; }
 .autosave-state { color:#aab994; font-size:.78rem; padding:6px 9px; border:1px solid #647650; border-radius:999px; background:#26382b; }
 .board-status { margin:8px 16px 0; padding:7px 11px; color:#6b5129; font-size:.8rem; text-align:center; border:1px solid #a68a5655; border-radius:6px; background:#f6ecc966; }
 .guide-strip { display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:12px; margin-top:18px; padding:14px 18px; border:1px solid #697753; border-left:4px solid #c4a05c; border-radius:10px; background:#28372a; }
-.guide-strip strong { color:#f0d797; font:1.15rem "KaiTi",serif; }.guide-strip p { color:#c8c9b3; font-size:.88rem; }.guide-stamp { color:#263526; background:#c9a65d; font-size:.72rem; padding:3px 6px; border-radius:3px; }
+.guide-strip strong { color:#f0d797; font:1.15rem var(--sans); }.guide-strip p { color:#c8c9b3; font-size:.88rem; }.guide-stamp { color:#263526; background:#c9a65d; font-size:.72rem; padding:3px 6px; border-radius:3px; }
 .result-panel { display:grid; grid-template-columns:1fr auto auto; gap:22px; align-items:center; margin:0 0 18px; padding:20px 24px; border:1px solid #b28d4e; border-radius:12px; background:linear-gradient(110deg,#49391f,#283827); box-shadow:inset 0 0 0 1px #f0d79722; }
-.result-title small { color:#d8b66f; }.result-title h2 { margin:3px 0; color:#ffe7a8; font:1.7rem "KaiTi",serif; }.result-title p { color:#c9c8ad; font-size:.85rem; }
+.result-title small { color:#d8b66f; }.result-title h2 { margin:3px 0; color:#ffe7a8; font:1.7rem var(--sans); }.result-title p { color:#c9c8ad; font-size:.85rem; }
 .result-score { display:flex; gap:8px; }.result-score-item { display:grid; min-width:65px; padding:6px 12px; text-align:center; border:1px solid #845841; border-radius:7px; }.result-score-item.officer { border-color:#557a8b; }.result-score-item small { color:#c9c6ad; }.result-score-item strong { color:#f5db99; font-size:1.35rem; }
 .result-actions { display:flex; gap:8px; flex-wrap:wrap; }
 @media(max-width:700px){.guide-strip,.result-panel{grid-template-columns:1fr;gap:8px}.autosave-state{display:none}.result-score{order:2}.result-actions{order:3}}
@@ -356,7 +356,7 @@ input[type=number] { accent-color:#d3ae62; font-variant-numeric:tabular-nums; }
 #actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(142px,1fr)); gap:9px; }
 #actions>button.table-action { display:flex; min-height:72px; align-items:center; gap:11px; padding:10px; border:1px solid #887a52; border-radius:5px; background:linear-gradient(145deg,#394631,#273529); box-shadow:0 4px 9px #0003,inset 0 1px #dfc88929; }
 #actions>button.table-action:hover { transform:translateY(-2px); border-color:#d5b56c; background:linear-gradient(145deg,#4c593e,#303f31); box-shadow:0 7px 13px #0005; }
-.action-glyph { display:grid; flex:0 0 38px; width:38px; height:38px; place-items:center; border:1px solid #d0b36b; border-radius:50%; color:#f1d895; background:radial-gradient(circle at 35% 30%,#827044,#443a28); box-shadow:inset 0 0 0 3px #362c1e,0 2px 4px #0004; font:1.12rem "KaiTi",serif; }
+.action-glyph { display:grid; flex:0 0 38px; width:38px; height:38px; place-items:center; border:1px solid #d0b36b; border-radius:50%; color:#f1d895; background:radial-gradient(circle at 35% 30%,#827044,#443a28); box-shadow:inset 0 0 0 3px #362c1e,0 2px 4px #0004; font:1.12rem var(--sans); }
 .action-copy { display:grid; gap:3px; min-width:0; }
 .action-copy strong { line-height:1.35; }
 .action-copy small { font-size:.72rem; }
@@ -364,7 +364,7 @@ input[type=number] { accent-color:#d3ae62; font-variant-numeric:tabular-nums; }
 .market-card { flex:0 0 150px; display:flex; flex-direction:column; gap:7px; margin:0; padding:6px; border:1px solid #9c8049; border-radius:5px; background:linear-gradient(150deg,#32402f,#1c2a20); box-shadow:0 6px 13px #0004,inset 0 1px #f2d99430; }
 .market-card>img { width:100%; aspect-ratio:178.5/249.75; object-fit:cover; border:2px solid #332819; border-radius:4px; box-shadow:0 3px 7px #0006; }
 .market-caption { display:grid; gap:2px; padding:3px 4px; }
-.market-caption strong { color:#f2ddb0; font:1rem "KaiTi",serif; }
+.market-caption strong { color:#f2ddb0; font:1rem var(--sans); }
 .market-caption small,.market-disabled { color:#c6b58e; font-size:.76rem; }
 .market-card>button { min-height:38px; width:100%; padding:6px; border-radius:4px; color:#f8e9bf; background:linear-gradient(#775b30,#594324); }
 .market-card>button:hover { background:linear-gradient(#98733a,#705327); }
@@ -403,7 +403,7 @@ input[type=number] { accent-color:#d3ae62; font-variant-numeric:tabular-nums; }
 .market-card>button { min-height:42px; }
 .card-face { position:relative; display:block; width:100%; aspect-ratio:273/382; overflow:hidden; container-type:inline-size; background:#171911; }
 .card-face>img { display:block; width:100%; height:100%; object-fit:fill; }
-.card-face-title { position:absolute; top:3.1%; left:18%; width:64%; height:8.1%; display:grid; place-items:center; overflow:hidden; padding:0 2%; color:#e7cb7b; background:linear-gradient(180deg,#201e16,#2a281d 52%,#1b1a14); border-block:1px solid #b59a55; box-shadow:inset 0 1px #f3dfa144,0 1px 3px #0008; font:700 7.1cqw/1.05 "Noto Serif CJK SC","Source Han Serif SC","KaiTi",serif; letter-spacing:.08em; white-space:nowrap; text-shadow:0 1px #000; }
+.card-face-title { position:absolute; top:3.1%; left:18%; width:64%; height:8.1%; display:grid; place-items:center; overflow:hidden; padding:0 2%; color:#e7cb7b; background:linear-gradient(180deg,#201e16,#2a281d 52%,#1b1a14); border-block:1px solid #b59a55; box-shadow:inset 0 1px #f3dfa144,0 1px 3px #0008; font:700 7.1cqw/1.05 var(--sans); letter-spacing:.08em; white-space:nowrap; text-shadow:0 1px #000; }
 .card-face-rules { position:absolute; top:76.8%; left:6%; right:6%; height:14.2%; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:1.2% 2%; color:#26241e; background:linear-gradient(150deg,#f0ead8,#d9d0b9); border:1px solid #9a8b6b; box-shadow:inset 0 1px #fff9e8,0 1px 2px #1116; font:500 4.65cqw/1.25 "Noto Sans CJK SC","Microsoft YaHei",sans-serif; text-align:center; overflow-wrap:anywhere; }
 .playing-card { flex:0 0 210px; min-height:0; height:auto; padding:0; }
 .playing-card.card-illustrated { display:flex; flex-direction:column; gap:0; }
@@ -423,7 +423,7 @@ body.hints-hidden #guide-strip,body.hints-hidden #board-prompt,body.hints-hidden
 /* Route encounters read as distinct board spaces; the small ideogram also doubles as the map legend. */
 .node.encounter-site circle { fill:#f3e4b6; stroke:#8c5d22; stroke-width:.065; filter:drop-shadow(0 1px 1.5px #2d231c88); }
 .node.encounter-site.reachable circle { fill:#ffe08a; stroke:#fff1b2; stroke-width:.09; }
-.node .site-symbol { fill:#68471d; stroke:#f8edcf; stroke-width:.018px; font-family:"Noto Serif SC","KaiTi",serif; font-size:.20px; font-weight:900; pointer-events:none; }
+.node .site-symbol { fill:#68471d; stroke:#f8edcf; stroke-width:.018px; font-family:var(--sans); font-size:.20px; font-weight:900; pointer-events:none; }
 .node.encounter-site:hover circle,.node.encounter-site:focus-visible circle { fill:#ffedb9; stroke:#b24e30; stroke-width:.10; }
 .board-heading .map-legend { display:inline-block; margin-top:3px; color:#765722; font-size:.72rem; letter-spacing:.08em; }
 @media(max-width:460px) { #cards { gap:7px; }.market-card { padding:5px; }.market-caption strong { font-size:.82rem; }.card-face-rules { font-size:4.35cqw; }.playing-card { flex-basis:190px; } }
@@ -515,7 +515,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .board-panel::before { content:""; position:absolute; z-index:3; inset:4px; border:1px solid #e0c47775; border-radius:3px; pointer-events:none; }
 .board-panel::after { opacity:.13; }
 .board-heading { padding-top:19px; }
-.board-heading h2 { font:600 1.45rem/1.3 "Noto Serif SC","Songti SC","KaiTi",serif; letter-spacing:.14em; }
+.board-heading h2 { font:600 1.45rem/1.3 var(--sans); letter-spacing:.14em; }
 .board-heading p { line-height:1.75; }
 .board-seal { border-radius:50% 50% 46% 46%; padding:8px 7px; font-weight:700; box-shadow:0 0 0 3px #954b3a22,0 2px 5px #57422533; }
 .board-status { border:1px solid #8c744566; border-radius:4px; color:#493c28; font-variant-numeric:tabular-nums; }
@@ -534,7 +534,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .control-panel::before { border-color:#d0b77324; inset:6px; }
 .control-panel section { position:relative; }
 .control-panel section>h2,#decision-section>h2 {
-  color:#e8d5a5; font-family:"Noto Serif SC","Songti SC","KaiTi",serif;
+  color:#e8d5a5; font-family:var(--sans);
   letter-spacing:.045em;
 }
 #turn-title::before { content:"◆"; color:#c4a35e; font-size:.72em; margin-right:8px; }
@@ -552,7 +552,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .resource-token:nth-child(3) { border-color:#a34d38; }
 .resource-token:nth-child(4) { border-color:#668898; }
 .resource-token small { color:#c2bda5; }
-.resource-token strong { font-family:"Noto Serif SC","Songti SC",serif; font-size:1.45rem; }
+.resource-token strong { font-family:var(--sans); font-size:1.45rem; }
 .tabs { border-radius:6px; }
 .tabs button { min-height:43px; color:#c8c2aa; }
 .tabs button.selected { color:#ffedbd; background:linear-gradient(180deg,#806943,#50442c); box-shadow:inset 0 1px #fff5,inset 0 -2px #d3b466; }
@@ -567,7 +567,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 #end-turn button::after { content:""; position:absolute; inset:0 auto 0 -35%; width:25%; transform:skewX(-20deg); background:linear-gradient(90deg,transparent,#fff2,transparent); transition:left .3s ease; }
 #end-turn button:hover::after { left:115%; }
 .event-banner { border:1px solid #9a8052; border-left:4px solid #d5b56c; background:linear-gradient(120deg,#354234,#202c25 62%,#2d3025); }
-.event-banner strong { color:#f0d99e; font-family:"Noto Serif SC","Songti SC","KaiTi",serif; }
+.event-banner strong { color:#f0d99e; font-family:var(--sans); }
 .turn-track { padding:2px 2px 8px; scrollbar-color:#9d824d #19241f; }
 .turn-piece { min-height:54px; border:1px solid #71694c; border-left:3px solid var(--road-smuggler); background:linear-gradient(145deg,#29372f,#1c2722); }
 .turn-piece.officer { border-left-color:var(--road-officer); }
@@ -599,7 +599,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .guide-strip { border:1px solid #726747; border-left:3px solid #b99b5b; background:linear-gradient(100deg,#29372e,#1c2822); }
 .guide-stamp { border-color:#a68b50; color:#ddc47f; background:#55492e; }
 .bottom-grid>section { border-color:#756d50; border-radius:7px; background:linear-gradient(150deg,#29372f,#1b2722); box-shadow:0 9px 21px #0003,inset 0 1px #fff1; }
-.bottom-grid h2 { color:#e6d3a1; font-family:"Noto Serif SC","Songti SC","KaiTi",serif; }
+.bottom-grid h2 { color:#e6d3a1; font-family:var(--sans); }
 .character { border-color:#5e6950; background:linear-gradient(120deg,#2c3a31,#202a24); }
 .character.smuggler { border-left:3px solid var(--road-smuggler); }
 .character.officer { border-left:3px solid var(--road-officer); }
@@ -724,13 +724,13 @@ input:focus,select:focus { border-color:#e2c579; }
 .card-face-title {
   z-index:2; top:3%; left:16.5%; width:67%; height:8%; padding:0 1%;
   border:0; background:none; box-shadow:none;
-  color:#f3dda5; font:700 6.3cqw/1.08 "Noto Serif SC","Songti SC","KaiTi",serif;
+  color:#f3dda5; font:700 6.3cqw/1.08 var(--sans);
   letter-spacing:.075em; text-shadow:0 1px 1px #0a0805,0 2px 5px #000;
 }
 .card-face-rules {
   z-index:2; top:66.4%; left:9%; right:9%; height:24%; padding:1.2% 1%;
   border:0; background:none; box-shadow:none;
-  color:#352616; font:600 4.35cqw/1.37 "Noto Serif SC","Songti SC","Microsoft YaHei",serif;
+  color:#352616; font:600 4.35cqw/1.37 var(--sans);
   text-shadow:0 1px #fff9dd8c; text-align:left; overflow-wrap:anywhere;
 }
 .playing-card.card-illustrated { border:1px solid #bba06b; background:#271e15; padding:3px; }
@@ -804,7 +804,7 @@ body { background:linear-gradient(90deg,#09130fd9,#101a15ad 48%,#09130fd9),url('
 .intel-sidebar,.control-panel { min-width:0; border:1px solid #9c8357; border-radius:8px; box-shadow:0 16px 30px #0008,inset 0 1px #ead49b35; }
 .intel-sidebar { padding:19px 17px; background:linear-gradient(#122019a8,#102018d6),url('/assets/ui/intel-ledger.webp') center/100% 100%; }
 .intel-section+.intel-section { border-top:1px solid #b89a604f; margin-top:14px; padding-top:14px; }
-.intel-section h2 { color:#eddaa9; font:700 1.06rem "Noto Serif SC","Songti SC","KaiTi",serif; letter-spacing:.08em; }
+.intel-section h2 { color:#eddaa9; font:700 1.06rem var(--sans); letter-spacing:.08em; }
 .intel-sidebar #summary { margin:0 0 12px; color:#e5d6b4; font-size:.82rem; line-height:1.6; }
 .intel-sidebar .turn-track { display:grid; grid-template-columns:1fr; gap:5px; overflow:visible; padding:0; margin:0 0 10px; }
 .intel-sidebar .turn-piece { display:grid; grid-template-columns:20px 1fr auto; align-items:center; min-width:0; padding:5px 8px; gap:5px; font-size:.78rem; }
@@ -852,7 +852,7 @@ body { background:linear-gradient(90deg,#09130fd9,#101a15ad 48%,#09130fd9),url('
 #report-projection { position:fixed; inset:0; width:100vw; height:100vh; max-width:none; max-height:none; margin:0; padding:clamp(26px,5vw,90px); overflow:auto; cursor:pointer; border:0; border-radius:0; background:linear-gradient(110deg,#07120cf2,#14251ce8 55%,#07120cf2),url('/assets/ui/world-backdrop.webp') center/cover; }
 #report-projection::backdrop { background:#07110ff5; }
 .projection-content { width:min(1400px,100%); min-height:100%; margin:auto; display:flex; flex-direction:column; }
-.projection-content h2 { font:700 clamp(2.4rem,5vw,5rem) "Noto Serif SC","Songti SC","KaiTi",serif; letter-spacing:.12em; color:#f4dfa5; border-bottom:2px solid #b99a5d; padding-bottom:18px; }
+.projection-content h2 { font:700 clamp(2.4rem,5vw,5rem) var(--sans); letter-spacing:.12em; color:#f4dfa5; border-bottom:2px solid #b99a5d; padding-bottom:18px; }
 #projection-summary { font-size:clamp(1rem,1.6vw,1.45rem); color:#ddccaa; margin:8px 0 26px; }
 #projection-log { flex:1; display:grid; align-content:start; gap:12px; padding:0 0 0 1.5em; font-size:clamp(1.15rem,2vw,2rem); line-height:1.5; color:#f6e9c9; }
 #projection-log li { padding:9px 10px; border-bottom:1px solid #bfa56a55; }
@@ -889,3 +889,14 @@ body:has(#screen-play:not([hidden])) .game-toolbar { margin-bottom:9px; }
  .control-panel { order:2; }
  #preview-card { width:min(100%,calc((100vh - 140px)*.71466)); }
 }
+/* 3.2–3.4: touch-safe teaching and independent sound preferences. */
+.sound-controls {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sound-controls label {display:flex;align-items:center;gap:6px;}
+.sound-controls input {width:100px;min-height:44px;}
+#tutorial-panel {border:2px solid #957044;margin:12px 0;padding:18px;scroll-margin-top:12px;}
+#tutorial-panel p {line-height:1.65;}
+#tutorial-result {font-weight:700;color:#554021;}
+.action-feedback-status {padding:10px 18px;background:#f6edda;border-left:4px solid #987547;}
+.game-toolbar .actions {flex-wrap:wrap;}
+button {touch-action:manipulation;}
+@media(max-width:700px){#tutorial-panel .actions {display:flex;flex-wrap:wrap;}#tutorial-panel button {min-height:44px;flex:1 1 145px;}.sound-controls {width:100%;} .sound-controls input {width:140px;} }

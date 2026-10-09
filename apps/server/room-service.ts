@@ -4,6 +4,7 @@ import { RoomSaveStore } from './room-save-store.ts';
 import { RoomEvents } from './room-events.ts';
 import { roomView } from './room-view.ts';
 import type { GameCommand } from '../../packages/rules/src/index.ts';
+import type {MatchStatistics} from './match-statistics.ts';
 
 /** Per-room serialized transactions: durable write precedes state commit and broadcast. */
 export class RoomService {
@@ -13,7 +14,8 @@ export class RoomService {
   timeoutMs: number;
   private queues = new Map<string, Promise<void>>();
   private seen = new Map<string, number>();
-  constructor(saves: RoomSaveStore, timeoutMs = 20000) { this.saves = saves; this.timeoutMs = timeoutMs; }
+  private statistics?:MatchStatistics;
+  constructor(saves: RoomSaveStore, timeoutMs = 20000,statistics?:MatchStatistics) { this.saves = saves; this.timeoutMs = timeoutMs;this.statistics=statistics; }
   private key(id: string, playerId: string): string { return id + ':' + playerId; }
   private queue<T>(id: string, job: () => Promise<T> | T): Promise<T> {
     const task = (this.queues.get(id) ?? Promise.resolve()).then(job);
@@ -24,6 +26,7 @@ export class RoomService {
   private async persist(room: Room): Promise<void> {
     try { await this.saves.recovery(room, this.store.credentials(room)); }
     catch { throw new RoomError('房间进度写入失败，操作未生效。请检查主机磁盘后重试', 503); }
+    await this.statistics?.record(room.game).catch(e=>console.warn('房间已保存，统计稍后重试：'+e.message));
   }
   async initialize(): Promise<void> {
     for (const recovery of await this.saves.recoveries()) {
@@ -34,6 +37,7 @@ export class RoomService {
       room.revision++;
       await this.saves.recovery(room, recovery.credentials);
       this.store.restore(room, recovery.credentials);
+      await this.statistics?.record(room.game).catch(e=>console.warn('统计读取失败：'+e.message));
     }
   }
   async create(playerId: string, body: Record<string, unknown>) {

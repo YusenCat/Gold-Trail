@@ -34,7 +34,13 @@ export function createBoardRenderer(deps) {
    const options=boardActions.filter((a)=>a.command.path.at(-1)===node.id).sort((a,b)=>(a.actionPointCost??0)-(b.actionPointCost??0)||a.command.path.length-b.command.path.length),action=options[0];
    const point=mapPoint(node),group=svg('g',{transform:`translate(${point.x} ${point.y})`,'data-node-id':node.id,class:'atlas-node '+(node.type==='road'?'road-node ':'city-node ')+(action?'reachable':'')});
    group.classList.toggle('encounter-site',Boolean(node.site));
+   group.setAttribute('aria-disabled',String(state.busy));
    const displayName=nodeName(node.id),siteNote=node.siteName&&node.siteName!==displayName?' · '+node.siteName:'';
+   if(action&&node.label){
+    const label=cityLabels[node.id]??{x:0,y:-40},width=displayName.length*(node.type==='road'?17:22)+12;
+    const x=label.anchor==='start'?label.x-6:label.anchor==='end'?label.x-width+6:label.x-width/2;
+    group.append(svg('rect',{x,y:label.y-28,width,height:52+(label.subtitle?19:0),fill:'transparent',class:'atlas-label-hit','aria-hidden':'true'}));
+   }
    group.append(svg('circle',{r:node.type==='road'?29:43,class:'atlas-hit-area'}),svg('circle',{r:node.type==='road'?20:node.type==='checkpoint'?30:36,class:'atlas-node-ring'}),svg('title',{},displayName+siteNote+(node.site?'（抵达时触发驿路遭遇）':'')));
    if(node.type!=='road')group.append(drawLocation(svg,node.type));
    if(node.site)group.append(svg('text',{y:7,class:'atlas-site-symbol'},({forage:'粮',forest:'林',caravan:'商',ruins:'遗',signal:'烽'})[node.site]));
@@ -56,7 +62,7 @@ export function createBoardRenderer(deps) {
    pawn.append(svg('circle',{cx:.16,cy:.18,r:.09,class:'pawn-badge'}),svg('text',{x:.16,y:.218,'text-anchor':'middle',class:'pawn-number'},actor.id.endsWith('1')?'一':'二'),svg('title',{},playerName(actor.id)));
    pawn.onclick=()=>{if(!state.busy)inspectCharacter(actor);};pawn.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!state.busy)inspectCharacter(actor);}};board.append(pawn);
    }
-   $('#board-prompt').textContent=state.selectedCard?'已选「'+card(state.selectedCard).name+'」 · 点击发光目标，再确认出牌':state.game.session.kind==='lan'&&!state.canAct?'等待征程继续 · 局面自动同步':state.botPending?'对手行棋中 · 可点击棋子查看状态':'落到带字圆点会触发一次驿路遭遇 · 点击亮圈规划移动';
+   $('#board-prompt').textContent=state.selectedCard?'已选「'+card(state.selectedCard).name+'」 · 点击发光目标，再确认出牌':state.game.session.kind==='lan'&&!state.canAct?'等待对方行动':state.botPending?'对手正在行动':'点击亮圈前往';
    const active=state.game.characters.find((c)=>c.id===state.game.activeCharacterId);
    const mined=state.game.mineOutputByFaction||{smuggler:0,officer:0},quota=state.balance.mineFactionOutputLimit??4;
    const mineText=state.game.activeEventId==='V_MINE_COLLAPSE'?'本轮矿洞塌方 · 暂停采矿':'本轮矿脉余量 '+state.game.mineOutputRemaining+' 枚 · 走私者 '+mined.smuggler+'/'+quota+' · 官兵 '+mined.officer+'/'+quota;

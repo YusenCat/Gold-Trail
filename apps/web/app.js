@@ -3,6 +3,9 @@ import {createOnboarding} from './modules/onboarding.js';
 import {createSurvivalAdvisor} from './modules/survival-advisor.js';
 import {createTabletopEffects} from './modules/tabletop-effects.js';
 import {createActionDie} from './modules/action-die.js';
+import {createTutorial} from './modules/tutorial.js';
+import {createActionFeedback} from './modules/action-feedback.js';
+import {bindStatistics} from './modules/statistics.js';
 import {bindSaveControls} from './modules/local-saves.js';
 import {createBotController} from './modules/bot-controller.js';
 import {bindReportView} from './modules/report-view.js';
@@ -37,7 +40,7 @@ function textCN(value) {
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
 function resourceIcon(kind){const icon=el('span',undefined,'resource-icon resource-icon-'+kind);icon.setAttribute('aria-hidden','true');return icon;}
 function button(label,action,disabled=false){const b=el('button',label);b.type='button';b.disabled=disabled||state.busy;b.onclick=async()=>{if(state.busy)return;try{await action();}catch(e){notify(e.message,true);}};return b;}
-function notify(message,error=false){const n=$('#notice');n.hidden=false;n.textContent=textCN(message);n.className=error?'notice error':'notice';}
+function notify(message,error=false){const n=$('#notice');n.hidden=false;n.textContent=textCN(message);n.className=error?'notice error':'notice';n.setAttribute('role',error?'alert':'status');}
 const { api, absorb, mutate, command } = createApiClient({ state, $, textCN, render: () => render(), scheduleBot: () => scheduleBot(), notify });
 function show(screen){
  if(state.screen!==screen && ['help','library'].includes(screen))state.previous=state.screen;
@@ -147,12 +150,13 @@ function renderHand(){
  if(lan)for(const c of state.game.characters.filter((c)=>c.faction===state.me?.faction))choices.append(button(playerName(c.id)+(state.me.characterIds.includes(c.id)?' · 你':' · 队友'),()=>{state.handCharacterId=c.id;state.selectedCard=null;state.previewPath=null;render();}));
  const chosen=lan&&state.handCharacterId?state.game.characters.find((c)=>c.id===state.handCharacterId&&c.faction===state.me?.faction):visible;
  const handActor=chosen||visible;
+ $('#hand-hint').hidden=!handActor?.hand.length;
  $('#hand-title').textContent=state.game.phase==='finished'?'本局已结束':handActor?playerName(handActor.id)+' · 手牌 '+handActor.hand.length+'/5':'等待你的回合';
  $('#hand-hint').textContent=state.selectedCard?'已选中「'+card(state.selectedCard).name+'」 · 点击发光棋子或目的地':'点击卡牌选取目标 · 每回合至多两张';
  if(lan&&!state.canAct)$('#hand-hint').textContent='可查看你方手牌 · 等待你的行动或响应窗口';
  if(state.game.pendingDecision&&!state.botPending&&(!lan||state.canAct))$('#hand-hint').textContent=state.game.pendingDecision.kind==='response'?'响应窗口 · 可使用亮起的响应牌，或在当前决策中放弃响应':'当前决策 · 仅亮起的卡牌可用，请先处理分箱、问话或选箱';
  if(!handActor){tray.append(el('p',state.game.phase==='finished'?'可回主菜单开始新的行程。':'对手正在行动。你的响应窗口出现时，手牌会自动切换。','empty-hand'));return;}
- if(!handActor.hand.length){tray.append(el('p','行囊里还没有功能牌。到驿站购买明牌，或在黑市盲抽。','empty-hand'));return;}
+ if(!handActor.hand.length){tray.append(el('p','暂无手牌','empty-hand'));return;}
  handActor.hand.forEach((id)=>{
   const item=card(id),available=lan&&!state.canAct?[]:state.actions.filter((a)=>a.command.type==='PLAY_TACTIC'&&a.command.cardId===id&&a.command.actorId===handActor.id),row=button('',()=>selectCard(id),!available.length),slot=el('div',undefined,'hand-card-slot');
   row.className='playing-card card-illustrated'+(available.length?' playable':'')+(state.selectedCard===id?' picked':'');
@@ -213,13 +217,15 @@ function render(){
  lobby.renderLobby();
  hall.render();
  onboarding.render();
+ tutorial.render();renderStatistics();syncButton.hidden=!!state.room;
   actionDie.render();
   if(state.screen!=='play')tabletopEffects.render();
  $('#home-load').hidden=!state.localAvailable||!!state.room;
  if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
- else {$('#resume').textContent='继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
+ else {$('#resume').textContent=state.tutorial?'继续实操教学':'继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
  const g=state.game;if(!g||!state.map)return;
- if(!state.room)$('#home-status').textContent=g.log.length?'自动恢复已就绪 · 第'+g.round+'轮 · '+phases[g.phase]+' · 每次落子都会保留。':'先选择一种游玩方式。';
+ if(!state.room)$('#home-status').textContent=g.log.length?'自动恢复已就绪 · 第'+g.round+'轮 · '+phases[g.phase]:'先选择一种游玩方式。';
+ if(state.tutorial)$('#home-status').textContent=state.tutorial.finished?'实操教学已完成':'实操教学 · 第'+(state.tutorial.stage+1)+'／'+state.tutorial.total+'步';
  if(state.screen==='library')renderLibrary();
  if(state.screen!=='play')return;
  const active=renderHud(g);
@@ -228,6 +234,7 @@ function render(){
  renderResult(g);renderBoard();renderDecision();renderOperations();renderHand();renderGuide(g,active);
  renderPlayerTableaux({state,el,button,playerName,nodeName,card,inspectCharacter,resourceIcon});
   tabletopEffects.render();
+ tutorial.render();actionFeedback.render();
  const log=$('#log');log.replaceChildren();for(const entry of g.log.slice(-35).reverse())log.append(el('li',textCN(entry.message)));
  $('#projection-summary').textContent=$('#summary').textContent;
  const projectionLog=$('#projection-log');projectionLog.replaceChildren();for(const entry of g.log.slice(-60).reverse())projectionLog.append(el('li',textCN(entry.message)));
@@ -250,11 +257,18 @@ const onboarding=createOnboarding({state,$,el,button,show,setup});
 const renderSurvival=createSurvivalAdvisor({state,$,playerName,nodeName,el});
 const tabletopEffects=createTabletopEffects({state,$,textCN,playerName});
 const actionDie=createActionDie({state,$,playerName});
+const tutorial=createTutorial({state,$,el,button,api,absorb,mutate,show,notify});
+const actionFeedback=createActionFeedback({state,$,el,button,textCN});
+const renderStatistics=bindStatistics({state,$,el,button,api,modal,notify});
+const syncButton=button('重新同步本地进度',async()=>{absorb(await api(state.tutorial?'/api/game/tutorial':'/api/game'));render();notify('已同步主机保存的最新进度。');});$('#effects-toggle').before(syncButton);
+const settingsMenu=$('.game-toolbar');
+document.addEventListener('pointerdown',event=>{if(settingsMenu.open&&!settingsMenu.contains(event.target))settingsMenu.open=false;});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')settingsMenu.open=false;});
 async function init(){
  try{
   const [session,map,cards]=await Promise.all([api('/api/session'),api('/api/map'),api('/api/cards')]);
   state.map=map;state.cards=cards.cards;hall.configure(session);
-  if(session.local)absorb(await api('/api/game'));
+  if(session.local){absorb(await api('/api/game'));await tutorial.restore();}
   await lobby.restore();render();
  }catch(e){notify('连接失败，正在重试；请确认主机服务已启动。',true);setTimeout(init,3000);}
 }

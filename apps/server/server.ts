@@ -2,7 +2,7 @@ import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {isIP} from 'node:net';
-import {RuleError} from '../../packages/rules/src/index.ts';
+import {RuleError,type GameCommand} from '../../packages/rules/src/index.ts';
 import {RoomError} from './room-store.ts';
 import {RoomService} from './room-service.ts';
 import {RoomSaveStore} from './room-save-store.ts';
@@ -11,17 +11,23 @@ import {LocalGameService} from './local-game-service.ts';
 import {handleLocalHttp} from './local-http.ts';
 import {createRoomHttp} from './room-http.ts';
 import {createStaticHttp} from './static-http.ts';
-import {json,isLoopback} from './http-utils.ts';
+import {json,isLoopback,requestBody} from './http-utils.ts';
 import {lanAddresses,sessionCapabilities} from './network-info.ts';
+import {TutorialService} from './tutorial-service.ts';
+import {MatchStatistics} from './match-statistics.ts';
+import packageInfo from '../../package.json' with {type:'json'};
 export {isLoopback} from './http-utils.ts';
 
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const port=Number(process.env.PORT??4173),lan=process.env.GAME_LAN!=='0';
 const heartbeatMs=Math.max(250,Number(process.env.GAME_HEARTBEAT_MS??5000));
 const timeoutMs=Math.max(heartbeatMs*3,Number(process.env.GAME_TIMEOUT_MS??20000));
-const local=new LocalGameService(new SaveStore(process.env.GAME_SAVE_DIR??join(root,'data','saves')));
-const rooms=new RoomService(new RoomSaveStore(process.env.GAME_ROOM_DIR??(process.env.GAME_SAVE_DIR?join(process.env.GAME_SAVE_DIR,'rooms'):join(root,'data','rooms'))),timeoutMs);
-await Promise.all([local.initialize(),rooms.initialize()]);
+const saveDirectory=process.env.GAME_SAVE_DIR??join(root,'data','saves');
+const statistics=new MatchStatistics(join(saveDirectory,'statistics'));
+const tutorial=new TutorialService(join(saveDirectory,'tutorial'));
+const local=new LocalGameService(new SaveStore(saveDirectory),statistics);
+const rooms=new RoomService(new RoomSaveStore(process.env.GAME_ROOM_DIR??(process.env.GAME_SAVE_DIR?join(process.env.GAME_SAVE_DIR,'rooms'):join(root,'data','rooms'))),timeoutMs,statistics);
+await Promise.all([local.initialize(),rooms.initialize(),tutorial.initialize()]);
 const roomHttp=createRoomHttp(rooms),staticHttp=createStaticHttp(root);
 const presenceTimer=setInterval(()=>{void rooms.expire().catch(error=>console.error(error.message));},Math.min(5000,Math.max(250,timeoutMs/4)));
 presenceTimer.unref();
@@ -42,7 +48,15 @@ async function handleRequest(request:IncomingMessage,response:ServerResponse){
    const address=server.address(),actualPort=typeof address==='object'&&address?address.port:port;
    return json(response,200,sessionCapabilities(isLoopback(request.socket.remoteAddress),lan,actualPort,heartbeatMs,timeoutMs));
   }
-  if(method==='GET'&&url.pathname==='/api/health')return json(response,200,{ok:true,state:local.phase,entry:'unified'});
+  if(method==='GET'&&url.pathname==='/api/health')return json(response,200,{ok:true,version:packageInfo.version,state:local.phase,entry:'unified'});
+  if(method==='GET'&&url.pathname==='/api/game/statistics')return json(response,200,await statistics.view());
+  if(method==='GET'&&url.pathname==='/api/game/tutorial')return json(response,200,tutorial.view());
+  if(method==='POST'&&url.pathname.startsWith('/api/game/tutorial/')){
+   const body=await requestBody(request);
+   if(url.pathname==='/api/game/tutorial/new')return json(response,201,await tutorial.create(body));
+   if(url.pathname==='/api/game/tutorial/next')return json(response,200,await tutorial.next(body));
+   if(url.pathname==='/api/game/tutorial/command')return json(response,200,await tutorial.command(body as GameCommand));
+  }
   if(localRoute&&await handleLocalHttp(request,response,url.pathname,local))return;
   if(await roomHttp(request,response,url))return;
   if(await staticHttp(request,response,url))return;

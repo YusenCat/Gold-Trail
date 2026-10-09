@@ -1,10 +1,12 @@
 export function createApiClient({ state, $, textCN, render, scheduleBot, notify }) {
   async function api(path, body) {
-    const response = await fetch(path, body === undefined ? { signal: AbortSignal.timeout(8000) } : {
+    let response;
+    try { response = await fetch(path, body === undefined ? { signal: AbortSignal.timeout(8000) } : {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
       signal: AbortSignal.timeout(8000),
-    });
-    const data = await response.json();
+    }); } catch(error) {throw new Error(error.name==='TimeoutError'?'主机响应超时。操作可能已保存，请重新同步查看结果，勿连续重复点击。':'连接中断。请确认主机服务和网络，再重新同步；进度会保留。');}
+    let data;
+    try {data=await response.json();}catch{const error=new Error('主机返回了无法识别的内容，请重新同步；不要重复提交上一操作。');error.status=response.status;throw error;}
     if (!response.ok) {
       const error = new Error(data.error || '服务暂时不可用');
       error.status = response.status;
@@ -29,6 +31,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
       state.room = null; state.me = null; state.canAct = false;
     }
     if (view.game) {
+      state.tutorial=view.tutorial||null;
       if (!view.room || changedGame) { state.selectedCard = null; state.previewPath = null; }
       if (view.room && view.decisionActorId !== state.decisionActorId) state.handCharacterId = null;
       Object.assign(state, {
@@ -63,6 +66,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
       if (payload.commandId) state.pendingLanCommand = null;
       absorb(result);
       if(path==='/api/game/new'||path.endsWith('/saves/load')){
+        try{localStorage.removeItem('gold-trail-tutorial-active');}catch{}
         state.actionDieGeneration=(state.actionDieGeneration||0)+1;
         state.actionDieFreshStart=path==='/api/game/new';
       }
@@ -76,7 +80,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
       notify(error.message, true);
       $('#dialog-error').textContent = textCN(error.message);
       if (path.includes('bot-step')) state.botPaused = true;
-      try { absorb(await api(state.room ? '/api/rooms/' + state.room.id : '/api/game')); } catch {}
+      try { absorb(await api(state.room ? '/api/rooms/' + state.room.id : state.tutorial?'/api/game/tutorial':'/api/game')); } catch {}
       return false;
     } finally {
       state.busy = false;
@@ -93,7 +97,7 @@ export function createApiClient({ state, $, textCN, render, scheduleBot, notify 
   const command = (payload) => {
     if (state.room && state.roomConnection !== 'connected') { notify('连接正在恢复，请稍候。'); return false; }
     const commandId = Array.from(crypto.getRandomValues(new Uint8Array(16)), (n) => n.toString(16).padStart(2, '0')).join('');
-    return mutate(state.room ? '/api/rooms/' + state.room.id + '/command' : '/api/game/command', state.room ? { ...payload, commandId } : payload);
+    return mutate(state.room ? '/api/rooms/' + state.room.id + '/command' : state.tutorial?'/api/game/tutorial/command':'/api/game/command', state.room ? { ...payload, commandId } : payload);
   };
   return { api, absorb, mutate, command };
 }

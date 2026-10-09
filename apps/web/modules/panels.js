@@ -2,9 +2,9 @@ export function createGamePanels(deps) {
   const { state, $, el, button, factionName, playerName, card, modal, field, number, boundedInteger, command,
     execute, actionMark, actionArt, actionLabel, chooseAction, displayedMarketPrice, displayedBlackMarketPrice, marketTile, pickup, setup, render, renderBoard, nodeName } = deps;
   function renderResult(g){
-   const panel=$('#result-panel');panel.replaceChildren();panel.hidden=g.phase!=='finished';if(g.phase!=='finished')return;
+   const panel=$('#result-panel');panel.replaceChildren();panel.hidden=g.phase!=='finished'||!!state.tutorial;if(g.phase!=='finished'||state.tutorial)return;
    const title=g.winner==='draw'?'平分秋色':factionName(g.winner)+'赢得此局';
-   const left=el('div',undefined,'result-title');left.append(el('small',g.mode==='race'?'竞速局结算':'三十轮火并结算'),el('h2',title),el('p','第'+g.round+'轮结束 · 自动保留已记录本局。'));
+   const left=el('div',undefined,'result-title');left.append(el('small',g.mode==='race'?'竞速局结算':'三十轮火并结算'),el('h2',title),el('p','第'+g.round+'轮结束'));
    const score=el('div',undefined,'result-score');for(const faction of ['smuggler','officer']){const chip=el('span',undefined,'result-score-item '+faction);chip.append(el('small',factionName(faction)),el('strong',String(g.reputation[faction])));score.append(chip);}
    const controls=el('div',undefined,'result-actions');
    if(g.session.kind==='lan'){controls.append(button('返回房间',()=>$('#lan-lobby').click()));if(state.me.playerId===state.room.hostId)controls.append(button('保存战报',()=>$('#save').click()),button('再开一局',()=>$('#lan-rematch').click(),state.roomConnection!=='connected'));}
@@ -27,7 +27,7 @@ export function createGamePanels(deps) {
    },(i)=>{const boxA=boundedInteger(i.value,0,actor.gold);return command({type:'SPLIT_GOLD',actorId:actor.id,boxA,boxB:actor.gold-boxA});},'确认分箱')));
    return;
    }
-   if(p?.kind==='response')panel.append(el('p',playerName(p.sourceId)+'向'+playerName(p.targetId)+'发动'+(p.responseTo==='robbery'?'劫道夺财':'收缴')+'。可打出“暴力拒查”，或放弃响应继续结算。'));
+   if(p?.kind==='response')panel.append(el('p',playerName(p.sourceId)+'向'+playerName(p.targetId)+'发动'+(p.responseTo==='robbery'?'劫道夺财':'收缴')+'。'+(actions.some(a=>a.command.cardId==='T_RESIST_SEARCH')?'可打出“暴力拒查”。':'当前没有可用的响应牌。')+(actions.some(a=>a.command.type==='PASS_RESPONSE')?'可放弃响应继续结算。':'')));
    if(p?.kind==='askSearchQuestion')panel.append(el('p','分箱已完成。选择一个问题，系统会如实回答；持有“刑讯逼供”可先打出以追加提问。'));
    if(p?.kind==='chooseSearchBox'){
     for(const answer of p.answers??[{question:p.question,answer:p.answer}]){const question={aMoreThanB:'甲箱比乙箱多吗',aEmpty:'甲箱为空吗',bAtLeast2:'乙箱至少有两枚碎金吗',equal:'两箱一样多吗'}[answer.question];panel.append(el('p',question+'？　'+(answer.answer?'是':'否'),'answer'));}

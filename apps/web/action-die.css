@@ -2,7 +2,7 @@
 .action-die-panel[hidden] {display:none;}
 .action-die-scene {flex:0 0 84px;display:grid;place-items:center;width:84px;height:84px;perspective:480px;}
 .action-die-cube {position:relative;width:54px;height:54px;transform-style:preserve-3d;transform:rotateX(-12deg) rotateY(-18deg) rotateX(var(--die-x,0deg)) rotateY(var(--die-y,0deg));}
-.action-die-face {position:absolute;inset:0;display:grid;place-items:center;border:2px solid #ab8a54;border-radius:8px;background:radial-gradient(circle at 30% 20%,#fffbea,#ebd8af);color:#674522;font:700 32px/1 "KaiTi","STKaiti",serif;box-shadow:inset 0 0 0 3px #fff3d7,inset 0 -5px 9px #a9854930;backface-visibility:hidden;}
+.action-die-face {position:absolute;inset:0;display:grid;place-items:center;border:2px solid #ab8a54;border-radius:8px;background:radial-gradient(circle at 30% 20%,#fffbea,#ebd8af);color:#674522;font:700 32px/1 var(--sans);box-shadow:inset 0 0 0 3px #fff3d7,inset 0 -5px 9px #a9854930;backface-visibility:hidden;}
 .action-die-face.front {transform:translateZ(27px);}
 .action-die-face.back {transform:rotateY(180deg) translateZ(27px);}
 .action-die-face.right {transform:rotateY(90deg) translateZ(27px);}
@@ -11,7 +11,7 @@
 .action-die-face.bottom {transform:rotateX(-90deg) translateZ(27px);}
 .action-die-cube.rolling {animation:action-die-tumble var(--roll-duration,950ms) cubic-bezier(.2,.65,.3,1) both;}
 .action-die-copy {min-width:0;}
-.action-die-copy h2 {color:#65492b;font:700 1.15rem/1.5 "KaiTi","STKaiti",serif;margin:0 0 3px;}
+.action-die-copy h2 {color:#65492b;font:700 1.15rem/1.5 var(--sans);margin:0 0 3px;}
 .action-die-copy p {font-weight:700;color:#715126;}
 .action-die-copy small {font-size:.75rem;color:#846f50;}
 @keyframes action-die-tumble {

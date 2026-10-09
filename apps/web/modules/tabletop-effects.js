@@ -51,7 +51,7 @@ export function createTabletopEffects({state,$,textCN,playerName}) {
    if(next.round!==previous.round||next.event!==previous.event)pulse('.round-dial','reveal');
    if(next.active!==previous.active)pulse('.turn-prompt','reveal');
    if(next.phase==='finished'&&previous.phase!=='finished')pulse('#result-panel','gold');
-   const last=g.log.at(-1);announce(next.phase==='finished'?'本局已结束 · 战报已生成':next.active!==previous.active?playerName(next.active)+'接过行动令':last?textCN(last.message):'行动已结算');
+   const last=g.log.at(-1);announce(next.phase==='finished'?(state.tutorial?'实操教学已完成':'本局已结束 · 战报已生成'):next.active!==previous.active?playerName(next.active)+'接过行动令':last?textCN(last.message):'行动已结算');
   }
   previous=next;
   restorePulses();

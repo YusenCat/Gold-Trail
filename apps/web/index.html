@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>二十二驿 · 黄金邮道</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/expedition.css"><link rel="stylesheet" href="/tabletop.css"><link rel="stylesheet" href="/action-die.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>二十二驿 · 黄金邮道</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/expedition.css"><link rel="stylesheet" href="/tabletop.css"><link rel="stylesheet" href="/action-die.css"><link rel="stylesheet" href="/scene.css"></head>
 <body>
 <main>
 <header class="app-header">
@@ -12,11 +12,11 @@
  <div class="hero"><p class="eyebrow">驿站大厅 · 一程风雪，一局黄金</p><h2>一起落座，<br>开启北境征程。</h2><p>朱衣行商与蓝甲巡卫，在同一张舆图上交锋。<br>先选择对战方式，再决定你的阵营与征程。</p></div>
  <div class="hall-heading"><div><p class="eyebrow">置席开局</p><h2>这次与谁同行？</h2><p id="hall-mode-note" class="muted">正在接通驿站…</p></div><span id="hall-service-state" class="hall-service-state" role="status">正在接通</span></div>
  <div class="mode-grid hall-mode-grid">
-  <button class="mode-card" id="mode-solo" disabled><span class="mode-icon">对</span><strong>本地人机</strong><span>独自落座，指挥两名角色，与人机阵营较量。同样的地图、卡牌与人物台面。</span><small>选择阵营，开始练习 →</small></button>
-  <button class="mode-card" id="mode-lan" disabled><span class="mode-icon">联</span><strong>局域网对战</strong><span>邀请朋友各用自己的设备，二人对阵或四人结伴。选位准备，踏上同一条驿路。</span><small>创建房间或凭码入席 →</small></button>
+  <button class="mode-card" id="mode-solo" disabled><span class="mode-icon">对</span><strong>本地人机</strong><span>指挥两名角色，与人机较量。</span><small>选择阵营，开始练习 →</small></button>
+  <button class="mode-card" id="mode-lan" disabled><span class="mode-icon">联</span><strong>局域网对战</strong><span>同一网络，二人对阵或四人结伴。</span><small>创建房间或凭码入席 →</small></button>
  </div>
  <div class="hall-secondary"><button id="mode-hotseat" disabled><strong>同屏对局</strong><span>共用一台设备，轮流执棋 →</span></button><button id="home-help"><strong>新手入门</strong><span>查看目标、流程与规则 →</span></button></div>
- <section id="hall-network" class="hall-network panel" hidden><label class="field">朋友从这里入席<select id="hall-address" aria-label="联机邀请使用的主机地址"></select></label><p class="muted">创建房间后会用此地址生成邀请链接。多网卡时选择与朋友同一网络的地址。</p></section>
+ <section id="hall-network" class="hall-network panel" hidden><label class="field">朋友从这里入席<select id="hall-address" aria-label="联机邀请使用的主机地址"></select></label><p class="muted">选择与朋友同一网络的地址。</p></section>
  <div class="home-resume"><button id="resume">继续当前对局</button><button id="home-load">读取本地存档</button><p id="home-status" class="muted"></p></div>
 </section>
 <section id="screen-lan" class="screen" hidden>
@@ -43,17 +43,20 @@
  <form id="setup-form">
  <fieldset><legend>胜负方式</legend><label class="choice"><input type="radio" name="mode" value="race" checked><strong>竞速局</strong><span>率先获得五十声望的阵营获胜。</span></label><label class="choice"><input type="radio" name="mode" value="fixedRounds"><strong>火并局</strong><span>三十轮后比较声望；相同时平局。</span></label></fieldset>
  <fieldset id="faction-choice"><legend>你的阵营</legend><label class="choice"><input type="radio" name="faction" value="smuggler" checked><strong>走私者</strong><span>向边境黑市运金，拥有黑市重抽技能。</span></label><label class="choice"><input type="radio" name="faction" value="officer"><strong>官兵</strong><span>向墨尔根交金，可稽查与刷新市场。</span></label></fieldset>
- <p class="muted">人机为启发式入门对手，使用相同规则，不读取隐藏手牌、分箱或牌库顺序。</p>
+ <fieldset id="difficulty-choice"><legend>人机难度</legend><label class="field">选择对手<select name="difficulty"><option value="easy">入门 · 减少拦截与干扰</option><option value="normal" selected>标准 · 押运与稽查兼顾</option><option value="hard">进阶 · 重视抵达后的行动与长期装备</option></select></label></fieldset>
+ <label class="field">对局种子（可选）<input name="seed" type="number" step="1" placeholder="留空随机"></label>
+
  <div class="dialog-actions"><button type="button" id="setup-back">返回</button><button class="primary" type="submit">开始征程</button></div>
  </form>
 </section>
 <section id="screen-play" class="screen" hidden>
- <div class="game-toolbar"><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="coach-open" type="button">新手指引</button><button id="effects-toggle" type="button">桌面特效 · 轻量</button><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></div>
+ <details class="game-toolbar"><summary>对局设置</summary><div class="actions"><span class="autosave-state" id="autosave-state">自动保留中</span><button id="coach-open" type="button">新手指引</button><button id="effects-toggle" type="button">桌面特效 · 轻量</button><button id="toggle-hints" type="button" aria-pressed="true">隐藏提示</button><button id="save">保存行程</button><button id="load">读取存档</button><button id="bot-speed">人机速度 · 正常</button><button id="bot-pause">暂停人机</button></div></details>
  <section class="expedition-scoreboard" aria-label="轮次与阵营声望"><div class="faction-score smuggler"><span class="faction-sign">朱</span><div><small>走私者 · 阵营声望</small><strong id="score-smuggler">0</strong></div></div><div class="round-dial"><span>第 <strong id="round-number">01</strong> 轮</span><small id="round-phase">角色行动</small><small id="victory-goal">五十声望竞速</small></div><div class="faction-score officer"><div><small>官兵 · 阵营声望</small><strong id="score-officer">0</strong></div><span class="faction-sign">蓝</span></div></section>
  <div id="lan-toolbar" class="room-game-status panel" hidden><span id="lan-player-status" role="status" aria-live="polite"></span><div class="actions"><button id="lan-pause" type="button" hidden>暂停对局</button><button id="lan-rematch" type="button" hidden>再开一局</button><button id="lan-refresh" type="button">重新同步</button><button id="lan-lobby" type="button">查看房间</button></div><small id="lan-sync-hint">驿路已接通 · 自动同步与保存</small></div>
+ <section id="tutorial-panel" class="panel" aria-label="可操作教学" hidden><p class="eyebrow" id="tutorial-progress"></p><h2 id="tutorial-title"></h2><p id="tutorial-detail"></p><p id="tutorial-result" role="status" aria-live="polite"></p><div class="actions"><button id="tutorial-locate" type="button">前往操作区</button><button id="tutorial-next" type="button">理解了，继续</button><button id="tutorial-exit" type="button">退出教学</button></div></section>
  <section id="result-panel" class="result-panel" hidden></section>
- <section id="turn-prompt" class="turn-prompt" aria-label="当前操作提示"><div class="turn-prompt-copy" role="status" aria-live="polite" aria-atomic="true"><p class="eyebrow">驿路传令 · 当前操作</p><h2 id="turn-prompt-title"></h2><p id="turn-prompt-detail"></p></div><button id="turn-prompt-action" type="button"></button></section>
- <section id="action-die" class="action-die-panel" aria-label="本回合行动骰" hidden><div class="action-die-scene"><div id="action-die-cube" class="action-die-cube" role="img"><span class="action-die-face front" aria-hidden="true">2</span><span class="action-die-face back" aria-hidden="true">2</span><span class="action-die-face right" aria-hidden="true">3</span><span class="action-die-face left" aria-hidden="true">3</span><span class="action-die-face top" aria-hidden="true">4</span><span class="action-die-face bottom" aria-hidden="true">4</span></div></div><div class="action-die-copy"><h2 id="action-die-title"></h2><p id="action-die-result" role="status" aria-live="polite"></p><small>六面行动骰 · 2／3／4各两面 · 装备与事件在骰点后结算</small></div></section>
+ <section id="turn-prompt" class="turn-prompt" aria-label="当前操作提示"><div class="turn-prompt-copy" role="status" aria-live="polite" aria-atomic="true"><h2 id="turn-prompt-title"></h2><p id="turn-prompt-detail"></p></div><button id="turn-prompt-action" type="button"></button></section>
+ <section id="action-die" class="action-die-panel" aria-label="本回合行动骰" hidden><div class="action-die-scene"><div id="action-die-cube" class="action-die-cube" role="img"><span class="action-die-face front" aria-hidden="true">2</span><span class="action-die-face back" aria-hidden="true">2</span><span class="action-die-face right" aria-hidden="true">3</span><span class="action-die-face left" aria-hidden="true">3</span><span class="action-die-face top" aria-hidden="true">4</span><span class="action-die-face bottom" aria-hidden="true">4</span></div></div><div class="action-die-copy"><h2 id="action-die-title"></h2><p id="action-die-result" role="status" aria-live="polite"></p></div></section>
  <section id="survival-alert" class="survival-alert" aria-label="粮草预警" hidden></section>
  <section id="coach-panel" class="coach-panel panel" aria-label="桌面新手指引" hidden><div class="coach-heading"><span id="coach-progress" class="eyebrow"></span><button id="coach-close" type="button">暂时收起</button></div><div role="status" aria-live="polite"><h2 id="coach-title"></h2><p id="coach-detail"></p></div><div class="actions"><button id="coach-previous" type="button">上一步</button><button id="coach-locate" type="button">带我找到它</button><button id="coach-next" type="button">下一步</button></div></section>
  <div class="layout">
@@ -61,7 +64,7 @@
    <section class="intel-section situation-panel"><h2>当前局势</h2><p id="summary"></p><div id="turn-track" class="turn-track" aria-label="本轮行动顺序"></div><p id="last-action" class="last-action" role="status" aria-live="polite"></p><div id="event-banner" class="event-banner"></div><section id="guide-strip" class="guide-strip" aria-label="本回合指引"></section></section>
    <section class="intel-section report-panel"><div class="report-heading"><h2>驿道战报</h2><button id="report-toggle" type="button" aria-expanded="true">收起</button></div><div class="report-tools"><button id="report-project" type="button">投影战报 · 暂停对局</button></div><ol id="log" class="log"></ol></section>
   </aside>
-  <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><p class="eyebrow">北境三道 · 风雪行旅</p><h2>北境舆图</h2><p><small class="map-legend">粮 / 林 / 商 / 遗 / 烽：停驻掷骰遭遇<br>每段驿道均为一步，虚线表示捷径</small></p></div><div class="atlas-controls"><span class="board-seal">北境<br>驿路</span><button id="map-expand" type="button" aria-haspopup="dialog">放大地图</button></div></div><div id="board-status" class="board-status"></div><div id="map-home-viewport" class="atlas-viewport"><svg id="board" class="expedition-map" viewBox="0 0 1200 840" aria-label="黄金邮道地图，任意相邻节点间的一段路线均为一步"></svg></div><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
+  <section class="board-panel"><div class="board-image" aria-hidden="true"></div><div class="board-heading"><div><h2>北境舆图</h2></div><div class="atlas-controls"><span class="board-seal">北境<br>驿路</span><button id="map-expand" type="button" aria-haspopup="dialog">放大地图</button></div></div><div id="board-status" class="board-status"></div><div id="map-home-viewport" class="atlas-viewport"><svg id="board" class="expedition-map" viewBox="0 0 1200 840" aria-label="黄金邮道地图，任意相邻节点间的一段路线均为一步"></svg></div><div id="board-prompt" role="status" aria-live="polite"></div><div id="move-actions" class="move-actions"></div></section>
   <aside class="control-panel">
    <section><h2 id="turn-title">当前角色</h2><div id="active-character"></div><p id="turn-hint" class="muted"></p></section>
    <section id="decision-section"><h2>当前决策</h2><div id="decision"></div></section>
@@ -69,12 +72,12 @@
    <section id="actions"></section><section id="cards"></section><div id="end-turn"></div>
   </aside>
  </div>
- <section class="tableaux-section" aria-label="四名角色的独立台面"><div class="tableaux-caption"><div><p class="eyebrow">朱衣蓝甲 · 各行其道</p><h2>同行者台面</h2></div><p class="muted">资源与行装一目了然 · 点击肖像查看角色</p></div><div id="characters" class="tableaux-grid"></div></section>
+ <section class="tableaux-section" aria-label="四名角色的独立台面"><div class="tableaux-caption"><div><p class="eyebrow">朱衣蓝甲 · 各行其道</p><h2>同行者台面</h2></div></div><div id="characters" class="tableaux-grid"></div></section>
  <section class="hand-table" aria-label="手牌区"><div class="hand-heading"><div><p class="eyebrow">运筹帷幄</p><h2 id="hand-title">你的手牌</h2></div><p id="hand-hint" class="muted"></p></div><div id="hand-characters" class="actions" hidden></div><div id="hand-tray"></div></section>
 </section>
 <section id="screen-help" class="screen" hidden>
  <div class="section-heading"><div><p class="eyebrow">从第一程开始</p><h2>新手驿路学堂</h2></div><button class="return-game">返回上一页</button></div>
- <section class="panel learning-intro"><h3>十分钟，学会看地图、押运与应对收缴</h3><p id="learning-mode-note"></p><div class="actions"><button id="learn-practice" type="button">开启人机练习</button><button id="learn-tour" type="button">带我认识当前棋盘</button></div><p class="muted">练习仍是正常人机对局，开始前可保存已有进度。也可只阅读下面九节课程。</p></section>
+ <section class="panel learning-intro"><h3>十分钟，学会看地图、押运与应对收缴</h3><p id="learning-mode-note"></p><div class="actions"><button id="learn-practice" type="button">开启人机练习</button><button id="learn-tour" type="button">带我认识当前棋盘</button></div></section>
  <div id="learning-lessons" class="guide-grid"></div>
  <details class="panel"><summary>完整规则与全部卡牌</summary><pre id="full-rules">正在载入规则书…</pre></details>
 </section>

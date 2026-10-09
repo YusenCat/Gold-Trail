@@ -168,6 +168,7 @@ export function applyCommand(state: GameState, command: GameCommand): GameState 
 
 export function publicView(state: GameState, faction?: Faction): GameState {
   const view = copy(state);
+  delete view.metrics;
   view.marketDeck = []; view.blackMarketDeck = []; view.eventDeck = []; view.rngState = 0;
   const pending = view.pendingDecision;
   if (pending && 'boxA' in pending) { pending.boxA = NaN; pending.boxB = NaN; }
