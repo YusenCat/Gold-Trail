@@ -9,9 +9,10 @@ function playerToken(request: IncomingMessage): string | undefined {
 }
 function identity(request: IncomingMessage, response: ServerResponse): string {
   const result = rooms.store.identity(playerToken(request));
-  if (result.token) response.setHeader('set-cookie', `golden_player=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${options.secure?'; Secure':''}`);
+  if (result.token) cookie(response,result.token);
   return result.playerId;
 }
+function cookie(response:ServerResponse,token:string){response.setHeader('set-cookie',`golden_player=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${options.secure?'; Secure':''}`);}
 function limitJoins(request: IncomingMessage): void {
   const now = Date.now(), key = options.clientAddress?.(request)??request.socket.remoteAddress ?? 'unknown';
   for (const [ip, entry] of joinAttempts) if (entry.until <= now) joinAttempts.delete(ip);
@@ -24,6 +25,10 @@ function limitJoins(request: IncomingMessage): void {
 return async (request:IncomingMessage,response:ServerResponse,url:URL) => {
 const method=request.method??'GET';
     if(method==='GET'&&url.pathname==='/api/rooms')return send(response,200,rooms.publicRooms());
+    if(method==='POST'&&url.pathname==='/api/rooms/transfer'){
+      limitJoins(request);const body=await requestBody(request),result=await rooms.redeemTransfer(body.token);
+      cookie(response,result.token);return send(response,200,result.view);
+    }
     if (method === 'POST' && (url.pathname === '/api/rooms' || url.pathname === '/api/rooms/join')) {
       limitJoins(request);
       const body = await requestBody(request) as { nickname?: unknown; capacity?: unknown; mode?: unknown; code?: unknown };
@@ -31,19 +36,20 @@ const method=request.method??'GET';
       const result = await (url.pathname === '/api/rooms' ? rooms.create(id, body) : rooms.join(id, body,!!options.secure));
       return send(response, url.pathname === '/api/rooms' ? 201 : 200, result);
     }
-    const roomRoute = url.pathname.match(/^\/api\/rooms\/([a-f0-9-]{36})(?:\/(seat|ready|start|command|leave|close|events|heartbeat|pause|resume|rematch|saves(?:\/load)?))?$/);
+    const roomRoute = url.pathname.match(/^\/api\/rooms\/([a-f0-9-]{36})(?:\/(seat|ready|start|command|leave|close|events|heartbeat|pause|resume|rematch|transfer|saves(?:\/load)?))?$/);
     if (roomRoute) {
-      const id = roomRoute[1], playerId = rooms.store.identify(playerToken(request));
+      const id = roomRoute[1], token=playerToken(request),playerId = rooms.store.identify(token);
       if (!playerId) throw new RoomError('玩家凭证无效，请重新加入房间', 403);
-      if (method === 'GET' && !roomRoute[2]) return send(response, 200, await rooms.read(id, playerId));
-      if (method === 'GET' && roomRoute[2] === 'events') { await rooms.subscribe(id, playerId, response); return true; }
-      if (method === 'GET' && roomRoute[2] === 'saves') return send(response, 200, await rooms.listSaves(id, playerId));
+      if (method === 'GET' && !roomRoute[2]) return send(response, 200, await rooms.read(id, playerId,token));
+      if (method === 'GET' && roomRoute[2] === 'events') { await rooms.subscribe(id, playerId, response,token); return true; }
+      if (method === 'GET' && roomRoute[2] === 'saves') return send(response, 200, await rooms.listSaves(id, playerId,token));
       if (method !== 'POST' || !roomRoute[2]) throw new RoomError('请求方法无效', 405);
       const body = await requestBody(request) as Record<string, unknown>;
       const action = roomRoute[2];
-      if (action === 'heartbeat') { await rooms.heartbeat(id, playerId); return send(response, 200, { ok: true }); }
-      if (action === 'saves') return send(response, 201, await rooms.save(id, playerId, body));
-      return send(response, 200, await rooms.action(id, playerId, action === 'saves/load' ? 'load' : action, body));
+      if(action==='transfer'){limitJoins(request);return send(response,201,await rooms.issueTransfer(id,playerId,token));}
+      if (action === 'heartbeat') { await rooms.heartbeat(id, playerId,token); return send(response, 200, { ok: true }); }
+      if (action === 'saves') return send(response, 201, await rooms.save(id, playerId, body,token));
+      return send(response, 200, await rooms.action(id, playerId, action === 'saves/load' ? 'load' : action, body,token));
     }
 
 return false;

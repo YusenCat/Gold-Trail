@@ -28,4 +28,5 @@ export class RoomEvents {
     if (!listener.response.destroyed) { listener.response.write(`event: closed\ndata: ${JSON.stringify({ reason })}\n\n`); listener.response.end(); }
   }
   close(id: string): void { for (const listener of this.listeners.get(id) ?? []) this.finish(listener, 'closed'); }
+  revokePlayer(playerId:string):void{for(const listeners of this.listeners.values())for(const listener of listeners)if(listener.playerId===playerId)this.finish(listener,'device_changed');}
 }

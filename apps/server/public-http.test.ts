@@ -42,6 +42,14 @@ test('public HTTP behind a loopback proxy isolates local state and creates secur
       const joined=await request('/api/rooms/join',{nickname:'邀请朋友',code:room.code,inviteToken:room.inviteToken});assert.equal(joined.status,200);
       const cookie=joined.headers.get('set-cookie')!.split(';')[0];
       assert.equal((await request('/api/rooms/join',{nickname:'重连朋友',code:room.code}, {cookie})).status,200);
+      const issued=await (await request('/api/rooms/'+room.id+'/transfer',{}, {cookie})).json();
+      const moved=await request('/api/rooms/transfer',{token:issued.token});assert.equal(moved.status,200);assert.match(moved.headers.get('set-cookie')??'',/; Secure/);
+      const nextCookie=moved.headers.get('set-cookie')!.split(';')[0],view=await moved.json();
+      assert.equal((await request('/api/rooms/'+room.id,undefined,{cookie})).status,403);
+      assert.equal((await request('/api/rooms/'+room.id,undefined,{cookie:nextCookie})).status,200);
+      assert.equal((await request('/api/rooms/transfer',{token:issued.token})).status,403);
+      assert.equal((await request('/api/rooms/'+room.id+'/transfer',{}, {cookie})).status,403);
+      assert.equal(view.room.id,room.id);
     }
     assert.deepEqual((await (await request('/api/rooms')).json()).rooms,[]);
     const open=await (await request('/api/rooms',{nickname:'公开房主',capacity:2,mode:'race',visibility:'public'})).json();

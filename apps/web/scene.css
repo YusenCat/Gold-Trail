@@ -24,6 +24,10 @@ button {border-radius:9px;box-shadow:0 2px 8px #51482710;transition:background .
 }
 .panel h2 {font-size:1.18rem;}
 .section-heading {background:transparent;}
+#screen-lobby .lobby-banner {background:linear-gradient(110deg,#f8f2dfda,#e3e5cf98);border:0;border-radius:24px 6px;padding:22px;backdrop-filter:blur(8px);}
+#screen-lobby .lobby-banner h2 {color:#2d4637;letter-spacing:.04em;}
+#screen-lobby .lobby-banner p,#screen-lobby .lobby-banner .eyebrow {color:#53654c;}
+#screen-lobby .lobby-room-label,#screen-lobby .room-code,#screen-lobby .room-connection {color:#385641;}
 .eyebrow {letter-spacing:.06em;}
 /* The hall is an open scene, with the invitation choices to its right. */
 #screen-home {display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px 38px;align-items:start;}

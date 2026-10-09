@@ -52,6 +52,8 @@ function nickname(value: unknown): string {
 export class RoomStore {
   private rooms = new Map<string, Room>();
   private identities = new Map<string, string>();
+  allCredentials():Array<[string,string]>{return [...this.identities.entries()];}
+  replaceCredentials(entries:Array<[string,string]>){this.identities=new Map(entries);}
   list(): Room[] { return [...this.rooms.values()]; }
   replace(room: Room): void { this.rooms.set(room.id, room); }
   remove(id: string): void { this.rooms.delete(id); }

@@ -5,7 +5,7 @@ import { createInitialGame, type GameState } from '../../packages/rules/src/inde
 import cards from '../../content/cards.v1.json' with { type: 'json' };
 import { RoomError, type Room } from './room-store.ts';
 
-export interface Recovery { schemaVersion: 1; room: Room; credentials: Array<[string, string]> }
+export interface Recovery { schemaVersion: 1; credentialRegistry?:1; room: Room; credentials: Array<[string, string]> }
 export interface SnapshotSummary { id: string; name: string; savedAt: string; round: number; phase: string; mode: string }
 const validId = (id: string) => /^[a-f0-9-]{36}$/.test(id);
 const cardIds = new Set(cards.cards.map((c) => c.id));
@@ -36,7 +36,7 @@ export class RoomSaveStore {
   }
   async recovery(room: Room, credentials: Array<[string, string]>): Promise<void> {
     const directory = this.folder(room.id); await mkdir(directory, { recursive: true });
-    await this.atomic(join(directory, 'recovery.json'), { schemaVersion: 1, room, credentials });
+    await this.atomic(join(directory, 'recovery.json'), { schemaVersion: 1, credentialRegistry:1, room, credentials });
   }
   async close(id: string): Promise<void> {
     const directory = this.folder(id); await mkdir(directory, { recursive: true });

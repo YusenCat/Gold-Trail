@@ -45,7 +45,7 @@ export function createRoomConnection({ state, api, absorb, render, show, onClose
       } catch { status('reconnecting'); }
     };
     source.addEventListener('view', receive); source.addEventListener('reset', receive);
-    source.addEventListener('closed', () => { if (attempt === generation) { disconnect(); onClosed(); notify('房间已关闭或你已离开房间。'); } });
+    source.addEventListener('closed', event => { if (attempt === generation) { disconnect(); onClosed();let reason;try{reason=JSON.parse(event.data).reason;}catch{} notify(reason==='device_changed'?'已在另一台设备接回席位，当前设备已退出。':'房间已关闭或你已离开房间。'); } });
     source.onerror = () => { if (attempt === generation) status('reconnecting'); };
     timer = setInterval(() => { void heartbeat(); }, state.heartbeatMs ?? 5000);
     void heartbeat(); render();

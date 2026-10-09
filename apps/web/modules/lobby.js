@@ -132,7 +132,23 @@ export function createLobbyController({ state, $, el, button, api, absorb, mutat
     try { await navigator.clipboard.writeText(input.value); notify('邀请链接已复制。'); }
     catch { notify('邀请链接已选中，请手动复制。'); }
   };
+  $('#room-transfer').onclick=async()=>{
+    if(!state.room)return;
+    try{
+      const ticket=await api('/api/rooms/'+state.room.id+'/transfer',{});
+      const link=new URL('/',state.invitationBase||location.href);link.hash='transfer='+ticket.token;
+      modal('换设备继续','五分钟内在自己的新设备打开此链接。接回席位后，当前设备会退出。',()=>{
+        const input=el('input');input.value=link.href;input.readOnly=true;input.setAttribute('aria-label','换设备链接');field('换设备链接',input);
+        $('#dialog-fields').append(button('复制换设备链接',async()=>{try{await navigator.clipboard.writeText(link.href);notify('换设备链接已复制。');}catch{input.focus();input.select();notify('链接已选中，请手动复制。');}}));return input;
+      },async()=>true,'关闭');
+    }catch(error){notify(error.message,true);}
+  };
   async function restore() {
+    const transfer=new URLSearchParams(location.hash.slice(1)).get('transfer');
+    if(transfer){
+      try{enter(await api('/api/rooms/transfer',{token:transfer}));history.replaceState(null,'',location.pathname);notify('已接回你的席位。');return;}
+      catch(error){notify(error.message,true);show('lan');return;}
+    }
     const code = new URL(location.href).searchParams.get('room');
     if (code) $('#join-code').value = code.slice(0, 6).toUpperCase();
     let id; try { id = localStorage.getItem(storageKey); } catch {}
