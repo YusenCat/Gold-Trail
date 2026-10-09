@@ -115,7 +115,11 @@ button {border-radius:9px;box-shadow:0 2px 8px #51482710;transition:background .
 .market-art-preview small {display:none;}
 #screen-play #coach-panel {grid-column:1;grid-row:5;margin:0;padding:16px;}
 #screen-play #survival-alert {grid-column:2;grid-row:6;margin:0;}
-#screen-play #lan-toolbar {grid-column:1/-1;grid-row:8;margin:0;}
+#screen-play:has(#lan-toolbar:not([hidden])) {position:relative;padding-top:86px;}
+#screen-play #lan-toolbar {position:absolute;top:0;left:0;right:0;margin:0;padding:12px 18px;color:#354d3e;background:linear-gradient(110deg,#f7f1dfdc,#dce5d2c9);border:1px solid #fff9e899;box-shadow:var(--scene-shadow);}
+#lan-player-status {font-weight:600;}
+#lan-toolbar .actions {gap:8px;}
+#lan-toolbar button {min-height:40px;}
 #lan-sync-hint {display:none;}
 #screen-play #result-panel {grid-column:2;grid-row:2;z-index:5;align-self:start;}
 #screen-play:has(#result-panel:not([hidden])) .board-panel {grid-row:3 / span 3;}
@@ -158,7 +162,7 @@ dialog::backdrop {background:#1a302d70;backdrop-filter:blur(5px);}
  .report-panel {margin:0;padding:0;border:0;}
  #screen-play #coach-panel {grid-column:1;grid-row:8;}
  #screen-play #survival-alert {grid-column:1;grid-row:9;}
- #screen-play #lan-toolbar {grid-column:1/-1;grid-row:10;}
+ #screen-play #lan-toolbar {grid-column:auto;grid-row:auto;}
  #screen-play .action-feedback-status {grid-column:1;grid-row:11;}
  #screen-play .hand-table {grid-column:1/-1;grid-row:12;}
  #screen-play .tableaux-section {grid-row:13;}
@@ -187,7 +191,8 @@ dialog::backdrop {background:#1a302d70;backdrop-filter:blur(5px);}
  .game-toolbar>.actions {right:0;left:auto;top:44px;}
  #screen-play .expedition-scoreboard {order:1;min-height:78px;padding:12px 16px;border-radius:24px;}
  .faction-score strong,.round-dial strong {font-size:1.5rem;}.faction-score small {font-size:.63rem;}
- #screen-play #lan-toolbar {order:2;}
+ #screen-play:has(#lan-toolbar:not([hidden])) {padding-top:0;}
+ #screen-play #lan-toolbar {position:static;order:2;padding:12px 14px;}
  #screen-play #tutorial-panel {order:3;margin:0;padding:16px 18px;}
  #tutorial-panel h2 {font-size:1.12rem;margin:5px 0 9px;}#tutorial-panel p {font-size:.82rem;}
  #tutorial-panel .actions {gap:7px;margin-top:10px;}#tutorial-panel button {flex:1;min-height:42px;}
