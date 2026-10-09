@@ -14,6 +14,7 @@ export interface RoomMember {
   online: boolean;
 }
 export interface Room {
+  lastActivityAt?:number;
   visibility?:'private'|'public';
   inviteToken?:string;
   id: string;
@@ -52,6 +53,13 @@ function nickname(value: unknown): string {
 export class RoomStore {
   private rooms = new Map<string, Room>();
   private identities = new Map<string, string>();
+  private identityRequests=new Map<string,number>();
+  retainIdentity(playerId:string){this.identityRequests.set(playerId,(this.identityRequests.get(playerId)??0)+1);}
+  releaseIdentity(playerId:string){const count=(this.identityRequests.get(playerId)??1)-1;if(count>0)this.identityRequests.set(playerId,count);else this.identityRequests.delete(playerId);}
+  pruneIdentities(){
+    const members=new Set(this.list().flatMap(room=>room.members.map(member=>member.playerId)));
+    for(const [hash,id] of this.identities)if(!members.has(id)&&!this.identityRequests.has(id))this.identities.delete(hash);
+  }
   allCredentials():Array<[string,string]>{return [...this.identities.entries()];}
   replaceCredentials(entries:Array<[string,string]>){this.identities=new Map(entries);}
   list(): Room[] { return [...this.rooms.values()]; }
@@ -96,6 +104,7 @@ export class RoomStore {
     const game = createInitialGame(seed, body.mode);beginMetrics(game,seed);
     game.session.kind = 'lan';
     const room: Room = {
+      lastActivityAt:Date.now(),
       visibility:body.visibility==='public'?'public':'private',inviteToken:randomBytes(32).toString('hex'),
       id: randomUUID(), code, capacity: body.capacity, mode: body.mode, hostId: playerId,
       revision: 1, status: 'lobby', game,

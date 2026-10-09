@@ -30,7 +30,7 @@ const local=new LocalGameService(new SaveStore(saveDirectory),statistics);
 const rooms=new RoomService(new RoomSaveStore(process.env.GAME_ROOM_DIR??(process.env.GAME_SAVE_DIR?join(process.env.GAME_SAVE_DIR,'rooms'):join(root,'data','rooms'))),timeoutMs,statistics);
 await Promise.all([local.initialize(),rooms.initialize(),tutorial.initialize()]);
 const roomHttp=createRoomHttp(rooms,{secure:hosting.online,clientAddress:hosting.clientAddress}),staticHttp=createStaticHttp(root);
-const presenceTimer=setInterval(()=>{void rooms.expire().catch(error=>console.error(error.message));},Math.min(5000,Math.max(250,timeoutMs/4)));
+const presenceTimer=setInterval(()=>{void rooms.maintain().catch(error=>console.error(error.message));},Math.min(5000,Math.max(250,timeoutMs/4)));
 presenceTimer.unref();
 
 async function handleRequest(request:IncomingMessage,response:ServerResponse){

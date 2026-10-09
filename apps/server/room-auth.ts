@@ -35,7 +35,8 @@ export class RoomAuth {
     }catch{throw new RoomError('玩家凭证保存失败，操作未生效，请检查磁盘后重试',503);}
   }
   synchronize(credentials:()=>Credentials){return this.queue(async()=>{
-    const next={...this.registry,credentials:credentials(),tickets:this.registry.tickets.filter(([,ticket])=>ticket.expiresAt>Date.now())};
+    const entries=credentials(),players=new Set(entries.map(([,id])=>id));
+    const next={...this.registry,credentials:entries,tickets:this.registry.tickets.filter(([,ticket])=>ticket.expiresAt>Date.now()&&players.has(ticket.playerId))};
     if(JSON.stringify(next)!==JSON.stringify(this.registry))await this.commit(next);
   });}
   issue(roomId:string,playerId:string,credentials:()=>Credentials,authorize:()=>void,now=Date.now()){

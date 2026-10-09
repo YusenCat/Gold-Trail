@@ -7,10 +7,10 @@ const joinAttempts=new Map<string,{count:number;until:number}>();
 function playerToken(request: IncomingMessage): string | undefined {
   return request.headers.cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith('golden_player='))?.slice('golden_player='.length);
 }
-function identity(request: IncomingMessage, response: ServerResponse): string {
+function identity(request: IncomingMessage, response: ServerResponse) {
   const result = rooms.store.identity(playerToken(request));
   if (result.token) cookie(response,result.token);
-  return result.playerId;
+  return {playerId:result.playerId,token:result.token??playerToken(request)};
 }
 function cookie(response:ServerResponse,token:string){response.setHeader('set-cookie',`golden_player=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${options.secure?'; Secure':''}`);}
 function limitJoins(request: IncomingMessage): void {
@@ -32,9 +32,15 @@ const method=request.method??'GET';
     if (method === 'POST' && (url.pathname === '/api/rooms' || url.pathname === '/api/rooms/join')) {
       limitJoins(request);
       const body = await requestBody(request) as { nickname?: unknown; capacity?: unknown; mode?: unknown; code?: unknown };
-      const id = identity(request, response);
-      const result = await (url.pathname === '/api/rooms' ? rooms.create(id, body) : rooms.join(id, body,!!options.secure));
-      return send(response, url.pathname === '/api/rooms' ? 201 : 200, result);
+      const {playerId:id,token} = identity(request, response);
+      rooms.store.retainIdentity(id);
+      try{
+        const result = await (url.pathname === '/api/rooms' ? rooms.create(id, body,token) : rooms.join(id, body,!!options.secure,token));
+        return send(response, url.pathname === '/api/rooms' ? 201 : 200, result);
+      }finally{
+        rooms.store.releaseIdentity(id);
+        await rooms.cleanupIdentities().catch(()=>console.warn('临时身份清理稍后重试'));
+      }
     }
     const roomRoute = url.pathname.match(/^\/api\/rooms\/([a-f0-9-]{36})(?:\/(seat|ready|start|command|leave|close|events|heartbeat|pause|resume|rematch|transfer|saves(?:\/load)?))?$/);
     if (roomRoute) {

@@ -27,7 +27,8 @@ export class RoomService {
     void tail.then(() => { if (this.queues.get(id) === tail) this.queues.delete(id); });
     return task;
   }
-  private async persist(room: Room): Promise<void> {
+  private async persist(room: Room,activity=true): Promise<void> {
+    if(activity)room.lastActivityAt=Date.now();
     await this.auth.synchronize(()=>this.store.allCredentials());
     try { await this.saves.recovery(room, this.store.credentials(room)); }
     catch { throw new RoomError('房间进度写入失败，操作未生效。请检查主机磁盘后重试', 503); }
@@ -46,6 +47,7 @@ export class RoomService {
     this.store.list().forEach(room=>this.store.remove(room.id));
     for (const recovery of recoveries) {
       const room = recovery.room;
+      room.lastActivityAt??=Date.now();
       room.visibility??='private';room.inviteToken??=randomBytes(32).toString('hex');
       if (this.store.list().some((r) => r.code === room.code)) { console.warn('重复房间码，保留恢复文件但不加载：' + room.id); continue; }
       for (const member of room.members) { member.online = false; if (room.status === 'lobby') member.ready = false; }
@@ -55,6 +57,20 @@ export class RoomService {
       this.store.replace(room);
       await this.statistics?.record(room.game).catch(e=>console.warn('统计读取失败：'+e.message));
     }
+    await this.cleanupIdentities();
+  }
+  cleanupIdentities(){return this.auth.synchronize(()=>{this.store.pruneIdentities();return this.store.allCredentials();});}
+  async maintain(now=Date.now()){
+    await this.expire(undefined,now);
+    await Promise.all(this.store.list().map(({id})=>this.queue(id,async()=>{
+      let room:Room;try{room=this.store.get(id);}catch{return;}
+      const retention=room.status==='lobby'?24*60*60*1000:room.status==='finished'?7*24*60*60*1000:Infinity;
+      const last=Math.max(room.lastActivityAt??now,...room.members.map(member=>this.seen.get(this.key(id,member.playerId))??0));
+      if(room.members.some(member=>member.online)||now-last<retention)return;
+      try{await this.saves.close(id,room,this.store.credentials(room));}catch{throw new RoomError('空闲房间归档失败，原房间保留',503);}
+      this.store.remove(id);this.events.close(id);for(const member of room.members)this.seen.delete(this.key(id,member.playerId));
+    })));
+    await this.cleanupIdentities();
   }
   issueTransfer(id:string,playerId:string,token?:string){return this.queue(id,()=>this.auth.issue(id,playerId,()=>this.store.allCredentials(),()=>{this.guard(playerId,token);this.store.member(this.store.get(id),playerId);}));}
   async redeemTransfer(token:unknown){
@@ -66,8 +82,9 @@ export class RoomService {
       return {token:result.token,view:roomView(this.store.get(result.roomId),this.store.member(this.store.get(result.roomId),result.playerId))};
     });
   }
-  async create(playerId: string, body: Record<string, unknown>) {
+  async create(playerId: string, body: Record<string, unknown>,token?:string) {
     return this.queue('create', async () => {
+      this.guard(playerId,token);
       const room = this.store.create(playerId, body);
       try { await this.persist(room); } catch (error) { this.store.remove(room.id); throw error; }
       this.seen.set(this.key(room.id, playerId), Date.now());
@@ -77,14 +94,14 @@ export class RoomService {
   publicRooms(){
     return {rooms:this.store.list().filter(room=>room.visibility==='public'&&room.status==='lobby'&&room.members.length<room.capacity).map(room=>({code:room.code,capacity:room.capacity,mode:room.mode,players:room.members.length}))};
   }
-  async join(playerId: string, body: Record<string, unknown>,requireInvitation=false) {
+  async join(playerId: string, body: Record<string, unknown>,requireInvitation=false,token?:string) {
     const id = this.store.byCode(body.code).id;
     const result = await this.mutate(id, playerId, (room) => {
       if(requireInvitation)this.store.authorizeInvitation(room,playerId,body.inviteToken);
       this.store.joinMember(room, playerId, body.nickname);
       const member = this.store.member(room, playerId);
       if (!member.online) { member.online = true; room.revision++; }
-    }, false);
+    }, false,false,token);
     this.seen.set(this.key(id, playerId), Date.now());
     return result;
   }
@@ -126,7 +143,7 @@ export class RoomService {
       for (const member of room.members) if (missing.some((m) => m.playerId === member.playerId)) { member.online = false; if (room.status === 'lobby') member.ready = false; }
       if (room.status === 'playing') { room.status = 'paused'; room.pauseReason = missing.map((m) => m.nickname).join('、') + '已断线，等待重新连接'; }
       room.revision++;
-      await this.persist(room); this.store.replace(room); this.events.broadcast(room);
+      await this.persist(room,false); this.store.replace(room); this.events.broadcast(room);
     })));
   }
   async action(id: string, playerId: string, action: string, body: Record<string, unknown>,token?:string) {
@@ -136,7 +153,7 @@ export class RoomService {
         this.guard(playerId,token);
         const room = this.store.get(id), member = this.store.member(room, playerId);
         this.store.host(room, member); this.store.checkRevision(room, body.roomRevision);
-        try { await this.saves.close(id); } catch { throw new RoomError('关闭房间写入失败，请重试', 503); }
+        try { await this.saves.close(id,room,this.store.credentials(room)); } catch { throw new RoomError('关闭房间写入失败，请重试', 503); }
         this.store.remove(id); this.events.close(id);
         for (const member of room.members) this.seen.delete(this.key(id, member.playerId));
         return { closed: true };

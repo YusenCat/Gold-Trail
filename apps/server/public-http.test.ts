@@ -39,7 +39,7 @@ test('public HTTP behind a loopback proxy isolates local state and creates secur
       assert.equal((await request('/api/rooms/join',{nickname:'无邀请',code:room.code})).status,403);
       assert.equal((await request('/api/rooms/join',{nickname:'错误邀请',code:room.code,inviteToken:'0'.repeat(64)})).status,403);
       assert.equal((await request('/api/rooms/'+room.id,undefined,{cookie:'golden_player='+room.inviteToken})).status,403);
-      const joined=await request('/api/rooms/join',{nickname:'邀请朋友',code:room.code,inviteToken:room.inviteToken});assert.equal(joined.status,200);
+      const joined=await request('/api/rooms/join',{nickname:'邀请朋友',code:room.code,inviteToken:room.inviteToken});assert.equal(joined.status,200,joined.status===200?'':JSON.stringify(await joined.json()));
       const cookie=joined.headers.get('set-cookie')!.split(';')[0];
       assert.equal((await request('/api/rooms/join',{nickname:'重连朋友',code:room.code}, {cookie})).status,200);
       const issued=await (await request('/api/rooms/'+room.id+'/transfer',{}, {cookie})).json();

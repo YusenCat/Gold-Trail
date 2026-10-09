@@ -38,9 +38,9 @@ export class RoomSaveStore {
     const directory = this.folder(room.id); await mkdir(directory, { recursive: true });
     await this.atomic(join(directory, 'recovery.json'), { schemaVersion: 1, credentialRegistry:1, room, credentials });
   }
-  async close(id: string): Promise<void> {
+  async close(id: string,room?:Room,credentials?:Array<[string,string]>): Promise<void> {
     const directory = this.folder(id); await mkdir(directory, { recursive: true });
-    await this.atomic(join(directory, 'recovery.json'), { schemaVersion: 1, closed: true, id });
+    await this.atomic(join(directory, 'recovery.json'), { schemaVersion: 1, closed: true, id,archivedAt:Date.now(),room,credentials });
   }
   async recoveries(): Promise<Recovery[]> {
     await mkdir(this.directory, { recursive: true });
@@ -59,6 +59,7 @@ export class RoomSaveStore {
         validateRoomGame(room.game);
         if(room.visibility!==undefined&&!['private','public'].includes(room.visibility))throw new Error('Invalid room visibility');
         if(room.inviteToken!==undefined&&!/^[a-f0-9]{64}$/.test(room.inviteToken))throw new Error('Invalid room invitation');
+        if(room.lastActivityAt!==undefined&&(!Number.isSafeInteger(room.lastActivityAt)||room.lastActivityAt<0))throw new Error('Invalid activity timestamp');
         const seats = new Set<string>(), players = new Set<string>();
         for (const member of room.members) {
           const options = room.capacity === 2 ? ['smuggler', 'officer'] : ['SMUGGLER_1', 'SMUGGLER_2', 'OFFICER_1', 'OFFICER_2'];

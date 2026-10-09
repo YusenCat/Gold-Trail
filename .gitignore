@@ -37,6 +37,7 @@
 !/apps/server/deployment.test.ts
 !/apps/server/public-http.test.ts
 !/apps/server/room-transfer.test.ts
+!/apps/server/room-lifecycle.test.ts
 
 # Card PNGs are runtime art. UI PNGs are originals; runtime uses WebP.
 /apps/web/assets/ui/*.png
