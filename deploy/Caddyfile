@@ -1,0 +1,5 @@
+{$GAME_DOMAIN} {
+    reverse_proxy app:4173 {
+        flush_interval -1
+    }
+}

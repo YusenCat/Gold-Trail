@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: ..
+    restart: unless-stopped
+    environment:
+      GAME_PUBLIC_ORIGIN: https://${GAME_DOMAIN:?Set GAME_DOMAIN to your game hostname}
+      GAME_TRUSTED_PROXIES: 172.30.50.2
+    volumes:
+      - game-data:/data
+    networks:
+      - game
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      GAME_DOMAIN: ${GAME_DOMAIN:?Set GAME_DOMAIN to your game hostname}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      game:
+        ipv4_address: 172.30.50.2
+    depends_on:
+      app:
+        condition: service_healthy
+networks:
+  game:
+    ipam:
+      config:
+        - subnet: 172.30.50.0/24
+volumes:
+  game-data:
+  caddy-data:
+  caddy-config:

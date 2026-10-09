@@ -5,6 +5,7 @@ import { RoomEvents } from './room-events.ts';
 import { roomView } from './room-view.ts';
 import type { GameCommand } from '../../packages/rules/src/index.ts';
 import type {MatchStatistics} from './match-statistics.ts';
+import {randomBytes} from 'node:crypto';
 
 /** Per-room serialized transactions: durable write precedes state commit and broadcast. */
 export class RoomService {
@@ -31,6 +32,7 @@ export class RoomService {
   async initialize(): Promise<void> {
     for (const recovery of await this.saves.recoveries()) {
       const room = recovery.room;
+      room.visibility??='private';room.inviteToken??=randomBytes(32).toString('hex');
       if (this.store.list().some((r) => r.code === room.code)) { console.warn('重复房间码，保留恢复文件但不加载：' + room.id); continue; }
       for (const member of room.members) { member.online = false; if (room.status === 'lobby') member.ready = false; }
       if (room.status === 'playing' || room.status === 'paused') { room.status = 'paused'; room.pauseReason = '主机服务已重启，等待全员重新连接'; }
@@ -48,9 +50,13 @@ export class RoomService {
       return roomView(room, this.store.member(room, playerId));
     });
   }
-  async join(playerId: string, body: Record<string, unknown>) {
+  publicRooms(){
+    return {rooms:this.store.list().filter(room=>room.visibility==='public'&&room.status==='lobby'&&room.members.length<room.capacity).map(room=>({code:room.code,capacity:room.capacity,mode:room.mode,players:room.members.length}))};
+  }
+  async join(playerId: string, body: Record<string, unknown>,requireInvitation=false) {
     const id = this.store.byCode(body.code).id;
     const result = await this.mutate(id, playerId, (room) => {
+      if(requireInvitation)this.store.authorizeInvitation(room,playerId,body.inviteToken);
       this.store.joinMember(room, playerId, body.nickname);
       const member = this.store.member(room, playerId);
       if (!member.online) { member.online = true; room.revision++; }

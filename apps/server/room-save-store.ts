@@ -57,6 +57,8 @@ export class RoomSaveStore {
           !Array.isArray(room.members) || !room.members.length || room.members.length > room.capacity ||
           !room.members.some((m) => m.playerId === room.hostId) || !Array.isArray(payload.credentials)) throw new Error('Invalid recovery');
         validateRoomGame(room.game);
+        if(room.visibility!==undefined&&!['private','public'].includes(room.visibility))throw new Error('Invalid room visibility');
+        if(room.inviteToken!==undefined&&!/^[a-f0-9]{64}$/.test(room.inviteToken))throw new Error('Invalid room invitation');
         const seats = new Set<string>(), players = new Set<string>();
         for (const member of room.members) {
           const options = room.capacity === 2 ? ['smuggler', 'officer'] : ['SMUGGLER_1', 'SMUGGLER_2', 'OFFICER_1', 'OFFICER_2'];

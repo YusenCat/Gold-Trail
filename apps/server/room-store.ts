@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID, createHash } from 'node:crypto';
+import { randomBytes, randomUUID, createHash,timingSafeEqual } from 'node:crypto';
 import {beginMetrics,trackCommand} from './match-statistics.ts';
 import { applyCommand, createInitialGame, startGame, type GameCommand, type GameState, type Faction, type Mode } from '../../packages/rules/src/index.ts';
 
@@ -14,6 +14,8 @@ export interface RoomMember {
   online: boolean;
 }
 export interface Room {
+  visibility?:'private'|'public';
+  inviteToken?:string;
   id: string;
   code: string;
   capacity: 2 | 4;
@@ -78,10 +80,11 @@ export class RoomStore {
     this.identities.set(digest(next), playerId);
     return { playerId, token: next };
   }
-  create(playerId: string, body: { nickname?: unknown; capacity?: unknown; mode?: unknown }): Room {
+  create(playerId: string, body: { nickname?: unknown; capacity?: unknown; mode?: unknown;visibility?:unknown }): Room {
     const name = nickname(body.nickname);
     if (body.capacity !== 2 && body.capacity !== 4) throw new RoomError('请选择二人或四人房间');
     if (body.mode !== 'race' && body.mode !== 'fixedRounds') throw new RoomError('胜负方式无效');
+    if(body.visibility!==undefined&&!['private','public'].includes(body.visibility as string))throw new RoomError('请选择私密或公开房间');
     if (this.rooms.size >= 32) throw new RoomError('房间数量已达上限，请先关闭不用的房间', 429);
     if ([...this.rooms.values()].some((r) => r.hostId === playerId && r.status !== 'finished')) throw new RoomError('你已有房间，请先返回或关闭它', 409);
     let code: string;
@@ -91,6 +94,7 @@ export class RoomStore {
     const game = createInitialGame(seed, body.mode);beginMetrics(game,seed);
     game.session.kind = 'lan';
     const room: Room = {
+      visibility:body.visibility==='public'?'public':'private',inviteToken:randomBytes(32).toString('hex'),
       id: randomUUID(), code, capacity: body.capacity, mode: body.mode, hostId: playerId,
       revision: 1, status: 'lobby', game,
       pauseReason: null, epoch: 1, receipts: [],
@@ -102,6 +106,10 @@ export class RoomStore {
   join(playerId: string, body: { nickname?: unknown; code?: unknown }): Room {
     const room = this.byCode(body.code);
     return this.joinMember(room, playerId, body.nickname);
+  }
+  authorizeInvitation(room:Room,playerId:string,token:unknown){
+    if(room.members.some(member=>member.playerId===playerId)||room.visibility==='public')return;
+    if(typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token)||!room.inviteToken||!/^[a-f0-9]{64}$/.test(room.inviteToken)||!timingSafeEqual(Buffer.from(token,'hex'),Buffer.from(room.inviteToken,'hex')))throw new RoomError('请使用朋友分享的完整邀请链接加入私密房间',403);
   }
   joinMember(room: Room, playerId: string, rawName: unknown): Room {
     const name = nickname(rawName);

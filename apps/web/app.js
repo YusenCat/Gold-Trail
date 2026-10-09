@@ -222,7 +222,7 @@ function render(){
   if(state.screen!=='play')tabletopEffects.render();
  $('#home-load').hidden=!state.localAvailable||!!state.room;
  if(state.room){$('#resume').disabled=false;$('#resume').textContent=state.game?'返回联机对局':'返回联机房间';$('#home-status').textContent='房间 '+state.room.code+' · '+state.room.capacity+' 人局 · '+(state.roomConnection==='connected'?'自动同步与保存':'正在恢复连接…');}
- else {$('#resume').textContent=state.tutorial?'继续实操教学':'继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
+ else {$('#resume').textContent=state.tutorial?'继续实操教学':'继续当前对局';$('#resume').disabled=!state.game?.log.length;$('#home-status').textContent=state.online?'创建房间或加入朋友的邀请。':state.localAvailable?'先选择一种游玩方式。':'已连接主机，请选择局域网对战。';}
  const g=state.game;if(!g||!state.map)return;
  if(!state.room)$('#home-status').textContent=g.log.length?'自动恢复已就绪 · 第'+g.round+'轮 · '+phases[g.phase]:'先选择一种游玩方式。';
  if(state.tutorial)$('#home-status').textContent=state.tutorial.finished?'实操教学已完成':'实操教学 · 第'+(state.tutorial.stage+1)+'／'+state.tutorial.total+'步';

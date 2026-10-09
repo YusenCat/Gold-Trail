@@ -37,10 +37,11 @@ export function createLobbyController({ state, $, el, button, api, absorb, mutat
     $('#lobby-code').textContent = room.code;
     $('#lobby-description').textContent = room.capacity + ' 人对战 · ' + (room.mode === 'race' ? '五十声望竞速局' : '三十轮火并局') + ' · 已入席 ' + room.members.length + '/' + room.capacity;
     const invitation = new URL('/', state.invitationBase || location.href); invitation.searchParams.set('room', room.code);
+    if(state.online&&room.visibility!=='public'&&room.inviteToken)invitation.hash='invite='+room.inviteToken;
     $('#room-invitation').value = invitation.href;
     $('#invite-hint').textContent = invitation.hostname === '127.0.0.1' || invitation.hostname === 'localhost'
       ? '这个地址只适用于本机。跨设备游玩请从启动窗口的局域网地址进入，再复制邀请链接。'
-      : '朋友需连接同一局域网，并用浏览器打开此链接。';
+      : state.online?'把链接发给朋友，打开后即可入席。':'朋友需连接同一局域网，并用浏览器打开此链接。';
     const members = $('#lobby-members'); members.replaceChildren();
     for (const member of room.members) {
       const row = el('article', undefined, 'character ' + (member.seat?.startsWith('OFFICER') || member.seat === 'officer' ? 'officer' : 'smuggler'));
@@ -88,8 +89,10 @@ export function createLobbyController({ state, $, el, button, api, absorb, mutat
     const form = new FormData(event.target);
     state.busy = true; formBusy(true);
     try {
-      const body = create ? { nickname: form.get('nickname'), capacity: Number(form.get('capacity')), mode: form.get('mode') }
-        : { nickname: form.get('nickname'), code: form.get('code') };
+      const invitation=new URL(location.href);
+      const token=invitation.searchParams.get('room')?.toUpperCase()===String(form.get('code')).trim().toUpperCase()?new URLSearchParams(invitation.hash.slice(1)).get('invite'):null;
+      const body = create ? { nickname: form.get('nickname'), capacity: Number(form.get('capacity')), mode: form.get('mode'),visibility:form.get('visibility')??'private' }
+        : { nickname: form.get('nickname'), code: form.get('code'),inviteToken:token };
       enter(await api(create ? '/api/rooms' : '/api/rooms/join', body));
     } catch (error) { notify(error.message, true); }
     finally { state.busy = false; formBusy(false); render(); }
@@ -97,8 +100,19 @@ export function createLobbyController({ state, $, el, button, api, absorb, mutat
   $('#mode-lan').onclick = async () => {
     if (!state.room) await restore();
     show(state.room ? (state.game ? 'play' : 'lobby') : 'lan');
+    if(state.online&&!state.room)await refreshPublicRooms();
   };
   $('#lan-back').onclick = () => show('home');
+  async function refreshPublicRooms(){
+    if(!state.online)return;
+    const list=$('#public-room-list');list.replaceChildren();
+    try{
+      const result=await api('/api/rooms');
+      for(const room of result.rooms)list.append(button(room.code+' · '+room.players+'/'+room.capacity+'人 · '+(room.mode==='race'?'竞速':'火并'),()=>{$('#join-code').value=room.code;$('#room-join-form input[name="nickname"]').focus();}));
+      if(!result.rooms.length)list.append(el('p','暂时没有空位，创建一间房邀请朋友吧。','muted'));
+    }catch(error){list.append(el('p','房间列表暂时无法读取，请重试。'));}
+  }
+  $('#public-room-refresh').onclick=refreshPublicRooms;
   $('#room-create-form').onsubmit = (e) => submit(e, true);
   $('#room-join-form').onsubmit = (e) => submit(e, false);
   $('#room-ready').onclick = () => act('ready', { ready: !state.room.members.find((m) => m.playerId === state.me.playerId).ready });
@@ -126,7 +140,7 @@ export function createLobbyController({ state, $, el, button, api, absorb, mutat
       try { enter(await api('/api/rooms/' + id)); return; }
       catch (error) { if (error.status === 403 || error.status === 404) remember(null); else notify('房间暂时无法读取，请稍后重试。', true); }
     }
-    if (code || !state.localAvailable) show('lan');
+    if (code || !state.localAvailable){show('lan');if(state.online)await refreshPublicRooms();}
   }
   function save() {
     if (state.me.playerId !== state.room.hostId) { notify('请由房主保存房间行程。'); return; }

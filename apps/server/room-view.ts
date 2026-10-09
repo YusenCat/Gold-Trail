@@ -22,6 +22,7 @@ export function roomView(room: Room, member: RoomMember) {
   return {
     room: {
       id: room.id, code: room.code, capacity: room.capacity, mode: room.mode,
+      visibility:room.visibility??'private',inviteToken:room.inviteToken,
       status: room.status, revision: room.revision, hostId: room.hostId, epoch: room.epoch, pauseReason: room.pauseReason,
       members: room.members.map((m) => ({ playerId: m.playerId, nickname: m.nickname, seat: m.seat, ready: m.ready, online: m.online, characterIds: ownedCharacters(room, m) })),
     },

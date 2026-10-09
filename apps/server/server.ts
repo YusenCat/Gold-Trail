@@ -1,7 +1,6 @@
 import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {isIP} from 'node:net';
 import {RuleError,type GameCommand} from '../../packages/rules/src/index.ts';
 import {RoomError} from './room-store.ts';
 import {RoomService} from './room-service.ts';
@@ -16,10 +15,12 @@ import {lanAddresses,sessionCapabilities} from './network-info.ts';
 import {TutorialService} from './tutorial-service.ts';
 import {MatchStatistics} from './match-statistics.ts';
 import packageInfo from '../../package.json' with {type:'json'};
+import {deployment} from './deployment.ts';
 export {isLoopback} from './http-utils.ts';
 
 const root=fileURLToPath(new URL('../../',import.meta.url));
-const port=Number(process.env.PORT??4173),lan=process.env.GAME_LAN!=='0';
+const hosting=deployment(process.env);
+const port=Number(process.env.PORT??4173),lan=hosting.online||process.env.GAME_LAN!=='0';
 const heartbeatMs=Math.max(250,Number(process.env.GAME_HEARTBEAT_MS??5000));
 const timeoutMs=Math.max(heartbeatMs*3,Number(process.env.GAME_TIMEOUT_MS??20000));
 const saveDirectory=process.env.GAME_SAVE_DIR??join(root,'data','saves');
@@ -28,27 +29,29 @@ const tutorial=new TutorialService(join(saveDirectory,'tutorial'));
 const local=new LocalGameService(new SaveStore(saveDirectory),statistics);
 const rooms=new RoomService(new RoomSaveStore(process.env.GAME_ROOM_DIR??(process.env.GAME_SAVE_DIR?join(process.env.GAME_SAVE_DIR,'rooms'):join(root,'data','rooms'))),timeoutMs,statistics);
 await Promise.all([local.initialize(),rooms.initialize(),tutorial.initialize()]);
-const roomHttp=createRoomHttp(rooms),staticHttp=createStaticHttp(root);
+const roomHttp=createRoomHttp(rooms,{secure:hosting.online,clientAddress:hosting.clientAddress}),staticHttp=createStaticHttp(root);
 const presenceTimer=setInterval(()=>{void rooms.expire().catch(error=>console.error(error.message));},Math.min(5000,Math.max(250,timeoutMs/4)));
 presenceTimer.unref();
 
 async function handleRequest(request:IncomingMessage,response:ServerResponse){
  try{
-  const base=new URL('http://'+(request.headers.host??'localhost'));
-  const hostname=base.hostname.replace(/^\[|\]$/g,'');
-  if(hostname!=='localhost'&&!isIP(hostname))throw new RoomError('请使用服务器显示的 IP 地址访问',403);
+  response.setHeader('x-content-type-options','nosniff');
+  response.setHeader('referrer-policy','no-referrer');
+  if(hosting.online)response.setHeader('strict-transport-security','max-age=31536000');
+  // Health probes need no player or local match data and work behind platform proxies.
+  if(request.method==='GET'&&request.url==='/api/health')return json(response,200,{ok:true,version:packageInfo.version,entry:'unified',online:hosting.online});
+  const base=hosting.requestBase(request);
   const url=new URL(request.url??'/',base),method=request.method??'GET';
   if(method==='POST'){
-   if(request.headers.origin&&request.headers.origin!==base.origin)throw new RoomError('请求来源不受允许',403);
+   if((hosting.online||request.headers.origin)&&request.headers.origin!==base.origin)throw new RoomError('请求来源不受允许',403);
    if(!/^application\/json(?:;|$)/i.test(request.headers['content-type']??''))throw new RoomError('请使用 JSON 提交操作',415);
   }
   const localRoute=/^\/api\/(?:game(?:\/|$)|saves(?:\/|$))/.test(url.pathname);
-  if(localRoute&&!isLoopback(request.socket.remoteAddress))throw new RoomError('本地对局与存档仅可在主机本地访问，请使用局域网房间',403);
+  if(localRoute&&!hosting.local(request))throw new RoomError('本地对局与存档仅可在主机本地访问，请使用联机房间',403);
   if(method==='GET'&&url.pathname==='/api/session'){
    const address=server.address(),actualPort=typeof address==='object'&&address?address.port:port;
-   return json(response,200,sessionCapabilities(isLoopback(request.socket.remoteAddress),lan,actualPort,heartbeatMs,timeoutMs));
+   return json(response,200,{...sessionCapabilities(hosting.local(request),lan,actualPort,heartbeatMs,timeoutMs),online:hosting.online,publicOrigin:hosting.origin});
   }
-  if(method==='GET'&&url.pathname==='/api/health')return json(response,200,{ok:true,version:packageInfo.version,state:local.phase,entry:'unified'});
   if(method==='GET'&&url.pathname==='/api/game/statistics')return json(response,200,await statistics.view());
   if(method==='GET'&&url.pathname==='/api/game/tutorial')return json(response,200,tutorial.view());
   if(method==='POST'&&url.pathname.startsWith('/api/game/tutorial/')){
@@ -78,7 +81,7 @@ const server=createServer((request,response)=>{
 server.listen(port,lan?'0.0.0.0':'127.0.0.1',()=>{
  const address=server.address(),actualPort=typeof address==='object'&&address?address.port:port;
  console.log('黄金邮道开发服务器已启动：http://127.0.0.1:'+actualPort);
- console.log('统一大厅：本地人机、同屏对局、局域网对战。');
- if(lan)for(const entry of lanAddresses())console.log('局域网房间地址：http://'+entry.address+':'+actualPort);
+ console.log(hosting.online?'公网房间服务：'+hosting.origin:'统一大厅：本地人机、同屏对局、局域网对战。');
+ if(lan&&!hosting.online)for(const entry of lanAddresses())console.log('局域网房间地址：http://'+entry.address+':'+actualPort);
  console.log('每步自动保留；联机操作自动同步。请保持本窗口运行。');
 });

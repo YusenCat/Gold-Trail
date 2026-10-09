@@ -10,6 +10,9 @@
 !/content/
 !/docs/
 !/tools/
+!/Dockerfile
+!/.dockerignore
+!/deploy/
 
 # Runtime rulebook and the release's player playtest record.
 /docs/*
@@ -17,6 +20,7 @@
 !/docs/PLAYTEST_3_4_0.md
 !/docs/PLAYTEST_3_5_0.md
 !/docs/ONLINE_4_0_PLAN.md
+!/docs/ONLINE_DEPLOYMENT.md
 
 # Only the launcher and Windows runtime finder are needed to play.
 /tools/*
@@ -30,6 +34,8 @@
 !/packages/rules/src/
 /packages/rules/src/bot-baseline.ts
 /apps/server/*.test.ts
+!/apps/server/deployment.test.ts
+!/apps/server/public-http.test.ts
 
 # Card PNGs are runtime art. UI PNGs are originals; runtime uses WebP.
 /apps/web/assets/ui/*.png

@@ -1,0 +1,13 @@
+**/.git
+**/node_modules
+**/.env
+**/.env.*
+**/*.test.ts
+**/*.log
+data
+tmp
+.codex
+.agents
+.aws
+tools
+docs
