@@ -16,6 +16,7 @@
 !/docs/RULEBOOK_V1.md
 !/docs/PLAYTEST_3_4_0.md
 !/docs/PLAYTEST_3_5_0.md
+!/docs/ONLINE_4_0_PLAN.md
 
 # Only the launcher and Windows runtime finder are needed to play.
 /tools/*
